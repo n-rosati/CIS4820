@@ -10,7 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #include "graphics.h"
+#include "elements.h"
 
 extern GLubyte world[WORLDX][WORLDY][WORLDZ];
 /* mouse function called by GLUT when a button is pressed or released */
@@ -249,6 +251,7 @@ int main(int argc, char** argv) {
     /* initialize the graphics system */
     graphicsInit(&argc, argv);
 
+    Room *rooms[9];
 
     /* the first part of this if statement builds a sample */
     /* world which will be used for testing */
@@ -303,15 +306,38 @@ int main(int argc, char** argv) {
         /* create sample player */
         createPlayer(0, 52.0, 27.0, 52.0, 0.0);
     } else {
+        //Build a platform
+        for (i = 0; i < WORLDX; i++) {
+            for (j = 0; j < WORLDZ; j++) {
+                world[i][0][j] = WHITE;
+            }
+        }
 
-        /* your code to build the world goes here */
+        //Generate rooms
+        srand(time(NULL));
+        for (int l = 0; l < 9; l++)
+            rooms[l] = createRoom();
 
+        //Place rooms
+        int roomIndex = 0;
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                drawRoom(row, col, rand() % (CELL_SIZE - rooms[roomIndex]->width - 3), rand() % (CELL_SIZE - rooms[roomIndex]->height - 3), rooms[roomIndex], world);
+                roomIndex++;
+            }
+        }
     }
 
 
     /* starts the graphics processing loop */
     /* code after this will not run until the program exits */
     glutMainLoop();
+
+    //Free the rooms
+    for (int l = 0; l < (sizeof(rooms) / sizeof(Room)); ++l) {
+        deleteRoom(rooms[l]);
+    }
+
     return 0;
 }
 

@@ -48,10 +48,8 @@ LIBS = -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/De
 # on your distribution.
 #LIBS = -lGL -lGLU -lglut -lm -D__LINUX__
 
-all: a1
-
-a1: a1.c graphics.c visible.c graphics.h
-	gcc a1.c graphics.c visible.c -o out/a1 $(LIBS)
+a1: a1.c graphics.c visible.c graphics.h elements.c elements.h
+	gcc a1.c graphics.c visible.c elements.c -o out/a1 $(LIBS) -ggdb
 
 clean:
 	rm out/*
