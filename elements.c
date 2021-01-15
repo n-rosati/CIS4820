@@ -35,6 +35,9 @@ void deleteRoom(Room* room) {
  * @param world World to build to
  */
 void drawRoom(int row, int col, int xOffset, int zOffset, Room* room, GLubyte world[100][50][100]) {
+    room->startX = (col * CELL_SIZE + xOffset);
+    room->startZ = (row * CELL_SIZE + xOffset);
+
     for (int i = (col * CELL_SIZE + xOffset); i < (room->width  + (col * CELL_SIZE + xOffset)); ++i) {
         world[i][1][row * CELL_SIZE + zOffset] = BLACK;
         world[i][2][row * CELL_SIZE + zOffset] = BLACK;

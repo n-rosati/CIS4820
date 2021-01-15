@@ -30,6 +30,7 @@
  */
 typedef struct Room {
     int width, height;
+    int startX, startZ;
 } Room;
 
 Room* createRoom();
