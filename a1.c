@@ -218,9 +218,18 @@ void update() {
 
 
     } else {
+        float oldX = 0, oldY = 0, oldZ = 0;
+        getOldViewPosition(&oldX, &oldY, &oldZ);
 
-        /* your code goes here */
+        float newX = 0, newY = 0, newZ = 0;
+        getViewPosition(&newX, &newY, &newZ);
 
+        //If there is a block where the camera is trying to go, don't go there
+        if (world[(int) NEGATE(newX)][(int) NEGATE(newY)][(int) NEGATE(newZ)] != 0) {
+            setViewPosition(oldX, oldY, oldZ);
+        }
+
+        printf("Old view position: %f %f %f\nNew view position: %f %f %f\n\n", oldX, oldY, oldZ, newX, newY, newZ);
     }
 }
 
@@ -252,6 +261,7 @@ int main(int argc, char** argv) {
     graphicsInit(&argc, argv);
 
     Room *rooms[9];
+    int numRooms;
 
     /* the first part of this if statement builds a sample */
     /* world which will be used for testing */
@@ -306,12 +316,26 @@ int main(int argc, char** argv) {
         /* create sample player */
         createPlayer(0, 52.0, 27.0, 52.0, 0.0);
     } else {
-        //Build a platform
-        for (i = 0; i < WORLDX; i++) {
-            for (j = 0; j < WORLDZ; j++) {
-                world[i][0][j] = WHITE;
+
+        //Zero the world
+        for (int l = 0; l < WORLDX; ++l) {
+            for (int m = 0; m < WORLDY; ++m) {
+                for (int n = 0; n < WORLDZ; ++n) {
+                    world[l][m][n] = 0;
+                }
             }
         }
+
+        //Build a platform
+        for (int l = 0; l < WORLDX; l++) {
+            for (int m = 0; m < WORLDZ; m++) {
+                world[l][0][m] = WHITE;
+            }
+        }
+
+        //Add some direction markers
+        world[99][0][49] = BLUE; //+x is blue
+        world[49][0][99] = RED; //+z is red
 
         //Generate rooms
         srand(time(NULL));
@@ -319,13 +343,19 @@ int main(int argc, char** argv) {
             rooms[l] = createRoom();
 
         //Place rooms
-        int roomIndex = 0;
+        numRooms = 0;
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
-                drawRoom(row, col, rand() % (CELL_SIZE - rooms[roomIndex]->width - 3), rand() % (CELL_SIZE - rooms[roomIndex]->height - 3), rooms[roomIndex], world);
-                roomIndex++;
+                drawRoom(row, col, rand() % (CELL_SIZE - rooms[numRooms]->width - 3), rand() % (CELL_SIZE - rooms[numRooms]->length - 3), rooms[numRooms], world);
+                numRooms++;
             }
         }
+
+        //Set the initial view position to be in a random room
+        int roomNumber = rand() % numRooms;
+        int halfwayX = rooms[roomNumber]->startX + (rooms[roomNumber]->width / 2);
+        int halfwayZ = rooms[roomNumber]->startZ + (rooms[roomNumber]->length / 2);
+        setViewPosition(NEGATE(halfwayX), -2, NEGATE(halfwayZ));
     }
 
 
@@ -334,7 +364,7 @@ int main(int argc, char** argv) {
     glutMainLoop();
 
     //Free the rooms
-    for (int l = 0; l < (sizeof(rooms) / sizeof(Room)); ++l) {
+    for (int l = 0; l < numRooms; l++) {
         deleteRoom(rooms[l]);
     }
 

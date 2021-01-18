@@ -14,6 +14,8 @@
 #define ROOM_MAX_HEIGHT 18
 #define CELL_SIZE 33
 
+#define NEGATE(x) (x * -1)
+
 //Colours
 #define EMPTY   0
 #define GREEN   1
@@ -29,7 +31,10 @@
  * Room information.
  */
 typedef struct Room {
-    int width, height;
+    /**Length along the x axis*/
+    int width;
+    /**Length along the z axis*/
+    int length;
     int startX, startZ;
 } Room;
 

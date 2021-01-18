@@ -11,9 +11,8 @@
  */
 Room* createRoom() {
     Room* room = calloc(1, sizeof(Room));
-
     room->width = (rand() % ROOM_MAX_WIDTH) + ROOM_MIN_WIDTH;
-    room->height = (rand() % ROOM_MAX_HEIGHT) + ROOM_MIN_HEIGHT;
+    room->length = (rand() % ROOM_MAX_HEIGHT) + ROOM_MIN_HEIGHT;
 
     return room;
 }
@@ -36,20 +35,27 @@ void deleteRoom(Room* room) {
  */
 void drawRoom(int row, int col, int xOffset, int zOffset, Room* room, GLubyte world[100][50][100]) {
     room->startX = (col * CELL_SIZE + xOffset);
-    room->startZ = (row * CELL_SIZE + xOffset);
+    room->startZ = (row * CELL_SIZE + zOffset);
 
-    for (int i = (col * CELL_SIZE + xOffset); i < (room->width  + (col * CELL_SIZE + xOffset)); ++i) {
+    //Draw in x direction first
+    for (int i = (col * CELL_SIZE + xOffset); i < (room->width + (col * CELL_SIZE + xOffset)); ++i) {
         world[i][1][row * CELL_SIZE + zOffset] = BLACK;
         world[i][2][row * CELL_SIZE + zOffset] = BLACK;
 
-        world[i][1][row * CELL_SIZE + zOffset + room->height - 1] = BLACK;
-        world[i][2][row * CELL_SIZE + zOffset + room->height - 1] = BLACK;
+        world[i][1][row * CELL_SIZE + zOffset + room->length - 1] = BLACK;
+        world[i][2][row * CELL_SIZE + zOffset + room->length - 1] = BLACK;
     }
-    for (int i = (row * CELL_SIZE + zOffset); i < (room->height + (row * CELL_SIZE + zOffset)); ++i) {
+
+    //Draw in z direction second
+    for (int i = (row * CELL_SIZE + zOffset); i < (room->length + (row * CELL_SIZE + zOffset)); ++i) {
         world[col * CELL_SIZE + xOffset][1][i] = BLACK;
         world[col * CELL_SIZE + xOffset][2][i] = BLACK;
 
         world[col * CELL_SIZE + xOffset + room->width - 1][1][i] = BLACK;
         world[col * CELL_SIZE + xOffset + room->width - 1][2][i] = BLACK;
     }
+
+    world[room->startX][2][room->startZ] = BLUE;
+    world[room->startX + room->width - 1][2][room->startZ] = YELLOW;
+    world[room->startX][2][room->startZ + room->length - 1] = ORANGE;
 }
