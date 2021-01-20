@@ -96,8 +96,12 @@ void collisionResponse() {
     float newX = 0, newY = 0, newZ = 0;
     getViewPosition(&newX, &newY, &newZ);
 
-    //If there is a block where the camera is trying to go, don't go there
-    if (world[(int) NEGATE(newX)][(int) NEGATE(newY)][(int) NEGATE(newZ)] != 0) {
+    //If there is a block where the camera is trying to go but not above it, move up on top
+    //Else if you're trying to move into a block, don't
+    if (world[(int) NEGATE(newX)][(int) NEGATE(newY)][(int) NEGATE(newZ)] != 0 &&
+        world[(int) NEGATE(newX)][(int) NEGATE(newY) + 1][(int) NEGATE(newZ)] == 0) {
+        setViewPosition(newX, newY - 1, newZ);
+    } else if (world[(int) NEGATE(newX)][(int) NEGATE(newY)][(int) NEGATE(newZ)] != 0){
         setViewPosition(oldX, oldY, oldZ);
     }
 }
@@ -228,8 +232,9 @@ void update() {
         float oldX = 0, oldY = 0, oldZ = 0;
         getOldViewPosition(&oldX, &oldY, &oldZ);
 
-        //If current block is empty and the one under the view is also empty
-        if (world[(int) NEGATE(oldX)][(int) NEGATE(oldY)][(int) NEGATE(oldZ)] == 0 && world[(int) NEGATE(oldX)][(int) NEGATE(oldY) - 1][(int) NEGATE(oldZ)] == 0)
+        //If current block and one under it are empty
+        if (world[(int) NEGATE(oldX)][(int) NEGATE(oldY)][(int) NEGATE(oldZ)] == 0 &&
+            world[(int) NEGATE(oldX)][(int) NEGATE(oldY) - 1][(int) NEGATE(oldZ)] == 0)
             setViewPosition(oldX, oldY + 0.1f, oldZ);
     }
 }
@@ -317,7 +322,6 @@ int main(int argc, char** argv) {
         /* create sample player */
         createPlayer(0, 52.0, 27.0, 52.0, 0.0);
     } else {
-
         //Zero the world
         for (int l = 0; l < WORLDX; ++l) {
             for (int m = 0; m < WORLDY; ++m) {
@@ -334,7 +338,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        //Add some direction markers
+        //Add direction markers
         world[99][0][49] = BLUE; //+x is blue
         world[49][0][99] = RED; //+z is red
 
