@@ -90,9 +90,16 @@ extern void getUserColour(int, GLfloat*, GLfloat*, GLfloat*, GLfloat*,
 /* note that the world coordinates returned from getViewPosition()
    will be the negative value of the array indices */
 void collisionResponse() {
+    float oldX = 0, oldY = 0, oldZ = 0;
+    getOldViewPosition(&oldX, &oldY, &oldZ);
 
-    /* your code for collisions goes here */
+    float newX = 0, newY = 0, newZ = 0;
+    getViewPosition(&newX, &newY, &newZ);
 
+    //If there is a block where the camera is trying to go, don't go there
+    if (world[(int) NEGATE(newX)][(int) NEGATE(newY)][(int) NEGATE(newZ)] != 0) {
+        setViewPosition(oldX, oldY, oldZ);
+    }
 }
 
 
@@ -221,15 +228,9 @@ void update() {
         float oldX = 0, oldY = 0, oldZ = 0;
         getOldViewPosition(&oldX, &oldY, &oldZ);
 
-        float newX = 0, newY = 0, newZ = 0;
-        getViewPosition(&newX, &newY, &newZ);
-
-        //If there is a block where the camera is trying to go, don't go there
-        if (world[(int) NEGATE(newX)][(int) NEGATE(newY)][(int) NEGATE(newZ)] != 0) {
-            setViewPosition(oldX, oldY, oldZ);
-        }
-
-        printf("Old view position: %f %f %f\nNew view position: %f %f %f\n\n", oldX, oldY, oldZ, newX, newY, newZ);
+        //If current block is empty and the one under the view is also empty
+        if (world[(int) NEGATE(oldX)][(int) NEGATE(oldY)][(int) NEGATE(oldZ)] == 0 && world[(int) NEGATE(oldX)][(int) NEGATE(oldY) - 1][(int) NEGATE(oldZ)] == 0)
+            setViewPosition(oldX, oldY + 0.1f, oldZ);
     }
 }
 
