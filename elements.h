@@ -5,9 +5,9 @@
 #ifndef CIS4820_ELEMENTS_H
 #define CIS4820_ELEMENTS_H
 
-//Arbitrary room sizes
 #include "graphics.h"
 
+//Arbitrary room sizes
 #define ROOM_MIN_WIDTH 7
 #define ROOM_MAX_WIDTH 18
 #define ROOM_MIN_HEIGHT 7
@@ -26,6 +26,8 @@
 #define PURPLE  6
 #define ORANGE  7
 #define YELLOW  8
+
+#define GRAVITY_AMT 0.1f
 
 /**
  * Room information.

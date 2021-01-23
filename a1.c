@@ -96,13 +96,14 @@ void collisionResponse() {
     float newX = 0, newY = 0, newZ = 0;
     getViewPosition(&newX, &newY, &newZ);
 
-    //If there is a block where the camera is trying to go but not above it, move up on top
-    //Else if you're trying to move into a block, don't
-    if (world[(int) NEGATE(newX)][(int) NEGATE(newY)][(int) NEGATE(newZ)] != 0 &&
-        world[(int) NEGATE(newX)][(int) NEGATE(newY) + 1][(int) NEGATE(newZ)] == 0) {
-        setViewPosition(newX, newY - 1, newZ);
-    } else if (world[(int) NEGATE(newX)][(int) NEGATE(newY)][(int) NEGATE(newZ)] != 0){
+    const float LOOK_AHEAD = 0.25f;
+    //Look ahead of where the player is moving and check for a block there. If there is a block at eye level, don't go there
+    //Otherwise, if there is no block at eye level but there is a block at foot level, move up onto it
+    if (world[(int) NEGATE(ceilf(newX + LOOK_AHEAD))][(int) NEGATE(floorf(newY))][(int) NEGATE(ceilf(newZ + LOOK_AHEAD))] != 0 ||
+        world[(int) NEGATE(ceilf(newX - LOOK_AHEAD))][(int) NEGATE(floorf(newY))][(int) NEGATE(ceilf(newZ - LOOK_AHEAD))] != 0) {
         setViewPosition(oldX, oldY, oldZ);
+    } else if (world[(int) NEGATE(ceilf(newX))][(int) NEGATE(floorf(newY)) - 1][(int) NEGATE(ceilf(newZ))] != 0) {
+        setViewPosition(newX, newY - 1, newZ);
     }
 }
 
@@ -232,10 +233,14 @@ void update() {
         float oldX = 0, oldY = 0, oldZ = 0;
         getOldViewPosition(&oldX, &oldY, &oldZ);
 
-        //If current block and one under it are empty
-        if (world[(int) NEGATE(oldX)][(int) NEGATE(oldY)][(int) NEGATE(oldZ)] == 0 &&
-            world[(int) NEGATE(oldX)][(int) NEGATE(oldY) - 1][(int) NEGATE(oldZ)] == 0)
-            setViewPosition(oldX, oldY + 0.1f, oldZ);
+        //Check if the current block and block under the view port are air
+        //If so, do gravity
+        if ((unsigned int)world[(int)NEGATE(ceilf((float)oldX))][(int)NEGATE(roundf((float)oldY))][(int)NEGATE(ceilf((float)oldZ))] == 0 &&
+            (unsigned int)world[(int)NEGATE(ceilf((float)oldX))][(int)NEGATE(roundf((float)oldY + 1.5f))][(int)NEGATE(ceilf((float)oldZ))] == 0) {
+            setOldViewPosition(oldX, oldY + GRAVITY_AMT, oldZ);
+            setViewPosition(oldX, oldY + GRAVITY_AMT, oldZ);
+            printf("%.2f\n", oldY);
+        }
     }
 }
 
@@ -360,7 +365,10 @@ int main(int argc, char** argv) {
         int roomNumber = rand() % numRooms;
         int halfwayX = rooms[roomNumber]->startX + (rooms[roomNumber]->width / 2);
         int halfwayZ = rooms[roomNumber]->startZ + (rooms[roomNumber]->length / 2);
-        setViewPosition(NEGATE(halfwayX), -2, NEGATE(halfwayZ));
+        setViewPosition(NEGATE(halfwayX), -5, NEGATE(halfwayZ));
+
+        //Test block
+//        world[rooms[roomNumber]->startX + 2][1][rooms[roomNumber]->startZ + 2] = GREEN;
     }
 
 
