@@ -239,7 +239,6 @@ void update() {
             (unsigned int)world[(int)NEGATE(ceilf((float)oldX))][(int)NEGATE(roundf((float)oldY + 1.5f))][(int)NEGATE(ceilf((float)oldZ))] == 0) {
             setOldViewPosition(oldX, oldY + GRAVITY_AMT, oldZ);
             setViewPosition(oldX, oldY + GRAVITY_AMT, oldZ);
-            printf("%.2f\n", oldY);
         }
     }
 }
@@ -327,11 +326,15 @@ int main(int argc, char** argv) {
         /* create sample player */
         createPlayer(0, 52.0, 27.0, 52.0, 0.0);
     } else {
+        //Set custom colors
+        setUserColour(9, 0.5, 0.5, 0.5, 1.0, 0.25, 0.25, 0.25, 1.0); //Light grey
+        setUserColour(10, 0.25, 0.25, 0.25, 1.0, 0.05, 0.05, 0.05, 1.0); //Dark grey
+
         //Zero the world
         for (int l = 0; l < WORLDX; ++l) {
             for (int m = 0; m < WORLDY; ++m) {
                 for (int n = 0; n < WORLDZ; ++n) {
-                    world[l][m][n] = 0;
+                    world[l][m][n] = EMPTY;
                 }
             }
         }
@@ -339,13 +342,15 @@ int main(int argc, char** argv) {
         //Build a platform
         for (int l = 0; l < WORLDX; l++) {
             for (int m = 0; m < WORLDZ; m++) {
-                world[l][0][m] = WHITE;
+                world[l][0][m] = ((l + m) % 2) ? DARK_GREY : LIGHT_GREY; //Checker board for light/dark grey
             }
         }
 
+#ifdef DEBUG
         //Add direction markers
         world[99][0][49] = BLUE; //+x is blue
         world[49][0][99] = RED; //+z is red
+#endif
 
         //Generate rooms
         srand(time(NULL));
@@ -365,10 +370,12 @@ int main(int argc, char** argv) {
         int roomNumber = rand() % numRooms;
         int halfwayX = rooms[roomNumber]->startX + (rooms[roomNumber]->width / 2);
         int halfwayZ = rooms[roomNumber]->startZ + (rooms[roomNumber]->length / 2);
-        setViewPosition(NEGATE(halfwayX), -5, NEGATE(halfwayZ));
+        setViewPosition(NEGATE(halfwayX), -2, NEGATE(halfwayZ));
 
+#ifdef DEBUG
         //Test block
-//        world[rooms[roomNumber]->startX + 2][1][rooms[roomNumber]->startZ + 2] = GREEN;
+        world[rooms[roomNumber]->startX + 2][1][rooms[roomNumber]->startZ + 2] = GREEN;
+#endif
     }
 
 

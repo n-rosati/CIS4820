@@ -8,24 +8,27 @@
 #include "graphics.h"
 
 //Arbitrary room sizes
+#define ROOM_HEIGHT 3
 #define ROOM_MIN_WIDTH 7
 #define ROOM_MAX_WIDTH 18
-#define ROOM_MIN_HEIGHT 7
-#define ROOM_MAX_HEIGHT 18
+#define ROOM_MIN_LENGTH 7
+#define ROOM_MAX_LENGTH 18
 #define CELL_SIZE 33
 
 #define NEGATE(x) (x * -1)
 
 //Colours
-#define EMPTY   0
-#define GREEN   1
-#define BLUE    2
-#define RED     3
-#define BLACK   4
-#define WHITE   5
-#define PURPLE  6
-#define ORANGE  7
-#define YELLOW  8
+#define EMPTY       0
+#define GREEN       1
+#define BLUE        2
+#define RED         3
+#define BLACK       4
+#define WHITE       5
+#define PURPLE      6
+#define ORANGE      7
+#define YELLOW      8
+#define LIGHT_GREY  9
+#define DARK_GREY  10
 
 #define GRAVITY_AMT 0.1f
 
