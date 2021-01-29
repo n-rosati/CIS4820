@@ -351,8 +351,10 @@ int main(int argc, char** argv) {
 #endif
 
         //Generate rooms
-        srand(time(NULL));
-//        srand(42069);
+        int seed = time(NULL);
+        printf("Seed: %d\n", seed);
+        srand(seed);
+
         for (int l = 0; l < 9; l++)
             rooms[l] = createRoom();
 

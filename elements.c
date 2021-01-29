@@ -15,7 +15,6 @@ Room* createRoom() {
     Room* room = calloc(1, sizeof(Room));
     room->width = (rand() % ROOM_MAX_WIDTH) + ROOM_MIN_WIDTH;
     room->length = (rand() % ROOM_MAX_LENGTH) + ROOM_MIN_LENGTH;
-
     return room;
 }
 
@@ -96,8 +95,8 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
  */
 void drawHallwaysX(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
     //Offsets on the walls
-    int hallZOffset1 = BETWEEN(roomOne->length, HALL_RADIUS - 1);
-    int hallZOffset2 = BETWEEN(roomTwo->length, HALL_RADIUS - 1);
+    int hallZOffset1 = rand() % (roomOne->length - (HALL_RADIUS - 1)) + (HALL_RADIUS - 1);
+    int hallZOffset2 = rand() % (roomTwo->length - (HALL_RADIUS - 1)) + (HALL_RADIUS - 1);
 
     //Get the distance between the two walls in X direction
     int roomOneStartX = roomOne->startX + roomOne->width - 1;
@@ -105,38 +104,37 @@ void drawHallwaysX(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
     int distanceX = roomTwoStartX - roomOneStartX;
     double halfDistanceX = distanceX / 2.0;
 
+    //Extend out from each room
     if (!(distanceX % 2)) {
-        //Even case
-        //Draw in X
+        //Extend from roomOne
         for (int i = roomOneStartX; i < roomOneStartX + halfDistanceX; ++i) {
             world[i][1][roomOne->startZ + hallZOffset1] = BLACK;
         }
+        //Extend from roomTwo
         for (int i = roomTwoStartX; i > roomTwoStartX - halfDistanceX; --i) {
             world[i][1][roomTwo->startZ + hallZOffset2] = BLACK;
         }
     } else {
-        //Odd case
-        //Draw in X
-        for (int i = roomOneStartX; i < roomOneStartX + ((int) ceil(halfDistanceX)); ++i) {
+        //Extend from roomOne
+        for (int i = roomOneStartX; i < roomOneStartX + ((int)ceil(halfDistanceX)); ++i) {
             world[i][1][roomOne->startZ + hallZOffset1] = BLACK;
         }
-        for (int i = roomTwoStartX; i > roomTwoStartX - ((int) ceil(halfDistanceX)) + 1; --i) {
+        //Extend from roomTwo
+        for (int i = roomTwoStartX; i > roomTwoStartX - ((int)ceil(halfDistanceX)) + 1; --i) {
             world[i][1][roomTwo->startZ + hallZOffset2] = BLACK;
         }
     }
-
-    //Get distances between to be drawn lines in Z direction
     int roomOneStartZ = roomOne->startZ + hallZOffset1;
     int roomTwoStartZ = roomTwo->startZ + hallZOffset2;
-    int distanceZ = roomTwoStartZ - roomOneStartZ;
 
-    if (distanceZ >= 0) {
+    //Connect the two extensions with a perpendicular line
+    if (roomTwoStartZ - roomOneStartZ >= 0) {
         for (int i = roomOneStartZ; i < roomTwoStartZ + 1; ++i) {
-            world[roomOneStartX + ((int) ceil(halfDistanceX))][1][i] = BLACK;
+            world[roomOneStartX + ((int)ceil(halfDistanceX))][1][i] = BLACK;
         }
     } else {
         for (int i = roomOneStartZ; i > roomTwoStartZ - 1; --i) {
-            world[roomOneStartX + ((int) ceil(halfDistanceX))][1][i] = BLACK;
+            world[roomOneStartX + ((int)ceil(halfDistanceX))][1][i] = BLACK;
         }
     }
 }
@@ -149,8 +147,8 @@ void drawHallwaysX(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
  */
 void drawHallwaysZ(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
     //Offsets on the walls
-    int hallXOffset1 = BETWEEN(roomOne->width, HALL_RADIUS);
-    int hallXOffset2 = BETWEEN(roomTwo->width, HALL_RADIUS);
+    int hallXOffset1 = rand() % (roomOne->width - HALL_RADIUS) + HALL_RADIUS;
+    int hallXOffset2 = rand() % (roomTwo->width - HALL_RADIUS) + HALL_RADIUS;
 
     //Get the distance between the two walls in Z direction
     int roomOneStartZ = roomOne->startZ + roomOne->length - 1;
@@ -158,37 +156,37 @@ void drawHallwaysZ(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
     int distanceZ = roomTwoStartZ - roomOneStartZ;
     double halfDistanceZ = distanceZ / 2.0;
 
+    //Extend out from each room
     if (!(distanceZ % 2)) {
-        //Even case
-        //Draw in Z
+        //Extend from roomOne
         for (int i = roomOneStartZ; i < roomOneStartZ + halfDistanceZ; ++i) {
             world[roomOne->startX + hallXOffset1][1][i] = BLACK;
         }
+        //Extend from roomTwo
         for (int i = roomTwoStartZ; i > roomTwoStartZ - halfDistanceZ; --i) {
             world[roomTwo->startX + hallXOffset2][1][i] = BLACK;
         }
     } else {
-        //Odd case
-        //Draw in Z
-        for (int i = roomOneStartZ; i < roomOneStartZ + ((int) ceil(halfDistanceZ)); ++i) {
+        //Extend from roomOne
+        for (int i = roomOneStartZ; i < roomOneStartZ + ((int)ceil(halfDistanceZ)); ++i) {
             world[roomOne->startX + hallXOffset1][1][i] = BLACK;
         }
-        for (int i = roomTwoStartZ; i > roomTwoStartZ - ((int) ceil(halfDistanceZ)) + 1; --i) {
+        //Extend from roomTwo
+        for (int i = roomTwoStartZ; i > roomTwoStartZ - ((int)ceil(halfDistanceZ)) + 1; --i) {
             world[roomTwo->startX + hallXOffset2][1][i] = BLACK;
         }
     }
-    //Get distances between to be drawn lines in X direction
     int roomOneStartX = roomOne->startX + hallXOffset1;
     int roomTwoStartX = roomTwo->startX + hallXOffset2;
-    int distanceX = roomTwoStartX - roomOneStartX;
 
-    if (distanceX >= 0) {
+    //Connect the two extensions with a perpendicular line
+    if (roomTwoStartX - roomOneStartX >= 0) {
         for (int i = roomOneStartX; i < roomTwoStartX + 1; ++i) {
-            world[i][1][roomOneStartZ + ((int) ceil(halfDistanceZ))] = BLACK;
+            world[i][1][roomOneStartZ + ((int)ceil(halfDistanceZ))] = BLACK;
         }
     } else {
         for (int i = roomOneStartX; i > roomTwoStartX - 1; --i) {
-            world[i][1][roomOneStartZ + ((int) ceil(halfDistanceZ))] = BLACK;
+            world[i][1][roomOneStartZ + ((int)ceil(halfDistanceZ))] = BLACK;
         }
     }
 }

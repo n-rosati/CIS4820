@@ -19,7 +19,6 @@
 #define HALL_RADIUS 3
 
 #define NEGATE(x) (x * -1)
-#define BETWEEN(x, y) ((rand() % (x - y)) + y)
 
 //Colours
 #define EMPTY       0
