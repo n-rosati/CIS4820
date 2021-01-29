@@ -61,7 +61,12 @@ int screenWidth = 1024;
 int screenHeight = 768;
 
 /* command line flags */
+#ifndef DEBUG
 int flycontrol = 0;        // allow viewpoint to move in y axis when 1
+#endif
+#ifdef DEBUG
+int flycontrol = 1;
+#endif
 int displayAllCubes = 0;    // draw all of the cubes in the world when 1
 int testWorld = 0;        // sample world for timing tests
 int fps = 0;            // turn on frame per second output

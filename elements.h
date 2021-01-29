@@ -15,7 +15,11 @@
 #define ROOM_MAX_LENGTH 18
 #define CELL_SIZE 33
 
+//Hallways stuff
+#define HALL_RADIUS 3
+
 #define NEGATE(x) (x * -1)
+#define BETWEEN(x, y) ((rand() % (x - y)) + y)
 
 //Colours
 #define EMPTY       0
@@ -46,5 +50,8 @@ typedef struct Room {
 Room* createRoom();
 void deleteRoom(Room* room);
 void drawRoom(int row, int col, int xOffset, int zOffset, Room* room, GLubyte world[100][50][100]);
+void populateRoom(Room* room, GLubyte world[100][50][100]);
+void drawHallwaysX(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]);
+void drawHallwaysZ(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]);
 
 #endif //CIS4820_ELEMENTS_H
