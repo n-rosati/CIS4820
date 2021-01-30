@@ -354,6 +354,7 @@ int main(int argc, char** argv) {
 
         //Generate rooms
         int seed = time(NULL);
+        seed = 1611982280;
         printf("Seed: %d\n", seed);
         srand(seed);
 
