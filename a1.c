@@ -230,7 +230,6 @@ void update() {
 
 
     } else {
-#ifndef DEBUG
         float oldX = 0, oldY = 0, oldZ = 0;
         getOldViewPosition(&oldX, &oldY, &oldZ);
 
@@ -241,7 +240,6 @@ void update() {
             setOldViewPosition(oldX, oldY + GRAVITY_AMT, oldZ);
             setViewPosition(oldX, oldY + GRAVITY_AMT, oldZ);
         }
-#endif
     }
 }
 
@@ -384,11 +382,6 @@ int main(int argc, char** argv) {
         int halfwayX = rooms[initialRoomNumber]->startX + (rooms[initialRoomNumber]->width / 2);
         int halfwayZ = rooms[initialRoomNumber]->startZ + (rooms[initialRoomNumber]->length / 2);
         setViewPosition(NEGATE(halfwayX), -2, NEGATE(halfwayZ));
-
-#ifdef DEBUG
-        //FIXME: remove
-        setViewPosition(NEGATE(halfwayX), -45, NEGATE(halfwayZ));
-#endif
     }
 
 

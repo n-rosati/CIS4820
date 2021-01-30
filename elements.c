@@ -55,12 +55,10 @@ void drawRoom(int row, int col, int xOffset, int zOffset, Room* room, GLubyte wo
         }
     }
 
-#ifdef DEBUG
-//    //Debug room markers
-    world[room->startX][3][room->startZ] = YELLOW;
-    world[room->startX + room->width - 1][3][room->startZ + room->length - 1] = PURPLE;
-//    world[room->startX][2][room->startZ + room->length - 1] = ORANGE;
-#endif
+    //Draw the roof
+    for (int x = room->startX; x < room->startX + room->width; ++x)
+        for (int z = room->startZ; z < room->startZ + room->length; ++z)
+            world[x][ROOM_HEIGHT + 1][z] = DARK_GREY;
 }
 
 /**
@@ -87,6 +85,8 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
     }
 }
 
+//TODO: Remove the duplicated lines
+
 /**
  * Draws hallways between two X adjacent rooms.
  * @param roomOne First room.
@@ -105,27 +105,31 @@ void drawHallwaysX(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
     double halfDistanceX = distanceX / 2.0;
 
     //Draws the walls of the hallways
-    for (int y = 1; y < 3; ++y) {
+    for (int y = 1; y < HALL_HEIGHT; ++y) {
         //Extend out from room one
-        drawLineX(roomOneStartX, roomOneStartX + ((int)ceil(halfDistanceX)), y, roomOne->startZ + hallZOffset1 + 1, BLACK, world);
-        drawLineX(roomOneStartX, roomOneStartX + ((int)ceil(halfDistanceX)), y, roomOne->startZ + hallZOffset1 - 1, BLACK, world);
+        drawLineX(roomOneStartX, roomOneStartX + ((int)ceil(halfDistanceX)), y, roomOne->startZ + hallZOffset1 + 1, ORANGE, world);
+        drawLineX(roomOneStartX, roomOneStartX + ((int)ceil(halfDistanceX)), y, roomOne->startZ + hallZOffset1, ORANGE, world);
+        drawLineX(roomOneStartX, roomOneStartX + ((int)ceil(halfDistanceX)), y, roomOne->startZ + hallZOffset1 - 1, ORANGE, world);
 
         //Extend from roomTwo
         if (!(distanceX % 2)) {
-            drawLineX(roomTwoStartX, roomTwoStartX - (int)halfDistanceX, y, roomTwo->startZ + hallZOffset2 + 1, BLACK, world);
-            drawLineX(roomTwoStartX, roomTwoStartX - (int)halfDistanceX, y, roomTwo->startZ + hallZOffset2 - 1, BLACK, world);
+            drawLineX(roomTwoStartX, roomTwoStartX - (int)halfDistanceX, y, roomTwo->startZ + hallZOffset2 + 1, ORANGE, world);
+            drawLineX(roomTwoStartX, roomTwoStartX - (int)halfDistanceX, y, roomTwo->startZ + hallZOffset2, ORANGE, world);
+            drawLineX(roomTwoStartX, roomTwoStartX - (int)halfDistanceX, y, roomTwo->startZ + hallZOffset2 - 1, ORANGE, world);
         } else {
-            drawLineX(roomTwoStartX, roomTwoStartX - ((int)ceil(halfDistanceX)) + 1, y, roomTwo->startZ + hallZOffset2 + 1, BLACK, world);
-            drawLineX(roomTwoStartX, roomTwoStartX - ((int)ceil(halfDistanceX)) + 1, y, roomTwo->startZ + hallZOffset2 - 1, BLACK, world);
+            drawLineX(roomTwoStartX, roomTwoStartX - ((int)ceil(halfDistanceX)) + 1, y, roomTwo->startZ + hallZOffset2 + 1, ORANGE, world);
+            drawLineX(roomTwoStartX, roomTwoStartX - ((int)ceil(halfDistanceX)) + 1, y, roomTwo->startZ + hallZOffset2, ORANGE, world);
+            drawLineX(roomTwoStartX, roomTwoStartX - ((int)ceil(halfDistanceX)) + 1, y, roomTwo->startZ + hallZOffset2 - 1, ORANGE, world);
         }
 
         //Connect the two extensions with a perpendicular line
-        drawLineZ(roomOneStartX + ((int)ceil(halfDistanceX)) + 1, y, roomOne->startZ + hallZOffset1, roomTwo->startZ + hallZOffset2, BLACK, world);
-        drawLineZ(roomOneStartX + ((int)ceil(halfDistanceX)) - 1, y, roomOne->startZ + hallZOffset1, roomTwo->startZ + hallZOffset2, BLACK, world);
+        drawLineZ(roomOneStartX + ((int)ceil(halfDistanceX)) + 1, y, roomOne->startZ + hallZOffset1, roomTwo->startZ + hallZOffset2, ORANGE, world);
+        drawLineZ(roomOneStartX + ((int)ceil(halfDistanceX)), y, roomOne->startZ + hallZOffset1, roomTwo->startZ + hallZOffset2, ORANGE, world);
+        drawLineZ(roomOneStartX + ((int)ceil(halfDistanceX)) - 1, y, roomOne->startZ + hallZOffset1, roomTwo->startZ + hallZOffset2, ORANGE, world);
     }
 
     //Draws the hollow walkway
-    for (int y = 1; y < 3; ++y) {
+    for (int y = 1; y < HALL_HEIGHT - 1; ++y) {
         //Extend out from room one
         drawLineX(roomOneStartX, roomOneStartX + ((int)ceil(halfDistanceX)), y, roomOne->startZ + hallZOffset1, EMPTY, world);
 
@@ -159,27 +163,31 @@ void drawHallwaysZ(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
     double halfDistanceZ = distanceZ / 2.0;
 
     //Draws the walls of the hallways
-    for (int y = 1; y < 3; ++y) {
+    for (int y = 1; y < HALL_HEIGHT; ++y) {
         //Extend out from room one
-        drawLineZ(roomOne->startX + hallXOffset1 - 1, y, roomOneStartZ, roomOneStartZ + ((int)ceil(halfDistanceZ)), BLACK, world);
-        drawLineZ(roomOne->startX + hallXOffset1 + 1, y, roomOneStartZ, roomOneStartZ + ((int)ceil(halfDistanceZ)), BLACK, world);
+        drawLineZ(roomOne->startX + hallXOffset1 - 1, y, roomOneStartZ, roomOneStartZ + ((int)ceil(halfDistanceZ)), ORANGE, world);
+        drawLineZ(roomOne->startX + hallXOffset1, y, roomOneStartZ, roomOneStartZ + ((int)ceil(halfDistanceZ)), ORANGE, world);
+        drawLineZ(roomOne->startX + hallXOffset1 + 1, y, roomOneStartZ, roomOneStartZ + ((int)ceil(halfDistanceZ)), ORANGE, world);
 
         //Extend from room two
         if (!(distanceZ % 2)) {
-            drawLineZ(roomTwo->startX + hallXOffset2 - 1, y, roomTwoStartZ, roomTwoStartZ - (int)halfDistanceZ, BLACK, world);
-            drawLineZ(roomTwo->startX + hallXOffset2 + 1, y, roomTwoStartZ, roomTwoStartZ - (int)halfDistanceZ, BLACK, world);
+            drawLineZ(roomTwo->startX + hallXOffset2 - 1, y, roomTwoStartZ, roomTwoStartZ - (int)halfDistanceZ, ORANGE, world);
+            drawLineZ(roomTwo->startX + hallXOffset2, y, roomTwoStartZ, roomTwoStartZ - (int)halfDistanceZ, ORANGE, world);
+            drawLineZ(roomTwo->startX + hallXOffset2 + 1, y, roomTwoStartZ, roomTwoStartZ - (int)halfDistanceZ, ORANGE, world);
         } else {
-            drawLineZ(roomTwo->startX + hallXOffset2 - 1, y, roomTwoStartZ, roomTwoStartZ - ((int)ceil(halfDistanceZ)) + 1, BLACK, world);
-            drawLineZ(roomTwo->startX + hallXOffset2 + 1, y, roomTwoStartZ, roomTwoStartZ - ((int)ceil(halfDistanceZ)) + 1, BLACK, world);
+            drawLineZ(roomTwo->startX + hallXOffset2 - 1, y, roomTwoStartZ, roomTwoStartZ - ((int)ceil(halfDistanceZ)) + 1, ORANGE, world);
+            drawLineZ(roomTwo->startX + hallXOffset2, y, roomTwoStartZ, roomTwoStartZ - ((int)ceil(halfDistanceZ)) + 1, ORANGE, world);
+            drawLineZ(roomTwo->startX + hallXOffset2 + 1, y, roomTwoStartZ, roomTwoStartZ - ((int)ceil(halfDistanceZ)) + 1, ORANGE, world);
         }
 
         //Connect the two extensions with a perpendicular line
-        drawLineX(roomOne->startX + hallXOffset1, roomTwo->startX + hallXOffset2, y, roomOneStartZ + ((int)ceil(halfDistanceZ)) - 1, BLACK, world);
-        drawLineX(roomOne->startX + hallXOffset1, roomTwo->startX + hallXOffset2, y, roomOneStartZ + ((int)ceil(halfDistanceZ)) + 1, BLACK, world);
+        drawLineX(roomOne->startX + hallXOffset1, roomTwo->startX + hallXOffset2, y, roomOneStartZ + ((int)ceil(halfDistanceZ)) - 1, ORANGE, world);
+        drawLineX(roomOne->startX + hallXOffset1, roomTwo->startX + hallXOffset2, y, roomOneStartZ + ((int)ceil(halfDistanceZ)), ORANGE, world);
+        drawLineX(roomOne->startX + hallXOffset1, roomTwo->startX + hallXOffset2, y, roomOneStartZ + ((int)ceil(halfDistanceZ)) + 1, ORANGE, world);
     }
 
     //Draws empty line that is the walkway
-    for (int y = 1; y < 3; ++y) {
+    for (int y = 1; y < HALL_HEIGHT - 1; ++y) {
         //Extend out from room one
         drawLineZ(roomOne->startX + hallXOffset1, y, roomOneStartZ, roomOneStartZ + ((int)ceil(halfDistanceZ)), EMPTY, world);
 

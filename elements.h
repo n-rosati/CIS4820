@@ -17,6 +17,7 @@
 
 //Hallways stuff
 #define HALL_RADIUS 2
+#define HALL_HEIGHT 4
 
 #define NEGATE(x) (x * -1)
 
