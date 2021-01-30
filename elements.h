@@ -16,7 +16,7 @@
 #define CELL_SIZE 33
 
 //Hallways stuff
-#define HALL_RADIUS 3
+#define HALL_RADIUS 2
 
 #define NEGATE(x) (x * -1)
 
@@ -43,6 +43,7 @@ typedef struct Room {
     int width;
     /**Length along the z axis*/
     int length;
+    /**Absolute starting coordinate of the room*/
     int startX, startZ;
 } Room;
 

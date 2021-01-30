@@ -328,9 +328,11 @@ int main(int argc, char** argv) {
         /* create sample player */
         createPlayer(0, 52.0, 27.0, 52.0, 0.0);
     } else {
+        /*TODO: Make a nicer to use function for setting colours
+         *      - Take hex or RGB in*/
         //Set custom colors
-        setUserColour(9, 0.5, 0.5, 0.5, 1.0, 0.25, 0.25, 0.25, 1.0); //Light grey
-        setUserColour(10, 0.25, 0.25, 0.25, 1.0, 0.05, 0.05, 0.05, 1.0); //Dark grey
+        setUserColour(LIGHT_GREY, 0.5, 0.5, 0.5, 1.0, 0.25, 0.25, 0.25, 1.0); //Light grey
+        setUserColour(DARK_GREY, 0.25, 0.25, 0.25, 1.0, 0.05, 0.05, 0.05, 1.0); //Dark grey
 
         //Zero the world
         for (int l = 0; l < WORLDX; ++l)
