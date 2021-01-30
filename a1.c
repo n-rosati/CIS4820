@@ -343,16 +343,8 @@ int main(int argc, char** argv) {
             for (int m = 0; m < WORLDZ; m++)
                 world[l][0][m] = ((l + m) % 2) ? DARK_GREY : LIGHT_GREY; //Checker board for light/dark grey
 
-
-#ifdef DEBUG
-        //Add direction markers
-        world[99][0][49] = BLUE; //+x is blue
-        world[49][0][99] = RED; //+z is red
-#endif
-
         //Generate rooms
         int seed = time(NULL);
-        seed = 1611982280;
         printf("Seed: %d\n", seed);
         srand(seed);
 

@@ -1,13 +1,19 @@
+Custom things
+-------------
+- Please ensure that elements.h and elements.c are included when compiling this assignment
+    - They contain pretty about 80% of my assignments code
+- Moving through the hallways is a little bit tricky without the ability for the camera to 'slide' along walls
 
 
 Building and Running the Graphics System
 ----------------------------------------
-The program consists of three .c files.  The a1.c file contains the main()
+The program consists of four .c files.  The a1.c file contains the main()
 routine and the update() function. All of the changes necessary for the
 assignments can be made to this file.  The graphics.c file contains all
 of the code to create the 3D graphics for the assignment. The visible.c
 file contains the visible surface determination code. You should not
-need to change graphics.c or visible.c.
+need to change graphics.c or visible.c. The elements.c file contains
+functions to get assignment one done to keep the code cleaner.
 
 There is a makefile which will compile the code on OSX or Linux.
 The code should build by typing make.
