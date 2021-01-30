@@ -52,5 +52,7 @@ void drawRoom(int row, int col, int xOffset, int zOffset, Room* room, GLubyte wo
 void populateRoom(Room* room, GLubyte world[100][50][100]);
 void drawHallwaysX(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]);
 void drawHallwaysZ(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]);
+void drawLineX(int xStart, int xEnd, int y, int z, int cubeColour, GLubyte world[100][50][100]);
+void drawLineZ(int x, int y, int zStart, int zEnd, int cubeColour, GLubyte world[100][50][100]);
 
 #endif //CIS4820_ELEMENTS_H

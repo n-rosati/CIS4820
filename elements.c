@@ -54,12 +54,12 @@ void drawRoom(int row, int col, int xOffset, int zOffset, Room* room, GLubyte wo
         }
     }
 
-//#ifdef DEBUG
-////    //Debug room markers
-//    world[room->startX][3][room->startZ] = YELLOW;
-//    world[room->startX + room->width - 1][3][room->startZ + room->length - 1] = PURPLE;
-////    world[room->startX][2][room->startZ + room->length - 1] = ORANGE;
-//#endif
+#ifdef DEBUG
+//    //Debug room markers
+    world[room->startX][3][room->startZ] = YELLOW;
+    world[room->startX + room->width - 1][3][room->startZ + room->length - 1] = PURPLE;
+//    world[room->startX][2][room->startZ + room->length - 1] = ORANGE;
+#endif
 }
 
 /**
@@ -86,9 +86,8 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
     }
 }
 
-//Gross functions but they work. May refactor later.
 /**
- * Draws hallways between two rooms along the X axis.
+ * Draws hallways between two X adjacent rooms.
  * @param roomOne First room.
  * @param roomTwo Second room.
  * @param world The world to draw the hallways in.
@@ -104,43 +103,22 @@ void drawHallwaysX(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
     int distanceX = roomTwoStartX - roomOneStartX;
     double halfDistanceX = distanceX / 2.0;
 
-    //Extend out from each room
+    //Extend out from room one
+    drawLineX(roomOneStartX, roomOneStartX + ((int)ceil(halfDistanceX)), 1, roomOne->startZ + hallZOffset1, BLACK, world);
+
+    //Extend from roomTwo
     if (!(distanceX % 2)) {
-        //Extend from roomOne
-        for (int i = roomOneStartX; i < roomOneStartX + halfDistanceX; ++i) {
-            world[i][1][roomOne->startZ + hallZOffset1] = BLACK;
-        }
-        //Extend from roomTwo
-        for (int i = roomTwoStartX; i > roomTwoStartX - halfDistanceX; --i) {
-            world[i][1][roomTwo->startZ + hallZOffset2] = BLACK;
-        }
+        drawLineX(roomTwoStartX, roomTwoStartX - (int) halfDistanceX, 1, roomTwo->startZ + hallZOffset2, BLACK, world);
     } else {
-        //Extend from roomOne
-        for (int i = roomOneStartX; i < roomOneStartX + ((int)ceil(halfDistanceX)); ++i) {
-            world[i][1][roomOne->startZ + hallZOffset1] = BLACK;
-        }
-        //Extend from roomTwo
-        for (int i = roomTwoStartX; i > roomTwoStartX - ((int)ceil(halfDistanceX)) + 1; --i) {
-            world[i][1][roomTwo->startZ + hallZOffset2] = BLACK;
-        }
+        drawLineX(roomTwoStartX, roomTwoStartX - ((int)ceil(halfDistanceX)) + 1, 1, roomTwo->startZ + hallZOffset2, BLACK, world);
     }
-    int roomOneStartZ = roomOne->startZ + hallZOffset1;
-    int roomTwoStartZ = roomTwo->startZ + hallZOffset2;
 
     //Connect the two extensions with a perpendicular line
-    if (roomTwoStartZ - roomOneStartZ >= 0) {
-        for (int i = roomOneStartZ; i < roomTwoStartZ + 1; ++i) {
-            world[roomOneStartX + ((int)ceil(halfDistanceX))][1][i] = BLACK;
-        }
-    } else {
-        for (int i = roomOneStartZ; i > roomTwoStartZ - 1; --i) {
-            world[roomOneStartX + ((int)ceil(halfDistanceX))][1][i] = BLACK;
-        }
-    }
+    drawLineZ(roomOneStartX + ((int)ceil(halfDistanceX)), 1, roomOne->startZ + hallZOffset1, roomTwo->startZ + hallZOffset2, BLACK, world);
 }
 
 /**
- * Draws hallways between two rooms along the Z axis.
+ * Draws hallways between two Z adjacent rooms.
  * @param roomOne First room.
  * @param roomTwo Second room.
  * @param world The world to draw the hallways in.
@@ -156,37 +134,55 @@ void drawHallwaysZ(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
     int distanceZ = roomTwoStartZ - roomOneStartZ;
     double halfDistanceZ = distanceZ / 2.0;
 
-    //Extend out from each room
+    //Extend out from room one
+    drawLineZ(roomOne->startX + hallXOffset1, 1, roomOneStartZ, roomOneStartZ + ((int)ceil(halfDistanceZ)), BLACK, world);
+
+    //Extend from room two
     if (!(distanceZ % 2)) {
-        //Extend from roomOne
-        for (int i = roomOneStartZ; i < roomOneStartZ + halfDistanceZ; ++i) {
-            world[roomOne->startX + hallXOffset1][1][i] = BLACK;
-        }
-        //Extend from roomTwo
-        for (int i = roomTwoStartZ; i > roomTwoStartZ - halfDistanceZ; --i) {
-            world[roomTwo->startX + hallXOffset2][1][i] = BLACK;
-        }
+        drawLineZ(roomTwo->startX + hallXOffset2, 1, roomTwoStartZ, roomTwoStartZ - (int) halfDistanceZ, BLACK, world);
     } else {
-        //Extend from roomOne
-        for (int i = roomOneStartZ; i < roomOneStartZ + ((int)ceil(halfDistanceZ)); ++i) {
-            world[roomOne->startX + hallXOffset1][1][i] = BLACK;
-        }
-        //Extend from roomTwo
-        for (int i = roomTwoStartZ; i > roomTwoStartZ - ((int)ceil(halfDistanceZ)) + 1; --i) {
-            world[roomTwo->startX + hallXOffset2][1][i] = BLACK;
-        }
+        drawLineZ(roomTwo->startX + hallXOffset2, 1, roomTwoStartZ, roomTwoStartZ - ((int)ceil(halfDistanceZ)) + 1, BLACK, world);
     }
-    int roomOneStartX = roomOne->startX + hallXOffset1;
-    int roomTwoStartX = roomTwo->startX + hallXOffset2;
 
     //Connect the two extensions with a perpendicular line
-    if (roomTwoStartX - roomOneStartX >= 0) {
-        for (int i = roomOneStartX; i < roomTwoStartX + 1; ++i) {
-            world[i][1][roomOneStartZ + ((int)ceil(halfDistanceZ))] = BLACK;
-        }
+    drawLineX(roomOne->startX + hallXOffset1, roomTwo->startX + hallXOffset2, 1, roomOneStartZ + ((int)ceil(halfDistanceZ)), BLACK, world);
+}
+
+/**
+ * Draws a line along the X axis
+ * @param xStart Starting X
+ * @param xEnd Ending X
+ * @param y Y height
+ * @param z Z position
+ * @param cubeColour The colour of the cube to set
+ * @param world World to draw in
+ */
+void drawLineX(int xStart, int xEnd, int y, int z, int cubeColour, GLubyte world[100][50][100]) {
+    if (xStart < xEnd) {
+        for (int x = xStart; x < xEnd + 1; ++x)
+            world[x][y][z] = cubeColour;
     } else {
-        for (int i = roomOneStartX; i > roomTwoStartX - 1; --i) {
-            world[i][1][roomOneStartZ + ((int)ceil(halfDistanceZ))] = BLACK;
+        for (int x = xStart; x > xEnd - 1; --x)
+            world[x][y][z] = cubeColour;
+    }
+}
+
+/**
+ * Draws a line along the Z axis
+ * @param y Y height
+ * @param x X position
+ * @param zStart Starting Z
+ * @param zEnd Ending Z
+ * @param cubeColour The colour of the cube to set
+ * @param world World to draw in
+ */
+void drawLineZ(int x, int y, int zStart, int zEnd, int cubeColour, GLubyte world[100][50][100]) {
+    if (zStart < zEnd) {
+        for (int z = zStart; z < zEnd + 1; ++z)
+            world[x][y][z] = cubeColour;
+    } else {
+        for (int z = zStart; z > zEnd - 1; --z) {
+            world[x][y][z] = cubeColour;
         }
     }
 }
