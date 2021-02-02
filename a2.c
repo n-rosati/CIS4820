@@ -90,6 +90,7 @@ extern void getUserColour(int, GLfloat*, GLfloat*, GLfloat*, GLfloat*,
 /* note that the world coordinates returned from getViewPosition()
    will be the negative value of the array indices */
 void collisionResponse() {
+#ifndef DEBUG
     float oldX = 0, oldY = 0, oldZ = 0;
     getOldViewPosition(&oldX, &oldY, &oldZ);
 
@@ -105,6 +106,7 @@ void collisionResponse() {
     } else if (world[(int) NEGATE(ceilf(newX))][(int) NEGATE(floorf(newY)) - 1][(int) NEGATE(ceilf(newZ))] != 0) {
         setViewPosition(newX, newY - 1, newZ);
     }
+#endif
 }
 
 
@@ -230,6 +232,7 @@ void update() {
 
 
     } else {
+#ifndef DEBUG
         float oldX = 0, oldY = 0, oldZ = 0;
         getOldViewPosition(&oldX, &oldY, &oldZ);
 
@@ -240,6 +243,7 @@ void update() {
             setOldViewPosition(oldX, oldY + GRAVITY_AMT, oldZ);
             setViewPosition(oldX, oldY + GRAVITY_AMT, oldZ);
         }
+#endif
     }
 }
 
@@ -270,8 +274,8 @@ int main(int argc, char** argv) {
     /* initialize the graphics system */
     graphicsInit(&argc, argv);
 
-    Room *rooms[9];
-    int numRooms;
+    int numRooms = 0;
+    Level level;
 
     /* the first part of this if statement builds a sample */
     /* world which will be used for testing */
@@ -326,11 +330,9 @@ int main(int argc, char** argv) {
         /* create sample player */
         createPlayer(0, 52.0, 27.0, 52.0, 0.0);
     } else {
-        /*TODO: Make a nicer to use function for setting colours
-         *      - Take hex or RGB in*/
         //Set custom colors
-        setUserColour(LIGHT_GREY, 0.5, 0.5, 0.5, 1.0, 0.25, 0.25, 0.25, 1.0); //Light grey
-        setUserColour(DARK_GREY, 0.25, 0.25, 0.25, 1.0, 0.05, 0.05, 0.05, 1.0); //Dark grey
+        setUserColourRGBA(LIGHT_GREY, 140, 140, 140, 1);
+        setUserColourRGBA(DARK_GREY, 70, 70, 70, 1);
 
         //Zero the world
         for (int l = 0; l < WORLDX; ++l)
@@ -342,21 +344,21 @@ int main(int argc, char** argv) {
         for (int l = 0; l < WORLDX; l++)
             for (int m = 0; m < WORLDZ; m++)
                 world[l][0][m] = ((l + m) % 2) ? DARK_GREY : LIGHT_GREY; //Checker board for light/dark grey
-
+                
+        level.seed = time(NULL);
+        
         //Generate rooms
-        int seed = time(NULL);
-        printf("Seed: %d\n", seed);
-        srand(seed);
+        printf("Seed: %d\n", level.seed);
+        srand(level.seed);
 
         for (int l = 0; l < 9; l++)
-            rooms[l] = createRoom();
+            level.rooms[l] = createRoom();
 
         //Place rooms
-        numRooms = 0;
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
-                drawRoom(row, col, rand() % (CELL_SIZE - rooms[numRooms]->width - 3), rand() % (CELL_SIZE - rooms[numRooms]->length - 3), rooms[numRooms], world);
-                populateRoom(rooms[row * 3 + col], world);
+                drawRoom(row, col, rand() % (CELL_SIZE - level.rooms[numRooms]->width - 3), rand() % (CELL_SIZE - level.rooms[numRooms]->length - 3), level.rooms[numRooms], world);
+                populateRoom(level.rooms[row * 3 + col], world);
                 numRooms++;
             }
         }
@@ -364,15 +366,15 @@ int main(int argc, char** argv) {
         //Connect rooms with hallways
         for (int l = 0; l < 3; l++) {
             for (int m = 0; m < 2; m++) {
-                drawHallwaysX(rooms[l * 3 + m], rooms[l * 3 + m + 1], world);
-                drawHallwaysZ(rooms[l + 3 * m], rooms[l + 3 * m + 3], world);
+                drawHallwaysX(level.rooms[l * 3 + m], level.rooms[l * 3 + m + 1], world);
+                drawHallwaysZ(level.rooms[l + 3 * m], level.rooms[l + 3 * m + 3], world);
             }
         }
 
         //Set the initial view position to be in a random room
         int initialRoomNumber = rand() % numRooms;
-        int halfwayX = rooms[initialRoomNumber]->startX + (rooms[initialRoomNumber]->width / 2);
-        int halfwayZ = rooms[initialRoomNumber]->startZ + (rooms[initialRoomNumber]->length / 2);
+        int halfwayX = level.rooms[initialRoomNumber]->startX + (level.rooms[initialRoomNumber]->width / 2);
+        int halfwayZ = level.rooms[initialRoomNumber]->startZ + (level.rooms[initialRoomNumber]->length / 2);
         setViewPosition(NEGATE(halfwayX), -2, NEGATE(halfwayZ));
     }
 
@@ -383,7 +385,7 @@ int main(int argc, char** argv) {
 
     //Free the rooms
     for (int l = 0; l < numRooms; l++)
-        deleteRoom(rooms[l]);
+        deleteRoom(level.rooms[l]);
 
     return 0;
 }
