@@ -331,8 +331,9 @@ int main(int argc, char** argv) {
         createPlayer(0, 52.0, 27.0, 52.0, 0.0);
     } else {
         //Set custom colors
-        setUserColourRGBA(LIGHT_GREY, 140, 140, 140, 1);
-        setUserColourRGBA(DARK_GREY, 70, 70, 70, 1);
+        setUserColourRGBA(LIGHT_BROWN, 100, 100, 60, 1);
+        setUserColourRGBA(DARK_BROWN, 50, 50, 30, 1);
+        setUserColourRGBA(BEIGE, 120, 120, 98, 1);
 
         //Zero the world
         for (int l = 0; l < WORLDX; ++l)
@@ -343,7 +344,7 @@ int main(int argc, char** argv) {
         //Build a platform
         for (int l = 0; l < WORLDX; l++)
             for (int m = 0; m < WORLDZ; m++)
-                world[l][0][m] = ((l + m) % 2) ? DARK_GREY : LIGHT_GREY; //Checker board for light/dark grey
+                world[l][0][m] = ((l + m) % 2) ? DARK_BROWN : LIGHT_BROWN; //Checker board for light/dark grey
                 
         level.seed = time(NULL);
         

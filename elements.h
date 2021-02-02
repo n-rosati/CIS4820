@@ -31,8 +31,9 @@
 #define PURPLE      6
 #define ORANGE      7
 #define YELLOW      8
-#define LIGHT_GREY  9
-#define DARK_GREY  10
+#define LIGHT_BROWN 9
+#define DARK_BROWN  10
+#define BEIGE       11
 
 #define GRAVITY_AMT 0.1f
 

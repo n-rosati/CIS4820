@@ -62,7 +62,7 @@ int screenHeight = 768;
 
 /* command line flags */
 #ifdef DEBUG
-int flycontrol = 1
+int flycontrol = 1;
 #endif
 #ifndef DEBUG
 int flycontrol = 0;        // allow viewpoint to move in y axis when 1
