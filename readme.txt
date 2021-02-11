@@ -1,6 +1,6 @@
 Custom things
 -------------
-- Please ensure that elements.h and elements.c are included when compiling this assignment
+- Please ensure that elements.h, elements.c, PerlinNoise.h, and PerlinNoise.c are included when compiling this assignment
     - They contain pretty about 80% of my assignments code
 - Moving through the hallways is a little bit tricky without the ability for the camera to 'slide' along walls
 

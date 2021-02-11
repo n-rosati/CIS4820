@@ -13,6 +13,7 @@
 #include <time.h>
 #include "graphics.h"
 #include "elements.h"
+#include "PerlinNoise.h"
 
 extern GLubyte world[WORLDX][WORLDY][WORLDZ];
 /* mouse function called by GLUT when a button is pressed or released */
@@ -341,42 +342,57 @@ int main(int argc, char** argv) {
                 for (int n = 0; n < WORLDZ; ++n)
                     world[l][m][n] = EMPTY;
 
-        //Build a platform
-        for (int l = 0; l < WORLDX; l++)
-            for (int m = 0; m < WORLDZ; m++)
-                world[l][0][m] = ((l + m) % 2) ? DARK_BROWN : LIGHT_BROWN; //Checker board for light/dark grey
+//        //Build a platform
+//        for (int l = 0; l < WORLDX; l++)
+//            for (int m = 0; m < WORLDZ; m++)
+//                world[l][0][m] = ((l + m) % 2) ? DARK_BROWN : LIGHT_BROWN; //Checker board for light/dark grey
                 
         level.seed = time(NULL);
-        
-        //Generate rooms
-        printf("Seed: %d\n", level.seed);
-        srand(level.seed);
 
-        for (int l = 0; l < 9; l++)
-            level.rooms[l] = createRoom();
-
-        //Place rooms
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                drawRoom(row, col, rand() % (CELL_SIZE - level.rooms[numRooms]->width - 3), rand() % (CELL_SIZE - level.rooms[numRooms]->length - 3), level.rooms[numRooms], world);
-                populateRoom(level.rooms[row * 3 + col], world);
-                numRooms++;
+        for (int x = 0; x < WORLDX; x++) {
+            for (int z = 0; z < WORLDZ; z++) {
+                int height = perlinNoise(x, z);
+                world[x][height][z] = WHITE;
+                world[x][height - 1][z] = GREEN;
+                world[x][height - 2][z] = DARK_BROWN;
+                world[x][height - 3][z] = DARK_BROWN;
+                world[x][height - 4][z] = DARK_BROWN;
+                world[x][height - 5][z] = DARK_BROWN;
             }
         }
 
-        //Connect rooms with hallways
-        for (int l = 0; l < 3; l++) {
-            for (int m = 0; m < 2; m++) {
-                drawHallwaysX(level.rooms[l * 3 + m], level.rooms[l * 3 + m + 1], world);
-                drawHallwaysZ(level.rooms[l + 3 * m], level.rooms[l + 3 * m + 3], world);
-            }
-        }
+        setViewPosition(10, -50, 10);
 
-        //Set the initial view position to be in a random room
-        int initialRoomNumber = rand() % numRooms;
-        int halfwayX = level.rooms[initialRoomNumber]->startX + (level.rooms[initialRoomNumber]->width / 2);
-        int halfwayZ = level.rooms[initialRoomNumber]->startZ + (level.rooms[initialRoomNumber]->length / 2);
-        setViewPosition(NEGATE(halfwayX), -2, NEGATE(halfwayZ));
+
+//        //Generate rooms
+//        printf("Seed: %d\n", level.seed);
+//        srand(level.seed);
+//
+//        for (int l = 0; l < 9; l++)
+//            level.rooms[l] = createRoom();
+//
+//        //Place rooms
+//        for (int row = 0; row < 3; row++) {
+//            for (int col = 0; col < 3; col++) {
+//                drawRoom(row, col, rand() % (CELL_SIZE - level.rooms[numRooms]->width - 3), rand() % (CELL_SIZE - level.rooms[numRooms]->length - 3), level.rooms[numRooms], world);
+//                populateRoom(level.rooms[row * 3 + col], world);
+//                numRooms++;
+//            }
+//        }
+//
+//        //Connect rooms with hallways
+//        for (int l = 0; l < 3; l++) {
+//            for (int m = 0; m < 2; m++) {
+//                drawHallwaysX(level.rooms[l * 3 + m], level.rooms[l * 3 + m + 1], world);
+//                drawHallwaysZ(level.rooms[l + 3 * m], level.rooms[l + 3 * m + 3], world);
+//            }
+//        }
+//
+//        //Set the initial view position to be in a random room
+//        int initialRoomNumber = rand() % numRooms;
+//        int halfwayX = level.rooms[initialRoomNumber]->startX + (level.rooms[initialRoomNumber]->width / 2);
+//        int halfwayZ = level.rooms[initialRoomNumber]->startZ + (level.rooms[initialRoomNumber]->length / 2);
+//        setViewPosition(NEGATE(halfwayX), -2, NEGATE(halfwayZ));
     }
 
 
@@ -384,9 +400,9 @@ int main(int argc, char** argv) {
     /* code after this will not run until the program exits */
     glutMainLoop();
 
-    //Free the rooms
-    for (int l = 0; l < numRooms; l++)
-        deleteRoom(level.rooms[l]);
+//    //Free the rooms
+//    for (int l = 0; l < numRooms; l++)
+//        deleteRoom(level.rooms[l]);
 
     return 0;
 }
