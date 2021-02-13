@@ -27,6 +27,7 @@ static int permutation[] = {151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53,
                             93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180 };
 
 float noise2D(float x, float z);
+/**Returns a Perlin noise value between 0 and 10*/
 int perlinNoise(int x, int z, float frequency, int depth);
 float smoothInter(float x, float z, float s);
 int noise2(int x, int z);

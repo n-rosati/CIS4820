@@ -24,13 +24,13 @@ Level* generateOutdoor() {
     //Generate terrain
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {
-            int height = perlinNoise(x, z, 0.2f, 1) + 15;
-            level->world[x][height][z] = WHITE;
-            level->world[x][height - 1][z] = GREEN;
-            level->world[x][height - 2][z] = DARK_BROWN;
-            level->world[x][height - 3][z] = DARK_BROWN;
-            level->world[x][height - 4][z] = DARK_BROWN;
-            level->world[x][height - 5][z] = DARK_BROWN;
+            int height = perlinNoise(x, z, 0.15f, 1) + 15;
+            if (height > 22) { level->world[x][height][z] = WHITE; }
+            level->world[x][height - (height > 22 ? 1 : 0)][z] = GREEN;
+            level->world[x][height - (height > 22 ? 2 : 1)][z] = DARK_BROWN;
+            level->world[x][height - (height > 22 ? 3 : 2)][z] = DARK_BROWN;
+            level->world[x][height - (height > 22 ? 4 : 3)][z] = DARK_BROWN;
+            level->world[x][height - (height > 22 ? 5 : 4)][z] = DARK_BROWN;
         }
     }
 
