@@ -6,10 +6,6 @@
 #include <math.h>
 #include "undergroundGen.h"
 
-/**
- * Creates a room
- * @return Pointer to a newly created room
- */
 Room* createRoom() {
     Room* room = calloc(1, sizeof(Room));
     room->width = (rand() % ROOM_MAX_WIDTH) + ROOM_MIN_WIDTH;
@@ -17,15 +13,6 @@ Room* createRoom() {
     return room;
 }
 
-/**
- * Draw a room on the world
- * @param row Cell row for room
- * @param col Cell column for room
- * @param xOffset Offset from edge of the cell
- * @param zOffset Offset from edge of the cell
- * @param room Room to build
- * @param world World to build to
- */
 void drawRoom(int row, int col, int xOffset, int zOffset, Room* room, GLubyte world[100][50][100]) {
     room->startX = (col * CELL_SIZE + xOffset);
     room->startZ = (row * CELL_SIZE + zOffset);
@@ -52,10 +39,6 @@ void drawRoom(int row, int col, int xOffset, int zOffset, Room* room, GLubyte wo
             world[x][ROOM_HEIGHT + 1][z] = DARK_BROWN;
 }
 
-/**
- * Adds 3 random cubes into a room
- * @param room Room to add cubes to
- */
 void populateRoom(Room* room, GLubyte world[100][50][100]) {
     for (int i = 0; i < 3; i++) {
         int relativeX = rand() % (room->width - 2);
@@ -76,12 +59,6 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
     }
 }
 
-/**
- * Draws hallways between two X adjacent rooms.
- * @param roomOne First room.
- * @param roomTwo Second room.
- * @param world The world to draw the hallways in.
- */
 void drawHallwaysX(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
     //Offsets on the walls
     int hallZOffset1 = rand() % (roomOne->length - 1 - HALL_RADIUS) + HALL_RADIUS;
@@ -119,12 +96,6 @@ void drawHallwaysX(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
     }
 }
 
-/**
- * Draws hallways between two Z adjacent rooms.
- * @param roomOne First room.
- * @param roomTwo Second room.
- * @param world The world to draw the hallways in.
- */
 void drawHallwaysZ(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
     //Offsets on the walls
     int hallXOffset1 = rand() % (roomOne->width - 1 - HALL_RADIUS) + HALL_RADIUS;
@@ -162,15 +133,6 @@ void drawHallwaysZ(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
     }
 }
 
-/**
- * Draws a line along the X axis
- * @param xStart Starting X
- * @param xEnd Ending X
- * @param y Y height
- * @param z Z position
- * @param cubeColour The colour of the cube to set
- * @param world World to draw in
- */
 void drawLineX(int xStart, int xEnd, int y, int z, int cubeColour, GLubyte world[100][50][100]) {
     if (xStart < xEnd) {
         for (int x = xStart; x < xEnd + 1; ++x)
@@ -181,15 +143,6 @@ void drawLineX(int xStart, int xEnd, int y, int z, int cubeColour, GLubyte world
     }
 }
 
-/**
- * Draws a line along the Z axis
- * @param x X position
- * @param y Y height
- * @param zStart Starting Z
- * @param zEnd Ending Z
- * @param cubeColour The colour of the cube to set
- * @param world World to draw in
- */
 void drawLineZ(int x, int y, int zStart, int zEnd, int cubeColour, GLubyte world[100][50][100]) {
     if (zStart < zEnd) {
         for (int z = zStart; z < zEnd + 1; ++z)

@@ -14,20 +14,33 @@ static const int CLOUD_SPEED = 20;
 extern void setViewPosition(float, float, float);
 extern void getViewPosition(float*, float*, float*);
 
+typedef struct ThreeTupleInt {
+    int x, y, z;
+} ThreeTupleInt;
+
+typedef struct ThreeTupleFloat {
+    float x, y, z;
+} ThreeTupleFloat;
+
 /**Level details.*/
-typedef  struct Level {
+typedef struct Level {
     /**World associated with level*/
     GLubyte world[100][50][100];
     /**Rooms in level. NULL if outdoor level.*/
     Room* rooms[9];
     /**Seed used to generate the level*/
     int seed;
+    //TODO: Replace individual X, Y, Z with ThreeTupleFloat
     /**Viewport X.*/
     float viewportX;
     /**Viewport Y.*/
     float viewportY;
     /**Viewport Z.*/
     float viewportZ;
+    /**Stairs down location*/
+    ThreeTupleInt stairsDown;
+    /**Stairs up location*/
+    ThreeTupleInt stairsUp;
 } Level;
 
 /**
