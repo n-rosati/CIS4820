@@ -49,7 +49,7 @@ LIBS = -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/De
 #LIBS = -lGL -lGLU -lglut -lm -D__LINUX__
 
 a2: a2.c graphics.c visible.c graphics.h undergroundGen.c undergroundGen.h perlinNoise.c perlinNoise.h levelGen.c levelGen.h
-	gcc a2.c graphics.c visible.c undergroundGen.c PerlinNoise.c LinkedListAPI.c levelGen.c -o out/a2 $(LIBS)
+	gcc a2.c graphics.c visible.c undergroundGen.c PerlinNoise.c LinkedListAPI.c levelGen.c -o out/a2 $(LIBS) -ggdb
 
 a2-debug: a2.c graphics.c visible.c graphics.h undergroundGen.c undergroundGen.h perlinNoise.c perlinNoise.h levelGen.c levelGen.h
 	gcc a2.c graphics.c visible.c undergroundGen.c PerlinNoise.c LinkedListAPI.c levelGen.c -o out/a2-debug $(LIBS) -DDEBUG -ggdb

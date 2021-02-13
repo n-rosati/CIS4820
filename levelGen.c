@@ -135,9 +135,19 @@ void moveDown(List* levels, GLubyte world[100][50][100]) {
         insertBack(levels, generateLevel());
     }
 
-    //Save viewport position
     Level* currentLevel = levels->head->data;
     getViewPosition(&currentLevel->viewportX, &currentLevel->viewportY, &currentLevel->viewportZ);
+
+    //This prevents the user from getting stuck in an up <-> down loop when going up stairs
+    if (levels->head->previous == NULL) {
+        //Outdoor level
+        currentLevel->viewportY -= 3;
+        currentLevel->viewportZ -= 2;
+        currentLevel->viewportX -= 2;
+    } else {
+        currentLevel->viewportX -= (world[currentLevel->stairsDown.x + 1][1][currentLevel->stairsDown.z] == 0) ? 1 : -1;
+        currentLevel->viewportZ -= (world[currentLevel->stairsDown.x][1][currentLevel->stairsDown.z + 1] == 0) ? 1 : -1;
+    }
 
     levels->head = levels->head->next;
     loadLevel(levels->head->data, world);
@@ -149,6 +159,10 @@ void moveUp(List* levels, GLubyte world[100][50][100]) {
         Level* currentLevel = levels->head->data;
         getViewPosition(&currentLevel->viewportX, &currentLevel->viewportY, &currentLevel->viewportZ);
 
+        //Prevents the user from getting stuck going down->up instantly
+        currentLevel->viewportX -= (world[currentLevel->stairsDown.x + 1][1][currentLevel->stairsDown.z] == 0) ? 1 : -1;
+        currentLevel->viewportZ -= (world[currentLevel->stairsDown.x][1][currentLevel->stairsDown.z + 1] == 0) ? 1 : -1;
+
         levels->head = levels->head->previous;
         loadLevel(levels->head->data, world);
     }
@@ -159,6 +173,7 @@ void loadLevel(Level* level, GLubyte world[100][50][100]) {
 
     srand(level->seed);
     setViewPosition(level->viewportX, level->viewportY, level->viewportZ);
+    setOldViewPosition(level->viewportX, level->viewportY, level->viewportZ);
 
     for (int x = 0; x < WORLDX; ++x) {
         for (int y = 0; y < WORLDY; ++y) {

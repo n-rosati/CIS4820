@@ -244,27 +244,45 @@ void update() {
         float oldX = 0, oldY = 0, oldZ = 0;
         getOldViewPosition(&oldX, &oldY, &oldZ);
 
+        int currentX = (int)NEGATE(ceilf((float)oldX));
+        int currentY = (int)NEGATE(floorf((float)oldY));
+        int currentZ = (int)NEGATE(ceilf((float)oldZ));
+
         //Check if the current block and block under the view port are air
         //If so, do gravity
-        if ((unsigned int)world[(int)NEGATE(ceilf((float)oldX))][(int)NEGATE(roundf((float)oldY))][(int)NEGATE(ceilf((float)oldZ))] == 0 &&
-            (unsigned int)world[(int)NEGATE(ceilf((float)oldX))][(int)NEGATE(roundf((float)oldY + 1.5f))][(int)NEGATE(ceilf((float)oldZ))] == 0) {
+        if (world[currentX][currentY][currentZ] == 0 &&
+            world[currentX][currentY - 2][currentZ] == 0) {
             setOldViewPosition(oldX, oldY + GRAVITY_AMT, oldZ);
             setViewPosition(oldX, oldY + GRAVITY_AMT, oldZ);
         }
 #endif
 
-        //Cloud animation
-        if (cloudTick % CLOUD_SPEED == 0) {
-            for (int a = 0; a < WORLDX; ++a) {
-                GLubyte end = world[a][49][WORLDZ - 1];
-                for (int b = WORLDZ - 1; b > 0; --b) {
-                    world[a][49][b] = world[a][49][b - 1];
-                }
-                world[a][49][0] = end;
-            }
+        //Check if the player is on stairs
+        Level* currentLevel = levels->head->data;
+#ifdef DEBUG
+        printf("At: %d %d (%d) %d\tStairs down: %d %d %d\tStairs up: %d %d %d\n", currentX, currentY, currentY - 2, currentZ, currentLevel->stairsDown.x, currentLevel->stairsDown.y, currentLevel->stairsDown.z, currentLevel->stairsUp.x, currentLevel->stairsUp.y, currentLevel->stairsUp.z);
+#endif
+        if (currentX == currentLevel->stairsDown.x && (currentY - 2) == currentLevel->stairsDown.y && currentZ == currentLevel->stairsDown.z) {
+            moveDown(levels, world);
+        } else if (currentX == currentLevel->stairsUp.x && (currentY - 2) == currentLevel->stairsUp.y && currentZ == currentLevel->stairsUp.z) {
+            moveUp(levels, world);
         }
-        cloudTick++;
 
+
+        //Save CPU cycles when not on the outside level
+        if (levels->head->previous == NULL) {
+            //Cloud animation
+            if (cloudTick % CLOUD_SPEED == 0) {
+                for (int a = 0; a < WORLDX; ++a) {
+                    GLubyte end = world[a][49][WORLDZ - 1];
+                    for (int b = WORLDZ - 1; b > 0; --b) {
+                        world[a][49][b] = world[a][49][b - 1];
+                    }
+                    world[a][49][0] = end;
+                }
+            }
+            cloudTick++;
+        }
     }
 }
 
@@ -277,14 +295,10 @@ void update() {
 void mouse(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON) {
         printf("left button - ");
-        //FIXME: Put into stairs blocks functionality
-        moveDown(levels, world);
     } else if (button == GLUT_MIDDLE_BUTTON) {
         printf("middle button - ");
     } else {
         printf("right button - ");
-        //FIXME: Put into stairs blocks functionality
-        moveUp(levels, world);
     }
     if (state == GLUT_UP) {
         printf("up - ");

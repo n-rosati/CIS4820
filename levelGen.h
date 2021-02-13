@@ -12,6 +12,7 @@ static const int CLOUD_SPEED = 20;
 
 //Function prototypes needed to compile
 extern void setViewPosition(float, float, float);
+extern void setOldViewPosition(float, float, float);
 extern void getViewPosition(float*, float*, float*);
 
 typedef struct ThreeTupleInt {
