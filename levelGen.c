@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 #include "levelGen.h"
 #include "perlinNoise.h"
 #include "LinkedListAPI.h"
@@ -20,6 +21,7 @@ Level* generateOutdoor() {
     level->seed = time(NULL);
     srand(level->seed);
 
+    //Generate terrain
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {
             int height = perlinNoise(x, z, 0.2f, 1) + 15;
@@ -32,12 +34,7 @@ Level* generateOutdoor() {
         }
     }
 
-    //TODO: Place camera near the stairs
-    level->viewportX = -50.0f;
-    level->viewportY = -30.0f;
-    level->viewportZ = -50.0f;
-
-
+    //Add the cloud layer
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {
             if (perlinNoise(x, z, 0.08f, 3) >= 6) {
@@ -45,6 +42,24 @@ Level* generateOutdoor() {
             }
         }
     }
+
+    //Pick location for the stairs and place the camera nearby
+    level->stairsDown.x = (rand() % (WORLDX - 14)) + 7;
+    level->stairsDown.z = (rand() % (WORLDZ - 14)) + 7;
+    level->stairsDown.y = 49;
+    while (level->world[level->stairsDown.x][--level->stairsDown.y][level->stairsDown.z] == EMPTY){} //Finds the top layer block
+    level->world[level->stairsDown.x][level->stairsDown.y][level->stairsDown.z] = GREY;
+
+    level->viewportX = (float) (level->stairsDown.x + ((rand() % 11) - 5));
+    level->viewportZ = (float) (level->stairsDown.z + ((rand() % 11) - 5));
+    level->viewportY = 48.0f;
+    while (level->world[(int) (level->viewportX)][(int) (level->viewportY - 3.0f)][(int) (level->viewportZ)] == EMPTY) { //Finds the top layer block
+        level->viewportY -= 1.0f;
+    }
+
+    level->viewportX = fabsf(level->viewportX) * -1.0f;
+    level->viewportY = fabsf(level->viewportY) * -1.0f;
+    level->viewportZ = fabsf(level->viewportZ) * -1.0f;
 
     return level;
 }

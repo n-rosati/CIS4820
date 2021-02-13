@@ -35,6 +35,7 @@ static const GLubyte YELLOW = 8;
 static const GLubyte LIGHT_BROWN = 9;
 static const GLubyte DARK_BROWN = 10;
 static const GLubyte BEIGE = 11;
+static const GLubyte GREY = 12;
 
 static const float GRAVITY_AMT = 0.1f;
 

@@ -356,6 +356,7 @@ int main(int argc, char** argv) {
         setUserColourRGBA(LIGHT_BROWN, 100, 100, 60, 1);
         setUserColourRGBA(DARK_BROWN, 50, 50, 30, 1);
         setUserColourRGBA(BEIGE, 120, 120, 98, 1);
+        setUserColourRGBA(GREY, 100, 100, 100, 1);
 
         //Prep the levels list
         levels = initializeList(printLevel, deleteLevel, compareLevels);
