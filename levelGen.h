@@ -4,12 +4,31 @@
 
 #ifndef CIS4820_LEVELGEN_H
 #define CIS4820_LEVELGEN_H
-#include "elements.h"
+#include "undergroundGen.h"
 #include "LinkedListAPI.h"
+
+//Lower speed is faster
+static const int CLOUD_SPEED = 20;
 
 //Function prototypes needed to compile
 extern void setViewPosition(float, float, float);
 extern void getViewPosition(float*, float*, float*);
+
+/**Level details.*/
+typedef  struct Level {
+    /**World associated with level*/
+    GLubyte world[100][50][100];
+    /**Rooms in level. NULL if outdoor level.*/
+    Room* rooms[9];
+    /**Seed used to generate the level*/
+    int seed;
+    /**Viewport X.*/
+    float viewportX;
+    /**Viewport Y.*/
+    float viewportY;
+    /**Viewport Z.*/
+    float viewportZ;
+} Level;
 
 /**
  * Removes all blocks in the world.

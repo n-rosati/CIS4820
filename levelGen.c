@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "levelGen.h"
-#include "PerlinNoise.h"
+#include "perlinNoise.h"
 #include "LinkedListAPI.h"
 
 void clearWorld(GLubyte world[100][50][100]) {
@@ -22,7 +22,7 @@ Level* generateOutdoor() {
 
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {
-            int height = perlinNoise(x, z, 0.25f, 1);
+            int height = perlinNoise(x, z, 0.2f, 1) + 15;
             level->world[x][height][z] = WHITE;
             level->world[x][height - 1][z] = GREEN;
             level->world[x][height - 2][z] = DARK_BROWN;
@@ -32,7 +32,19 @@ Level* generateOutdoor() {
         }
     }
 
-    //TODO: Generate cloud layer with perlin noise. Low frequency, low depth.
+    //TODO: Place camera near the stairs
+    level->viewportX = -50.0f;
+    level->viewportY = -30.0f;
+    level->viewportZ = -50.0f;
+
+
+    for (int x = 0; x < WORLDX; x++) {
+        for (int z = 0; z < WORLDZ; z++) {
+            if (perlinNoise(x, z, 0.08f, 3) >= 6) {
+                level->world[x][49][z] = WHITE;
+            }
+        }
+    }
 
     return level;
 }

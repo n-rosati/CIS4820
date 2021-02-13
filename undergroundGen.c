@@ -3,9 +3,8 @@
 //
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
-#include "elements.h"
+#include "undergroundGen.h"
 
 /**
  * Creates a room
@@ -200,18 +199,4 @@ void drawLineZ(int x, int y, int zStart, int zEnd, int cubeColour, GLubyte world
             world[x][y][z] = cubeColour;
         }
     }
-}
-
-extern int setUserColour(int, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat);
-/**
- * Sets a user colour using RGBA instead of a number between 0 and 1.
- * @param colourNumber The colour number to set in OpenGL
- * @param red Red value [0-255]
- * @param green Green value [0-255]
- * @param blue Blue value [0-255]
- * @param alpha Alpha value [0-1]
- * @return
- */
-void setUserColourRGBA(int colourNumber, int red, int green, int blue, float alpha) {
-    setUserColour(colourNumber, red / 255.0f, green / 255.0f, blue / 255.0f, alpha, (red / 255.0f) / 2.0f, (green / 255.0f) / 2.0f, (blue / 255.0f) / 2.0f, alpha / 2.0f);
 }

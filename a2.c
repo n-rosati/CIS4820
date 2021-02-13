@@ -13,8 +13,8 @@
 #include <time.h>
 
 #include "graphics.h"
-#include "elements.h"
-#include "PerlinNoise.h"
+#include "undergroundGen.h"
+#include "perlinNoise.h"
 #include "LinkedListAPI.h"
 #include "levelGen.h"
 
@@ -86,7 +86,10 @@ extern void getUserColour(int, GLfloat*, GLfloat*, GLfloat*, GLfloat*,
 
 /********* end of extern variable declarations **************/
 
+/**Custom things*/
+void setUserColourRGBA(int colourNumber, int red, int green, int blue, float alpha);
 List* levels;
+int cloudTick = 0;
 
 /*** collisionResponse() ***/
 /* -performs collision detection and response */
@@ -249,6 +252,19 @@ void update() {
             setViewPosition(oldX, oldY + GRAVITY_AMT, oldZ);
         }
 #endif
+
+        //Cloud animation
+        if (cloudTick % CLOUD_SPEED == 0) {
+            for (int a = 0; a < WORLDX; ++a) {
+                GLubyte end = world[a][49][WORLDZ - 1];
+                for (int b = WORLDZ - 1; b > 0; --b) {
+                    world[a][49][b] = world[a][49][b - 1];
+                }
+                world[a][49][0] = end;
+            }
+        }
+        cloudTick++;
+
     }
 }
 
@@ -360,3 +376,15 @@ int main(int argc, char** argv) {
     return 0;
 }
 
+/**
+ * Sets a user colour using RGBA instead of a number between 0 and 1.
+ * @param colourNumber The colour number to set in OpenGL
+ * @param red Red value [0-255]
+ * @param green Green value [0-255]
+ * @param blue Blue value [0-255]
+ * @param alpha Alpha value [0-1]
+ * @return
+ */
+void setUserColourRGBA(int colourNumber, int red, int green, int blue, float alpha) {
+    setUserColour(colourNumber, red / 255.0f, green / 255.0f, blue / 255.0f, alpha, (red / 255.0f) / 2.0f, (green / 255.0f) / 2.0f, (blue / 255.0f) / 2.0f, alpha / 2.0f);
+}

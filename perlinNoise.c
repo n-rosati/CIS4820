@@ -1,5 +1,5 @@
 #include <math.h>
-#include "PerlinNoise.h"
+#include "perlinNoise.h"
 
 int perlinNoise(int x, int z, float frequency, int depth) {
     float xa = (float) x * frequency;
@@ -18,8 +18,8 @@ int perlinNoise(int x, int z, float frequency, int depth) {
         amplitude /= 2;
     }
 
-    //Will return a number between 0 and 1. I want to generate between 10 and 20
-    return ((int) floorf((fin / div) * 10)) + 10;
+    //Will return a number between 0 and 10
+    return ((int) floorf((fin / div) * 10));
 }
 
 float noise2D(float x, float z) {
