@@ -1,9 +1,10 @@
 Custom things
 -------------
-- Please ensure that elements.h, elements.c, PerlinNoise.h, and PerlinNoise.c are included when compiling this assignment
+- Please ensure that elements.h, elements.c, PerlinNoise.h, PerlinNoise.c, LinkedListAPI.c, and LinkedListAPI.h are included when compiling this assignment
     - They contain pretty about 80% of my assignments code
 - Moving through the hallways is a little bit tricky without the ability for the camera to 'slide' along walls
 
+- The LinkedListAPI is from CIS*2750 in the W20 semester. Denis Nikitenko told us we were free to use it with other project and course work.
 
 Building and Running the Graphics System
 ----------------------------------------

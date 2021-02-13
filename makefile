@@ -48,11 +48,11 @@ LIBS = -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/De
 # on your distribution.
 #LIBS = -lGL -lGLU -lglut -lm -D__LINUX__
 
-a2: a2.c graphics.c visible.c graphics.h elements.c elements.h PerlinNoise.c PerlinNoise.h
-	gcc a2.c graphics.c visible.c elements.c PerlinNoise.c -o out/a2 $(LIBS)
+a2: a2.c graphics.c visible.c graphics.h elements.c elements.h PerlinNoise.c PerlinNoise.h levelGen.c levelGen.h
+	gcc a2.c graphics.c visible.c elements.c PerlinNoise.c LinkedListAPI.c levelGen.c -o out/a2 $(LIBS)
 
-a2-debug: a2.c graphics.c visible.c graphics.h elements.c elements.h PerlinNoise.c PerlinNoise.h
-	gcc a2.c graphics.c visible.c elements.c PerlinNoise.c -o out/a2-debug $(LIBS) -DDEBUG -ggdb
+a2-debug: a2.c graphics.c visible.c graphics.h elements.c elements.h PerlinNoise.c PerlinNoise.h levelGen.c levelGen.h
+	gcc a2.c graphics.c visible.c elements.c PerlinNoise.c LinkedListAPI.c levelGen.c -o out/a2-debug $(LIBS) -DDEBUG -ggdb
 
 clean:
 	rm -rfv out/*

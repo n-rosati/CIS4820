@@ -1,15 +1,15 @@
 #include <math.h>
 #include "PerlinNoise.h"
 
-int perlinNoise(int x, int z) {
-    float xa = (float) x * FREQUENCY;
-    float ya = (float) z * FREQUENCY;
+int perlinNoise(int x, int z, float frequency, int depth) {
+    float xa = (float) x * frequency;
+    float ya = (float) z * frequency;
     float amplitude = 1.0f;
     float fin = 0.0f;
     float div = 0.0f;
 
     int i = 0;
-    while (i < DEPTH) {
+    while (i < depth) {
         ++i;
         fin += noise2D(xa, ya) * amplitude;
         ya *= 2;

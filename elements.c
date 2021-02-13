@@ -19,13 +19,6 @@ Room* createRoom() {
 }
 
 /**
- * Frees a room
- */
-void deleteRoom(Room* room) {
-    free(room);
-}
-
-/**
  * Draw a room on the world
  * @param row Cell row for room
  * @param col Cell column for room
@@ -212,7 +205,7 @@ void drawLineZ(int x, int y, int zStart, int zEnd, int cubeColour, GLubyte world
 extern int setUserColour(int, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat);
 /**
  * Sets a user colour using RGBA instead of a number between 0 and 1.
- * @param colourNumber The colour numbert to set in OpenGL
+ * @param colourNumber The colour number to set in OpenGL
  * @param red Red value [0-255]
  * @param green Green value [0-255]
  * @param blue Blue value [0-255]

@@ -13,6 +13,7 @@
 #define ROOM_MAX_WIDTH 18
 #define ROOM_MIN_LENGTH 7
 #define ROOM_MAX_LENGTH 18
+#define NUM_ROOMS 9
 #define CELL_SIZE 33
 
 //Hallways stuff
@@ -49,8 +50,10 @@ typedef struct Room {
 
 /**Level details.*/
 typedef  struct Level {
-    /**Rooms in the level*/
-    Room *rooms[9];
+    /**World associated with level*/
+    GLubyte world[100][50][100];
+    /**Rooms in level. NULL if outdoor level.*/
+    Room* rooms[9];
     /**Seed used to generate the level*/
     int seed;
     /**Viewport X.*/
@@ -62,7 +65,6 @@ typedef  struct Level {
 } Level;
 
 Room* createRoom();
-void deleteRoom(Room* room);
 void drawRoom(int row, int col, int xOffset, int zOffset, Room* room, GLubyte world[100][50][100]);
 void populateRoom(Room* room, GLubyte world[100][50][100]);
 void drawHallwaysX(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]);
