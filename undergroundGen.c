@@ -40,20 +40,20 @@ void drawRoom(int row, int col, int xOffset, int zOffset, Room* room, GLubyte wo
 }
 
 void populateRoom(Room* room, GLubyte world[100][50][100]) {
-    for (int i = 0; i < 3; i++) {
-        int relativeX = rand() % (room->width - 2);
-        int relativeZ = rand() % (room->length - 2);
+    for (int i = 0; i < 2; i++) {
+        int offsetX = rand() % (room->width - 2);
+        int offsetZ = rand() % (room->length - 2);
 
         //Choose a random colour for the block
         switch (rand() % 3) {
             case 0:
-                world[room->startX + relativeX + 1][1][room->startZ + relativeZ + 1] = RED;
+                world[room->startX + offsetX + 1][1][room->startZ + offsetZ + 1] = RED;
                 break;
             case 1:
-                world[room->startX + relativeX + 1][1][room->startZ + relativeZ + 1] = GREEN;
+                world[room->startX + offsetX + 1][1][room->startZ + offsetZ + 1] = GREEN;
                 break;
             case 2:
-                world[room->startX + relativeX + 1][1][room->startZ + relativeZ + 1] = BLUE;
+                world[room->startX + offsetX + 1][1][room->startZ + offsetZ + 1] = BLUE;
                 break;
         }
     }

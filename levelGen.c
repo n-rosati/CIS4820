@@ -96,11 +96,33 @@ Level* generateLevel() {
         }
     }
 
-    //Set the initial view position
-    int initialRoomNumber = rand() % numRooms;
-    int halfwayX = level->rooms[initialRoomNumber]->startX + (level->rooms[initialRoomNumber]->width / 2);
-    int halfwayZ = level->rooms[initialRoomNumber]->startZ + (level->rooms[initialRoomNumber]->length / 2);
+    //Pick a random room to have the stairs
+    //Up stairs
+    int upStairsRoom = rand() % NUM_ROOMS;
+    level->stairsUp.x = level->rooms[upStairsRoom]->startX + ((rand() % (level->rooms[upStairsRoom]->width - 2)) + 1);
+    level->stairsUp.y = 0;
+    level->stairsUp.z = level->rooms[upStairsRoom]->startZ + ((rand() % (level->rooms[upStairsRoom]->length - 2)) + 1);
 
+    //Down stairs
+    int downStairsRoom;
+    do {
+        downStairsRoom = rand() % NUM_ROOMS;
+    } while (downStairsRoom == upStairsRoom);
+    level->stairsDown.x = level->rooms[downStairsRoom]->startX + ((rand() % (level->rooms[downStairsRoom]->width - 2)) + 1);
+    level->stairsDown.y = 0;
+    level->stairsDown.z = level->rooms[downStairsRoom]->startZ + ((rand() % (level->rooms[downStairsRoom]->length - 2)) + 1);
+
+    //Place stairs
+    level->world[level->stairsUp.x][level->stairsUp.y][level->stairsUp.z] = WHITE;
+    level->world[level->stairsDown.x][level->stairsDown.y][level->stairsDown.z] = GREY;
+
+    //Set the initial view position
+    int cameraStartingRoom;
+    do {
+        cameraStartingRoom = rand() % NUM_ROOMS;
+    } while (cameraStartingRoom == upStairsRoom || cameraStartingRoom == downStairsRoom);
+    int halfwayX = level->rooms[cameraStartingRoom]->startX + (level->rooms[cameraStartingRoom]->width / 2);
+    int halfwayZ = level->rooms[cameraStartingRoom]->startZ + (level->rooms[cameraStartingRoom]->length / 2);
     level->viewportX = NEGATE(halfwayX);
     level->viewportY = -2.0f;
     level->viewportZ = NEGATE(halfwayZ);
