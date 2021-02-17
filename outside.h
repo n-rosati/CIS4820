@@ -28,12 +28,11 @@ static int PERMUTATION[] = {151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53,
                             157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205,
                             93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180 };
 
-float noise2D(float x, float z);
+float noise2D(TwoTupleFloat coordinate);
 /**Returns x Perlin noise value between 0 and 10*/
-int perlinNoise(int x, int z, float frequency, int depth);
+int perlinNoise(TwoTupleInt coordinate, float frequency, int depth);
 float smoothInter(float x, float z, float s);
-int noise2(int x, int z);
-
+int noise2(TwoTupleInt coordinate);
 
 
 /*

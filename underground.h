@@ -43,7 +43,7 @@ Room* createRoom();
  * @param room Room to build
  * @param world World to build to
  */
-void drawRoom(int row, int col, int xOffset, int zOffset, Room* room, GLubyte world[100][50][100]);
+void drawRoom(TwoTupleInt coordinate, Room* room, GLubyte world[100][50][100]);
 
 /**
  * Adds 3 random cubes into x room

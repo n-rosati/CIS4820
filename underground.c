@@ -24,7 +24,10 @@ Level* generateUndergroundLevel() {
     int numRooms = 0;
     for (int row = 0; row < 3; row++) {
         for (int col = 0; col < 3; col++) {
-            drawRoom(row, col, rand() % (CELL_SIZE - level->rooms[numRooms]->length.x - 3), rand() % (CELL_SIZE - level->rooms[numRooms]->length.z - 3), level->rooms[numRooms], level->world);
+            int xOffset = rand() % (CELL_SIZE - level->rooms[numRooms]->length.x - 3);
+            int zOffset = rand() % (CELL_SIZE - level->rooms[numRooms]->length.z - 3);
+
+            drawRoom((TwoTupleInt) {.x = col * CELL_SIZE + xOffset, .z = row * CELL_SIZE + zOffset}, level->rooms[numRooms], level->world);
             populateRoom(level->rooms[row * 3 + col], level->world);
             numRooms++;
         }
@@ -79,24 +82,23 @@ Room* createRoom() {
     return room;
 }
 
-//TODO: Use absolute coordinates instead of cells
-void drawRoom(int row, int col, int xOffset, int zOffset, Room* room, GLubyte world[100][50][100]) {
-    room->origin.x = (col * CELL_SIZE + xOffset);
-    room->origin.z = (row * CELL_SIZE + zOffset);
+void drawRoom(TwoTupleInt coordinate, Room* room, GLubyte world[100][50][100]) {
+    room->origin.x = coordinate.x;
+    room->origin.z = coordinate.z;
 
     //Draw in x direction first
-    for (int x = (col * CELL_SIZE + xOffset); x < (room->length.x + (col * CELL_SIZE + xOffset)); ++x) {
+    for (int x = room->origin.x; x < (room->length.x + (room->origin.x)); ++x) {
         for (int y = 1; y <= ROOM_HEIGHT; y++) {
-            world[x][y][row * CELL_SIZE + zOffset] = BLACK;
-            world[x][y][row * CELL_SIZE + zOffset + room->length.z - 1] = BLACK;
+            world[x][y][room->origin.z] = BLACK;
+            world[x][y][room->origin.z + room->length.z - 1] = BLACK;
         }
     }
 
     //Draw in z direction second
-    for (int z = (row * CELL_SIZE + zOffset); z < (room->length.z + (row * CELL_SIZE + zOffset)); ++z) {
+    for (int z = room->origin.z; z < (room->length.z + (room->origin.z)); ++z) {
         for (int y = 1; y <= ROOM_HEIGHT; y++) {
-            world[col * CELL_SIZE + xOffset][y][z] = BLACK;
-            world[col * CELL_SIZE + xOffset + room->length.x - 1][y][z] = BLACK;
+            world[room->origin.x][y][z] = BLACK;
+            world[room->origin.x + room->length.x - 1][y][z] = BLACK;
         }
     }
 

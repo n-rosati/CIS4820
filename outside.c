@@ -5,9 +5,8 @@
 #include <math.h>
 #include "outside.h"
 
-int perlinNoise(int x, int z, float frequency, int depth) {
-    float xa = (float) x * frequency;
-    float ya = (float) z * frequency;
+int perlinNoise(TwoTupleInt coordinate, float frequency, int depth) {
+    TwoTupleFloat coordinateAmplitude = {.x = (float) coordinate.x * frequency, .z = (float) coordinate.z * frequency};
     float amplitude = 1.0f;
     float fin = 0.0f;
     float div = 0.0f;
@@ -15,9 +14,9 @@ int perlinNoise(int x, int z, float frequency, int depth) {
     int i = 0;
     while (i < depth) {
         ++i;
-        fin += noise2D(xa, ya) * amplitude;
-        ya *= 2;
-        xa *= 2;
+        fin += noise2D((TwoTupleFloat) {.x = coordinateAmplitude.x, .z = coordinateAmplitude.z}) * amplitude;
+        coordinateAmplitude.x *= 2;
+        coordinateAmplitude.z *= 2;
         div += 256 * amplitude;
         amplitude /= 2;
     }
@@ -26,21 +25,20 @@ int perlinNoise(int x, int z, float frequency, int depth) {
     return ((int) floorf((fin / div) * 10));
 }
 
-float noise2D(float x, float z) {
-    int xInt = (int) x;
-    int yInt = (int) z;
-    float low = smoothInter((float) noise2(xInt, yInt), (float) noise2(xInt + 1, yInt), (float) (x - (float) xInt));
-    float high = smoothInter((float) noise2(xInt, yInt + 1), (float) noise2(xInt + 1, yInt + 1), (float) (x - (float) xInt));
-    return smoothInter(low, high, (float)(z - (float) yInt));
+float noise2D(TwoTupleFloat coordinate) {
+    TwoTupleInt coordinateNoise = {.x = (int) coordinate.x, .z = (int) coordinate.z};
+    float low = smoothInter((float) noise2((TwoTupleInt) {.x = coordinateNoise.x, .z = coordinateNoise.z}), (float) noise2((TwoTupleInt) {.x = coordinateNoise.x + 1, .z = coordinateNoise.z}), (float) (coordinate.x - (float) coordinateNoise.x));
+    float high = smoothInter((float) noise2((TwoTupleInt) {.x = coordinateNoise.x, .z = coordinateNoise.z + 1}), (float) noise2((TwoTupleInt) {.x = coordinateNoise.x + 1, .z = coordinateNoise.z + 1}), (float) (coordinate.x - (float) coordinateNoise.x));
+    return smoothInter(low, high, (float)(coordinate.z - (float) coordinateNoise.z));
 }
 
 float smoothInter(float x, float z, float s) {
     return (x + (s * s * (3 - 2 * s)) * (z - x));
 }
 
-int noise2(int x, int z) {
+int noise2(TwoTupleInt coordinate) {
     const int NUM_PERMS = 256;
-    return PERMUTATION[(PERMUTATION[z % NUM_PERMS] + x) % NUM_PERMS];
+    return PERMUTATION[(PERMUTATION[coordinate.z % NUM_PERMS] + coordinate.x) % NUM_PERMS];
 }
 
 Level* generateOutsideLevel() {
@@ -51,7 +49,7 @@ Level* generateOutsideLevel() {
     //Generate terrain
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {
-            int height = perlinNoise(x, z, 0.15f, 1) + 15;
+            int height = perlinNoise((TwoTupleInt) {.x = x, .z = z}, 0.15f, 1) + 15;
             if (height > 22) { level->world[x][height][z] = WHITE; }
             level->world[x][height - (height > 22 ? 1 : 0)][z] = GREEN;
             level->world[x][height - (height > 22 ? 2 : 1)][z] = DARK_BROWN;
@@ -64,7 +62,7 @@ Level* generateOutsideLevel() {
     //Add the cloud layer
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {
-            if (perlinNoise(x, z, 0.08f, 3) >= 6) {
+            if (perlinNoise((TwoTupleInt) {.x = x, .z = z}, 0.08f, 3) >= 6) {
                 level->world[x][49][z] = WHITE;
             }
         }
