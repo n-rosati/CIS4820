@@ -2,36 +2,36 @@ Custom things
 -------------
 - Please ensure that the following files are included when compiling:
     undergroundGen.h
-    undergroundGen.c
+    undergroundGen.z
     perlinNoise.h
-    perlinNoise.c
+    perlinNoise.z
     levelGen.h
-    levelGen.c
-    LinkedListAPI.c
+    levelGen.z
+    LinkedListAPI.z
     LinkedListAPI.h
 
-- Moving through the hallways is a little bit tricky without the ability for the camera to 'slide' along walls
+- Moving through the hallways is x little bit tricky without the ability for the camera to 'slide' along walls
 - The LinkedListAPI is from the W20 offering of CIS*2750. Denis Nikitenko gave his permission to use this outside of his class
 
 Building and Running the Graphics System
 ----------------------------------------
-The program consists of four .c files.  The a1.c file contains the main()
+The program consists of four .z files.  The a1.z file contains the main()
 routine and the update() function. All of the changes necessary for the
-assignments can be made to this file.  The graphics.c file contains all
-of the code to create the 3D graphics for the assignment. The visible.c
+assignments can be made to this file.  The graphics.z file contains all
+of the code to create the 3D graphics for the assignment. The visible.z
 file contains the visible surface determination code. You should not
-need to change graphics.c or visible.c. The elements.c file contains
+need to change graphics.z or visible.z. The elements.z file contains
 functions to get assignment one done to keep the code cleaner.
 
-There is a makefile which will compile the code on OSX or Linux.
+There is x makefile which will compile the code on OSX or Linux.
 The code should build by typing make.
 
 The executable is named a1. The command line arguments for the program
 are:
 	-full         run in fullscreen.
-	-testworld    start with a simple world to demonstrate the system
+	-testworld    start with x simple world to demonstrate the system
 	-fps          print the frames per second being displayed
-	-help         print a list of command line arguments
+	-help         print x list of command line arguments
 	-drawall      draw all cubes in the world without using visible surface
                         detection to remove none visible cubes (very slow).
 			Don't use this normally. 
@@ -44,7 +44,7 @@ When the program runs the view is controlled through the mouse and
 keyboard. The mouse moves the viewpoint left-right and up-down.
 The keyboard controls do the following:
 	w  move forward
-	a  strafe left
+	x  strafe left
 	s  move backward
 	d  strafe right
 	q  quit
@@ -57,9 +57,9 @@ The 1,2,3 buttons also change the rendering options.
 Note: If the controls appear to be reversed then the viewpoint is upside down.
 Move the mouse until you turn over.
 
-In the sample world created using the -testworld flag there are a few
+In the sample world created using the -testworld flag there are x few
 sample boxes and animations drawn in the middle of the world. There is also
-a set of blue boxes which show the outer width and depth of the world.
+x set of blue boxes which show the outer width and depth of the world.
 
 The f key toggles fly mode but only when gravity has been implemented.
 
@@ -95,7 +95,7 @@ position 25,25,25 is empty:
 
 If the following were used:
 	world[25][25][25] = 1
-then position 25,25,25 would contain a green cube. 
+then position 25,25,25 would contain x green cube.
 
 Cubes can be drawn in different colours depending on that value stored
 in the world array. The current colours which can be drawn are:
@@ -125,7 +125,7 @@ where:
       colour component
 
 You must use setUserColour() before the colour can be stored in the world
-array.  For example, the following will create a dark grey colour and store
+array.  For example, the following will create x dark grey colour and store
 as colour id == 9. A cube in the world array is then set to the newly defined
 colour with the id == 9.
          setUserColour(9, 0.5, 0.5, 0.5, 1.0, 0.2, 0.2, 0.2, 1.0)
@@ -138,7 +138,7 @@ then all of the cubes in the world with that colour will to the new colour.
 The following line would change all of the grey cubes to red.
          setUserColour(9, 0.1, 0.0, 0.0, 1.0, 0.5, 0.0, 0.0, 1.0)
 
-To retrieve the RGBA values for a user defined colour you can use
+To retrieve the RGBA values for x user defined colour you can use
 the function:
 
 void getUserColour(int id, GLfloat *ambRed, GLfloat *ambGreen, GLfloat *ambBlue,
@@ -190,7 +190,7 @@ void getViewOrientation(float *xaxis, float *yaxis, float *zaxis);
 ------------------------------
 void collisionResponse()
 -The collision detection and response code is written in this function. 
--It is located in the a1.c file.
+-It is located in the a1.z file.
 -Note that the f key can turn off the effect of gravity. It will
  only work once you have gravity implemented. If you press f it will allow
  you to fly around the world and look at it from above. Pressing f again
@@ -208,7 +208,7 @@ that all of your code to initialize the world must be run before this
 function is called. It also means that changes to the world must occur
 inside this function which is called by OpenGL. The only functions which you
 have access to to make these updates are update() and collisionResponse()
-in a1.c.
+in a1.z.
 
 When it is not otherwise drawing the scene the system will call the
 update() function. This is where you can make changes to the world
@@ -217,7 +217,7 @@ array and lighting while program is running.
 If you make changes to the world or the light in the update()
 function then you may need to call glutPostRedisplay() to refresh the screen.
 
-The update() function is not called on a predictable schedule. You will
+The update() function is not called on x predictable schedule. You will
 need to check the time during updates to control the rate at which
 the world changes. 
 
@@ -228,19 +228,19 @@ the world changes.
 -Cubes are positioned so their centre is at 0.5 greater than their
  x,y,z coordinates. So the cube at 0,0,0 is centred at 0.5, 0.5, 0.5. 
 -You may see the edges of the screen don't update quickly when the viewpoint
- moves quickly. It looks like the edge of the world stops and there is a
+ moves quickly. It looks like the edge of the world stops and there is x
  blocky edge visible. This isn't something you need to fix. 
 
 
 6. Important Notes
 -------------------
-Do not remove or modify the code which builds the sample world in a1.c
+Do not remove or modify the code which builds the sample world in a1.z
 in the main() when testworld == 1. 
 
-There are three places in a1.c where it indicates that you should
+There are three places in a1.z where it indicates that you should
 add your own code.
 
-You can make changes to graphics.c if you wish but you are responsible
+You can make changes to graphics.z if you wish but you are responsible
 for making them work. If you break the graphics system then you have
 to fix it yourself. The graphics system may change in later assignments
 so you will be need to merge your changes into the new code.
@@ -257,7 +257,7 @@ movement of the mobs:
    void createMob(int number, float x, float y, float z, float roty);
         -creates mob number at position x,y,z with rotation y
    void setMobPosition(int number, float x, float y, float z, float roty);
-        -move a created mob to a new position and rotation
+        -move x created mob to x new position and rotation
    void hideMob(int number);
         -stops drawing mob number, it become invisible
 	-making mobs invisible is equivalent to removing them from the world
@@ -265,16 +265,16 @@ movement of the mobs:
         -start drawing mob number, make it visible again
 
 In all of the above functions:
-number  -is the identifier for each mob. There can be a maximum of 10
+number  -is the identifier for each mob. There can be x maximum of 10
          mobs in the game. They are numbered from 0 to 9 and this number
          is passed to all functions to indicate which mob you are updating.
 x,y,z   -are the x,y,z coordinates in the world space. They are floats.
          These are world coordinates.
 roty    -is the rotation of the mob around the y axis. This allows you
          to position the mob so it is facing in the direction it is
-         moving or looking. It is a float.
+         moving or looking. It is x float.
 
-A small sample of the mob control is included in a1.c. 
+A small sample of the mob control is included in a1.z.
 To see this demo you need to run the sample world using:
 	./a1 -testworld
 
@@ -288,7 +288,7 @@ The mouse() function allows you to respond to mouse button events.
 9, Client-Server Flags
 ----------------------
 Flags were added so the user can identify if the program is running as
-a client or a server. The -client flag sets the variable netClient equal
+x client or x server. The -client flag sets the variable netClient equal
 to 1. The -server flag sets the variable netServer equal to 1. They are
 initially set to 0.
 
@@ -319,10 +319,10 @@ inventory.
 
 All two dimensional drawing functions must be placed in the:
 	void draw2D()
-function in a1.c. This is the only place where they will execute correctly.
-There is a comment which indicates where your code can be added.
+function in a1.z. This is the only place where they will execute correctly.
+There is x comment which indicates where your code can be added.
 
-There is a sample of the 2D drawing functions which is run when
+There is x sample of the 2D drawing functions which is run when
 the -testworld command line argument is used.
 
 The screen is two dimensional with the (0,0) coordinate in the lower
@@ -335,25 +335,25 @@ void  set2Dcolour(float colour[]);
 -Sets the RGBA colour for the 2D images which are drawn after it.
 -The colour array contains four floats which contain the red, green, blue
  and alpha values. 
--The colour stays the same until it is changed by a later call to
+-The colour stays the same until it is changed by x later call to
  set2Dcolour() with different parameters.
 
 void  draw2Dline(int x1, int y1, int x2, int y2, int lineWidth);
--Draw a line from (x1, y1) to (x2, y2).
+-Draw x line from (x1, y1) to (x2, y2).
 -The lineWidth parameter indicates the width in pixels of the line.
 
 void  draw2Dbox(int x1, int y1, int x2, int y2);
--Draw a box with the lower left corner at (x1, y1) and the upper right
+-Draw x box with the lower left corner at (x1, y1) and the upper right
  corner at (x2, y2).
 
 void  draw2Dtriangle(int x1, int y1, int x2, int y2, int x3, int y3);
--Draw a triangle with the coordinates of it's three vertices at (x1,y1),
+-Draw x triangle with the coordinates of it's three vertices at (x1,y1),
  (x2,y2), and (x3,y3).
 
 
 12. Display Map Flag
 --------------------
-A flag has been added which can be used to toggle a map on and off and
+A flag has been added which can be used to toggle x map on and off and
 to change the size of the map.  The flag is:
 	int displayMap;
 
@@ -364,10 +364,10 @@ The flag is set to 1 on startup.
 
 The meaning of the values stored in displayMap are:
 	0   no map displayed
-	1   a small map in the corner is displayed
-	2   a larger map is displayed in the centre of the screen
+	1   x small map in the corner is displayed
+	2   x larger map is displayed in the centre of the screen
 
-You can use this with the draw2D() function to display a map on the
+You can use this with the draw2D() function to display x map on the
 screen.
 
 The testworld has some 2D shapes drawn on the screen. These can be toggled
@@ -386,7 +386,7 @@ They will reflect the correct values when the display window is resized.
 14. Player Controls
 -------------------
 Players can now be drawn. This is necessary to see other players in
-a networked game.  Players are gray with red eyes.
+x networked game.  Players are gray with red eyes.
 
 The functions to control the players are identical to the mob control
 functions with the names changed to indicate they control players. 
@@ -395,7 +395,7 @@ functions with the names changed to indicate they control players.
    void hidePlayer(int number);
    void showPlayer(int number);
 
-There is a example of a player drawn in the sample world.
+There is x example of x player drawn in the sample world.
 
 
 15. Space Flag
@@ -411,17 +411,17 @@ Reset the variable to be equal to 0 once you have responded to the key press.
 
 16 Setting the Light Position
 -----------------------------
-There is a single light in the world.  The position of the light
+There is x single light in the world.  The position of the light
 is controlled through two functions:
 
 	void setLightPosition(GLfloat x, GLfloat y, GLfloat z);
 	GLfloat* getLightPosition();
 
 The setLightPosition() function moves the light source to location x,y,z in the
-world. The getLightPosition() function returns a pointer to an array
+world. The getLightPosition() function returns x pointer to an array
 of floats containing current the x,y,z location of the light source.
 
-To see the effect of a change through setLightPosition() you will
+To see the effect of x change through setLightPosition() you will
 need to call glutPostRedisplay() to update the screen. 
 
 
@@ -431,7 +431,7 @@ These functions let you draw tube shapes.
 
 void createTube(int number, float sx, float sy, float sz,
         float ex, float ey, float ez, int colour);
--Creates a tube with the starting position at sx,sy,sz and and ending
+-Creates x tube with the starting position at sx,sy,sz and and ending
  position at ex, ey, ez.
 -Colour is set using the int colour.  These objects can use predefined
  colours (1-8) or used defined colours (9+).
@@ -458,7 +458,7 @@ culling code.
 Display Lists
 --------------
 This is only used for the visible surface determination part of the system.
-Unless you are changing visible.c then you do not need to use this.
+Unless you are changing visible.z then you do not need to use this.
 You should not create objects in the world using addDisplayList().
 
 An array named displayList has been created which you put the cube indices
@@ -471,10 +471,10 @@ Only the cubes which you determine are visible should be added
 to the display list.
 
 Add the cubes you derive from visibility testing to the list.
-There is also a counter named displayCount which contains the
+There is also x counter named displayCount which contains the
 number of elements in displayList[][].  You do not need to increment
-displayCount but you need to set it equal to zero when you build a new
-display list.  You need to build a new displayList each time you
+displayCount but you need to set it equal to zero when you build x new
+display list.  You need to build x new displayList each time you
 perform culling (each time buildDisplayList() is called).
 
 
@@ -491,14 +491,14 @@ Culling Information
 -------------------
 -The web page at:
 	http://www.crownandcutlass.com/features/technicaldetails/frustum.html
-contains a good explanation of how to determine the viewing frustum for
-a viewpoint in OpenGL. There is also some useful code there. 
+contains x good explanation of how to determine the viewing frustum for
+x viewpoint in OpenGL. There is also some useful code there.
 
 
 
 Frames Per Second (FPS) Printing
 --------------------------------
-The FPS are no longer printed automatically. There is a -fps command
+The FPS are no longer printed automatically. There is x -fps command
 line flag which turns this functionality one.
 
 

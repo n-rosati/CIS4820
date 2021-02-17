@@ -1,5 +1,5 @@
 
-/* Derived from scene.z in the The OpenGL Programming Guide */
+/* Derived from scene.c in the The OpenGL Programming Guide */
 /* Keyboard and mouse rotation taken from Swiftless Tutorials #23 Part 2 */
 /* http://www.swiftless.com/tutorials/opengl/camera2.html */
 
@@ -99,7 +99,7 @@ short tubeVisible[TUBE_COUNT];
 int space = 0;
 /* flag indicates if map is to be printed */
 int displayMap = 1;
-/* flag indicating x fixed viewpoint - not updated by mouse/keyboard */
+/* flag indicating a fixed viewpoint - not updated by mouse/keyboard */
 int fixedVP = 0;
 
 /* list of user defined colours */
@@ -151,7 +151,7 @@ void createPlayer(int number, float x, float y, float z, float playerroty) {
     playerVisible[number] = 1;
 }
 
-/* move player to x new position xyz with rotation rotx,roty,rotz */
+/* move player to a new position xyz with rotation rotx,roty,rotz */
 void setPlayerPosition(int number, float x, float y, float z, float playerroty) {
     if (number >= PLAYER_COUNT) {
         printf("ERROR: player number greater than %d\n", PLAYER_COUNT);
@@ -210,7 +210,7 @@ void createMob(int number, float x, float y, float z, float mobroty) {
     mobVisible[number] = 1;
 }
 
-/* move mob to x new position xyz with rotation rotx,roty,rotz */
+/* move mob to a new position xyz with rotation rotx,roty,rotz */
 void setMobPosition(int number, float x, float y, float z, float mobroty) {
     if (number >= MOB_COUNT) {
         printf("ERROR: mob number greater than %d\n", MOB_COUNT);
@@ -491,7 +491,7 @@ void display(void) {
         glRotatef(mvy, 0.0, 1.0, 0.0);
         glRotatef(mvz, 0.0, 0.0, 1.0);
         /* Subtract 0.5 to raise viewpoint slightly above objects. */
-        /* Gives the impression of x head on top of x body. */
+        /* Gives the impression of a head on top of a body. */
         glTranslatef(vpx, vpy - 0.5, vpz);
         //   glTranslatef(vpx, vpy, vpz);
     }
@@ -523,9 +523,9 @@ void display(void) {
     /* set starting location of objects */
     glPushMatrix();
 
-    /* make x blue sky cube */
+    /* make a blue sky cube */
     glShadeModel(GL_SMOOTH);
-    /* turn off all reflection from sky so it is x solid colour */
+    /* turn off all reflection from sky so it is a solid colour */
     glMaterialfv(GL_FRONT, GL_AMBIENT, black);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, black);
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, skyblue);
@@ -796,7 +796,7 @@ void keyboard(unsigned char key, int x, int y) {
     }
 }
 
-/* load x texture from x file */
+/* load a texture from a file */
 /* not currently used */
 void loadTexture() {
     FILE* fp;
@@ -834,14 +834,14 @@ void loadTexture() {
     fclose(fp);
 }
 
-/* responds to mouse movement when x button is pressed */
+/* responds to mouse movement when a button is pressed */
 void motion(int x, int y) {
     /* update current mouse movement but don't use to change the viewpoint*/
     oldx = x;
     oldy = y;
 }
 
-/* responds to mouse movement when x button is not pressed */
+/* responds to mouse movement when a button is not pressed */
 void passivemotion(int x, int y) {
     mvx += (float)y - oldy;
     mvy += (float)x - oldx;
@@ -965,7 +965,7 @@ int setUserColour(int id, GLfloat ambRed, GLfloat ambGreen, GLfloat ambBlue,
         return (1);
     }
     if (id >= NUMBERCOLOURS) {
-        printf("ERROR, attempt to setUserColour() with x colour number of %d which is greater than the maximum user colour number %d.\n",
+        printf("ERROR, attempt to setUserColour() with a colour number of %d which is greater than the maximum user colour number %d.\n",
                id, NUMBERCOLOURS - 1);
         return (1);
     }

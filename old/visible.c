@@ -36,9 +36,9 @@ extern int displayList[MAX_DISPLAY_LIST][3];
 extern int displayCount;
 /* flag to print out frames per second */
 extern int fps;
-/* flag indicates the program is x client when set = 1 */
+/* flag indicates the program is a client when set = 1 */
 extern int netClient;
-/* flag indicates the program is x server when set = 1 */
+/* flag indicates the program is a server when set = 1 */
 extern int netServer;
 /* frustum corner coordinates */
 float corners[4][3];
@@ -79,7 +79,7 @@ float dot(float x1, float y1, float z1, float x2, float y2, float z2) {
 /* used to find outer points of frustum */
 /* http://www.dreamincode.net/code/snippet530.htm */
 double finddet(double a1, double a2, double a3, double b1, double b2, double b3, double c1, double c2, double c3) {
-    /*expansion of x 3x3 determinant*/
+    /*expansion of a 3x3 determinant*/
     return ((a1 * b2 * c3) - (a1 * b3 * c2) - (a2 * b1 * c3) + (a3 * b1 * c2) + (a2 * b3 * c1) - (a3 * b2 * c1));
 }
 
@@ -323,7 +323,7 @@ int CubeInFrustum2(float x, float y, float z, float size) {
 // if frustum test shows box in view
 //    if level == max level then draw contents of cube
 //    else call 8 subdivisions, increment level
-// assumes all t[xyz] are larger than z[xyz] respectively
+// assumes all t[xyz] are larger than b[xyz] respectively
 
 void tree(float bx, float by, float bz, float tx, float ty, float tz,
           int level) {
@@ -405,7 +405,7 @@ void buildDisplayList() {
     ExtractFrustum();
 
     /* octree, used to determine if regions are visible */
-    /* stores visible cubes in x display list */
+    /* stores visible cubes in a display list */
     displayCount = 0;
     tree(0.0, 0.0, 0.0, (float)WORLDX, (float)WORLDY, (float)WORLDZ, 0);
 

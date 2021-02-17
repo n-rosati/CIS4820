@@ -1,5 +1,5 @@
 
-/* Derived from scene.z in the The OpenGL Programming Guide */
+/* Derived from scene.c in the The OpenGL Programming Guide */
 /* Keyboard and mouse rotation taken from Swiftless Tutorials #23 Part 2 */
 /* http://www.swiftless.com/tutorials/opengl/camera2.html */
 
@@ -12,14 +12,14 @@
 #include <math.h>
 #include <time.h>
 
-#include "utilities.h"
-#include "outside.h"
-#include "underground.h"
 #include "graphics.h"
+#include "underground.h"
+#include "perlinNoise.h"
 #include "LinkedListAPI.h"
+#include "levelGen.h"
 
 extern GLubyte world[WORLDX][WORLDY][WORLDZ];
-/* mouse function called by GLUT when x button is pressed or released */
+/* mouse function called by GLUT when a button is pressed or released */
 void mouse(int, int, int, int);
 /* initialize graphics library */
 extern void graphicsInit(int*, char**);
@@ -62,15 +62,15 @@ extern int testWorld;
 extern int fps;
 /* flag to indicate the space bar has been pressed */
 extern int space;
-/* flag indicates the program is x client when set = 1 */
+/* flag indicates the program is a client when set = 1 */
 extern int netClient;
-/* flag indicates the program is x server when set = 1 */
+/* flag indicates the program is a server when set = 1 */
 extern int netServer;
 /* size of the window in pixels */
 extern int screenWidth, screenHeight;
 /* flag indicates if map is to be printed */
 extern int displayMap;
-/* flag indicates use of x fixed viewpoint */
+/* flag indicates use of a fixed viewpoint */
 extern int fixedVP;
 /* frustum corner coordinates, used for visibility determination  */
 extern float corners[4][3];
@@ -106,8 +106,8 @@ void collisionResponse() {
     getViewPosition(&newX, &newY, &newZ);
 
     const float LOOK_AHEAD = 0.25f;
-    //Look ahead of where the player is moving and check for x block there. If there is x block at eye level, don't go there
-    //Otherwise, if there is no block at eye level but there is x block at foot level, move up onto it
+    //Look ahead of where the player is moving and check for a block there. If there is a block at eye level, don't go there
+    //Otherwise, if there is no block at eye level but there is a block at foot level, move up onto it
     if (world[(int) NEGATE(ceilf(newX + LOOK_AHEAD))][(int) NEGATE(floorf(newY))][(int) NEGATE(ceilf(newZ + LOOK_AHEAD))] != 0 ||
         world[(int) NEGATE(ceilf(newX - LOOK_AHEAD))][(int) NEGATE(floorf(newY))][(int) NEGATE(ceilf(newZ - LOOK_AHEAD))] != 0) {
         setViewPosition(oldX, oldY, oldZ);
@@ -161,10 +161,10 @@ void update() {
     if (testWorld) {
 
         /* update old position so it contains the correct value */
-        /* -otherwise view position is only correct after x key is */
+        /* -otherwise view position is only correct after a key is */
         /*  pressed and keyboard() executes. */
 #if 0
-        // Fire x ray in the direction of forward motion
+        // Fire a ray in the direction of forward motion
         float xx, yy, zz;
         getViewPosition(&x, &y, &z);
         getOldViewPosition(&xx, &yy, &zz);
@@ -233,13 +233,14 @@ void update() {
         setUserColour(9, 0.7, 0.3 + offset, 0.7, 1.0, 0.3, 0.15 + offset, 0.3, 1.0);
 
         /* sample tube creation  */
-        /* draws x purple tube above the other sample objects */
+        /* draws a purple tube above the other sample objects */
         createTube(1, 45.0, 30.0, 45.0, 50.0, 30.0, 50.0, 6);
 
         /* end testworld animation */
 
 
     } else {
+#ifndef DEBUG
         float oldX = 0, oldY = 0, oldZ = 0;
         getOldViewPosition(&oldX, &oldY, &oldZ);
 
@@ -247,7 +248,6 @@ void update() {
         int currentY = (int)NEGATE(floorf((float)oldY));
         int currentZ = (int)NEGATE(ceilf((float)oldZ));
 
-#ifndef DEBUG
         //Check if the current block and block under the view port are air
         //If so, do gravity
         if (world[currentX][currentY][currentZ] == 0 &&
@@ -260,10 +260,10 @@ void update() {
         //Check if the player is on stairs
         Level* currentLevel = levels->head->data;
 #ifdef DEBUG
-        printf("At: %d %d (%d) %d\tStairs down: %d %d %d\tStairs up: %d %d %d\n", currentX, currentY, currentY - 2, currentZ, currentLevel->stairsDown.x, currentLevel->stairsDown.z, currentLevel->stairsDown.z, currentLevel->stairsUp.x, currentLevel->stairsUp.z, currentLevel->stairsUp.z);
+        printf("At: %d %d (%d) %d\tStairs down: %d %d %d\tStairs up: %d %d %d\n", currentX, currentY, currentY - 2, currentZ, currentLevel->stairsDown.x, currentLevel->stairsDown.y, currentLevel->stairsDown.z, currentLevel->stairsUp.x, currentLevel->stairsUp.y, currentLevel->stairsUp.z);
 #endif
         if (currentX == currentLevel->stairsDown.x && (currentY - 2) == currentLevel->stairsDown.y && currentZ == currentLevel->stairsDown.z) {
-            moveDown(levels, world, generateUndergroundLevel());
+            moveDown(levels, world);
         } else if (currentX == currentLevel->stairsUp.x && (currentY - 2) == currentLevel->stairsUp.y && currentZ == currentLevel->stairsUp.z) {
             moveUp(levels, world);
         }
@@ -287,9 +287,9 @@ void update() {
 }
 
 
-/* called by GLUT when x mouse button is pressed or released */
+/* called by GLUT when a mouse button is pressed or released */
 /* -button indicates which button was pressed or released */
-/* -state indicates x button down or button up event */
+/* -state indicates a button down or button up event */
 /* -x,y are the screen coordinates when the mouse is pressed or */
 /*  released */
 void mouse(int button, int state, int x, int y) {
@@ -313,11 +313,11 @@ int main(int argc, char** argv) {
     /* initialize the graphics system */
     graphicsInit(&argc, argv);
 
-    /* the first part of this if statement builds x sample */
+    /* the first part of this if statement builds a sample */
     /* world which will be used for testing */
     /* DO NOT remove this code. */
     /* Put your code in the else statment below */
-    /* The testworld is only guaranteed to work with x world of
+    /* The testworld is only guaranteed to work with a world of
         with dimensions of 100,50,100. */
     if (testWorld == 1) {
         /* initialize world to empty */
@@ -330,7 +330,7 @@ int main(int argc, char** argv) {
         }
 
         /* some sample objects */
-        /* build x red platform */
+        /* build a red platform */
         for (i = 0; i < WORLDX; i++) {
             for (j = 0; j < WORLDZ; j++) {
                 world[i][24][j] = 3;
@@ -376,7 +376,7 @@ int main(int argc, char** argv) {
         levels = initializeList(printLevel, deleteLevel, compareLevels);
 
         //Generate outdoor level
-        insertFront(levels, generateOutsideLevel());
+        insertFront(levels, generateOutdoor());
         loadLevel((Level*)(levels->head->data), world);
     }
 
@@ -389,4 +389,17 @@ int main(int argc, char** argv) {
     freeList(levels);
 
     return 0;
+}
+
+/**
+ * Sets a user colour using RGBA instead of a number between 0 and 1.
+ * @param colourNumber The colour number to set in OpenGL
+ * @param red Red value [0-255]
+ * @param green Green value [0-255]
+ * @param blue Blue value [0-255]
+ * @param alpha Alpha value [0-1]
+ * @return
+ */
+void setUserColourRGBA(int colourNumber, int red, int green, int blue, float alpha) {
+    setUserColour(colourNumber, red / 255.0f, green / 255.0f, blue / 255.0f, alpha, (red / 255.0f) / 2.0f, (green / 255.0f) / 2.0f, (blue / 255.0f) / 2.0f, alpha / 2.0f);
 }

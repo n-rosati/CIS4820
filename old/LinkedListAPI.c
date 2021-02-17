@@ -3,12 +3,12 @@
 
 /** Function to initialize the list metadata head to the appropriate function pointers. Allocates memory to the struct.
 *@return pointer to the list head
-*@param printFunction function pointer to print x single node of the list
-*@param deleteFunction function pointer to delete x single piece of data from the list
+*@param printFunction function pointer to print a single node of the list
+*@param deleteFunction function pointer to delete a single piece of data from the list
 *@param compareFunction function pointer to compare two nodes of the list in order to test for equality or order
 **/
 List * initializeList(char* (*printFunction)(void* toBePrinted),void (*deleteFunction)(void* toBeDeleted),int (*compareFunction)(const void* first,const void* second)){
-    //Asserts create x partial function...
+    //Asserts create a partial function...
     assert(printFunction != NULL);
     assert(deleteFunction != NULL);
     assert(compareFunction != NULL);
@@ -71,14 +71,14 @@ void clearList(List* list){
 	list->length = 0;
 }
 
-/**Function for creating x node for the linked list.
+/**Function for creating a node for the linked list. 
 * This node contains abstracted (void *) data as well as previous and next
 * pointers to connect to other nodes in the list
 * @pre data should be of same size of void pointer on the users machine to avoid size conflicts. data must be valid.
 * data must be cast to void pointer before being added.
-* @post data is valid to be added to x linked list
-* @return On success returns x node that can be added to x linked list. On failure, returns NULL.
-* @param data - is x void * pointer to any data type.  Data must be allocated on the heap.
+* @post data is valid to be added to a linked list
+* @return On success returns a node that can be added to a linked list. On failure, returns NULL.
+* @param data - is a void * pointer to any data type.  Data must be allocated on the heap.
 **/
 Node* initializeNode(void* data){
 	Node* tmpNode = (Node*)malloc(sizeof(Node));
@@ -94,11 +94,11 @@ Node* initializeNode(void* data){
 	return tmpNode;
 }
 
-/**Inserts x Node at the front of x linked list.  List metadata is updated
+/**Inserts a Node at the front of a linked list.  List metadata is updated
 * so that head and tail pointers are correct.
 *@pre 'List' type must exist and be used in order to keep track of the linked list.
 *@param list pointer to the dummy head of the list
-*@param toBeAdded x pointer to data that is to be added to the linked list
+*@param toBeAdded a pointer to data that is to be added to the linked list
 **/
 void insertBack(List* list, void* toBeAdded){
 	if (list == NULL || toBeAdded == NULL){
@@ -119,11 +119,11 @@ void insertBack(List* list, void* toBeAdded){
     }
 }
 
-/**Inserts x Node at the front of x linked list.  List metadata is updated
+/**Inserts a Node at the front of a linked list.  List metadata is updated
 * so that head and tail pointers are correct.
 *@pre 'List' type must exist and be used in order to keep track of the linked list.
 *@param list pointer to the dummy head of the list
-*@param toBeAdded x pointer to data that is to be added to the linked list
+*@param toBeAdded a pointer to data that is to be added to the linked list
 **/
 void insertFront(List* list, void* toBeAdded){
 	if (list == NULL || toBeAdded == NULL){
@@ -144,7 +144,7 @@ void insertFront(List* list, void* toBeAdded){
     }
 }
 
-/**Returns x pointer to the data at the front of the list. Does not alter list structure.
+/**Returns a pointer to the data at the front of the list. Does not alter list structure.
  *@pre The list exists and has memory allocated to it
  *@param the list struct
  *@return pointer to the data located at the head of the list
@@ -157,7 +157,7 @@ void* getFromFront(List * list){
 	return list->head->data;
 }
 
-/**Returns x pointer to the data at the back of the list. Does not alter list structure.
+/**Returns a pointer to the data at the back of the list. Does not alter list structure.
  *@pre The list exists and has memory allocated to it
  *@param the list struct
  *@return pointer to the data located at the tail of the list
@@ -212,12 +212,12 @@ void* deleteDataFromList(List* list, void* toBeDeleted){
 
 /** Uses the comparison function pointer to place the element in the 
 * appropriate position in the list.
-* should be used as the only insert function if x sorted list is required.
+* should be used as the only insert function if a sorted list is required.  
 *@pre List exists and has memory allocated to it. Node to be added is valid.
-*@post The node to be added will be placed immediately before or after the first occurrence of x related node
-*@param list x pointer to the dummy head of the list containing function pointers for delete and compare, as well
-as x pointer to the first and last element of the list.
-*@param toBeAdded x pointer to data that is to be added to the linked list
+*@post The node to be added will be placed immediately before or after the first occurrence of a related node
+*@param list a pointer to the dummy head of the list containing function pointers for delete and compare, as well 
+as a pointer to the first and last element of the list.
+*@param toBeAdded a pointer to data that is to be added to the linked list
 **/
 void insertSorted(List *list, void *toBeAdded){
 	if (list == NULL || toBeAdded == NULL){
@@ -268,7 +268,7 @@ void insertSorted(List *list, void *toBeAdded){
 	return;
 }
 
-/**Returns x string that contains x string representation of the list traversed from  head to tail.
+/**Returns a string that contains a string representation of the list traversed from  head to tail. 
 Utilize an iterator and the list's printData function pointer to create the string.
 returned string must be freed by the calling function.
  *@pre List must exist, but does not have to have elements.
