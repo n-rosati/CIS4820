@@ -306,6 +306,14 @@ void mouse(int button, int state, int x, int y) {
         printf("down - ");
     }
     printf("%d %d\n", x, y);
+
+#ifdef DEBUG
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        moveDown(levels, world, generateUndergroundLevel());
+    } else if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
+        moveUp(levels, world);
+    }
+#endif
 }
 
 int main(int argc, char** argv) {
