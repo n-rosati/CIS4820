@@ -27,6 +27,7 @@ static const GLubyte WHITE = 5;
 static const GLubyte PURPLE = 6;
 static const GLubyte ORANGE = 7;
 static const GLubyte YELLOW = 8;
+
 static const GLubyte LIGHT_BROWN = 9;
 static const GLubyte DARK_BROWN = 10;
 static const GLubyte BEIGE = 11;
