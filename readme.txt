@@ -14,7 +14,7 @@ Custom things
     underground.c
     underground.h
 
-- Moving through the hallways is x little bit tricky without the ability for the camera to 'slide' along walls
+- Moving through the hallways is a little bit tricky without the ability for the camera to 'slide' along walls
 - The LinkedListAPI is from the W20 offering of CIS*2750. Denis Nikitenko gave his permission to use this outside of his class
 
 Building and Running the Graphics System
