@@ -1,14 +1,18 @@
 Custom things
 -------------
 - Please ensure that the following files are included when compiling:
-    undergroundGen.h
-    undergroundGen.z
-    perlinNoise.h
-    perlinNoise.z
-    levelGen.h
-    levelGen.z
-    LinkedListAPI.z
+    a2.c
+    graphics.c
+    graphics.h
+    visible.c
+    utilities.c
+    utilities.h
+    LinkedListAPI.c
     LinkedListAPI.h
+    outside.c
+    outside.h
+    underground.c
+    underground.h
 
 - Moving through the hallways is x little bit tricky without the ability for the camera to 'slide' along walls
 - The LinkedListAPI is from the W20 offering of CIS*2750. Denis Nikitenko gave his permission to use this outside of his class
