@@ -68,6 +68,12 @@ void connectTopBottom(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100])
 void connectLeftRight(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]);
 
 /**
+ * Places the stairs in the level
+ * @param level Level to place stairs in
+ */
+void placeStairs(Level* level, int roomNumber);
+
+/**
  * Draws a line in the world along the X axis.
  * @param xStart Starting X coordinate
  * @param xEnd Ending X coordinate

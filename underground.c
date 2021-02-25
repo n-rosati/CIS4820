@@ -41,6 +41,14 @@ Level* generateUndergroundLevel() {
         }
     }
 
+    //Place the viewport in a random room
+    int roomNumber = rand() % 9;
+    level->viewport.x = -((float) ((rand() % level->rooms[roomNumber]->length.x) + level->rooms[roomNumber]->origin.x + 1));
+    level->viewport.y = -2.1f;
+    level->viewport.z = -((float) ((rand() % level->rooms[roomNumber]->length.z) + level->rooms[roomNumber]->origin.z + 1));
+
+    placeStairs(level, roomNumber);
+
     return level;
 }
 
@@ -134,6 +142,21 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
                 break;
         }
     }
+}
+
+void placeStairs(Level* level, int roomNumber) {
+    //Add stairs up
+    level->stairsUp.x = (rand() % level->rooms[roomNumber]->length.x) + level->rooms[roomNumber]->origin.x;
+    level->stairsUp.y = 0;
+    level->stairsUp.z = (rand() % level->rooms[roomNumber]->length.z) + level->rooms[roomNumber]->origin.z;
+    level->world[level->stairsUp.x][level->stairsUp.y][level->stairsUp.z] = WHITE;
+
+    //Add stairs down
+    roomNumber = rand() % 9;
+    level->stairsDown.x = (rand() % level->rooms[roomNumber]->length.x) + level->rooms[roomNumber]->origin.x;
+    level->stairsDown.y = 0;
+    level->stairsDown.z = (rand() % level->rooms[roomNumber]->length.z) + level->rooms[roomNumber]->origin.z;
+    level->world[level->stairsDown.x][level->stairsDown.y][level->stairsDown.z] = GREY;
 }
 
 void drawLineX(int xStart, int xEnd, int y, int z, GLubyte world[100][50][100], GLubyte color) {
