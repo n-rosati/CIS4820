@@ -260,7 +260,7 @@ void update() {
         //Check if the player is on stairs
         Level* currentLevel = levels->head->data;
 #ifdef DEBUG
-//        printf("At: %d %d (%d) %d\tStairs down: %d %d %d\tStairs up: %d %d %d\n", currentX, currentY, currentY - 2, currentZ, currentLevel->stairsDown.x, currentLevel->stairsDown.z, currentLevel->stairsDown.z, currentLevel->stairsUp.x, currentLevel->stairsUp.z, currentLevel->stairsUp.z);
+        //printf("At: %d %d (%d) %d\tStairs down: %d %d %d\tStairs up: %d %d %d\n", currentX, currentY, currentY - 2, currentZ, currentLevel->stairsDown.x, currentLevel->stairsDown.z, currentLevel->stairsDown.z, currentLevel->stairsUp.x, currentLevel->stairsUp.z, currentLevel->stairsUp.z);
 #endif
         if (currentX == currentLevel->stairsDown.x && (currentY - 2) == currentLevel->stairsDown.y && currentZ == currentLevel->stairsDown.z) {
             moveDown(levels, world, generateUndergroundLevel());

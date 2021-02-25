@@ -30,7 +30,7 @@ static int PERMUTATION[] = {151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53,
 
 float noise2D(TwoTupleFloat coordinate);
 /**Returns x Perlin noise value between 0 and 10*/
-int perlinNoise(TwoTupleInt coordinate, float frequency, int depth);
+int perlinNoise(TwoTupleInt coordinate, float frequency, int depth, int maxHeight);
 float smoothInter(float x, float z, float s);
 int noise2(TwoTupleInt coordinate);
 

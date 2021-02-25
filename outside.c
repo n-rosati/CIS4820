@@ -5,7 +5,7 @@
 #include <math.h>
 #include "outside.h"
 
-int perlinNoise(TwoTupleInt coordinate, float frequency, int depth) {
+int perlinNoise(TwoTupleInt coordinate, float frequency, int depth, int maxHeight) {
     TwoTupleFloat coordinateAmplitude = {.x = (float) coordinate.x * frequency, .z = (float) coordinate.z * frequency};
     float amplitude = 1.0f;
     float fin = 0.0f;
@@ -21,8 +21,8 @@ int perlinNoise(TwoTupleInt coordinate, float frequency, int depth) {
         amplitude /= 2;
     }
 
-    //Will return x number between 0 and 10
-    return ((int) floorf((fin / div) * 10));
+    //Will return x number between 0 and maxHeight
+    return (int)floorf((fin / div) * maxHeight);
 }
 
 float noise2D(TwoTupleFloat coordinate) {
@@ -47,22 +47,33 @@ Level* generateOutsideLevel() {
     srand(level->seed);
 
     //Generate terrain
-    for (int x = 0; x < WORLDX; x++) {
-        for (int z = 0; z < WORLDZ; z++) {
-            int height = perlinNoise((TwoTupleInt) {.x = x, .z = z}, 0.15f, 1) + 15;
-            if (height > 22) { level->world[x][height][z] = WHITE; }
-            level->world[x][height - (height > 22 ? 1 : 0)][z] = GREEN;
-            level->world[x][height - (height > 22 ? 2 : 1)][z] = DARK_BROWN;
-            level->world[x][height - (height > 22 ? 3 : 2)][z] = DARK_BROWN;
-            level->world[x][height - (height > 22 ? 4 : 3)][z] = DARK_BROWN;
-            level->world[x][height - (height > 22 ? 5 : 4)][z] = DARK_BROWN;
+    const float maxHeight = 20.0f;
+    for (int x = 0; x < WORLDX; ++x) {
+        for (int z = 0; z < WORLDZ; ++z) {
+            int height = perlinNoise((TwoTupleInt){.x = x, .z = z}, 0.05f, 1, (int)maxHeight) + 5;
+
+            for (int i = height; i > height - 3; --i) {
+                switch (i) {
+                    case 0 ... (int)(maxHeight * (0.2f)) + 5:
+                        level->world[x][i][z] = DARK_BROWN;
+                        break;
+                    case (int)(maxHeight * (0.2f)) + 6 ... (int)(maxHeight * (0.8f)) + 5:
+                        level->world[x][i][z] = GREEN;
+                        break;
+                    case (int)(maxHeight * (0.8f)) + 6 ... (int)maxHeight + 5:
+                        level->world[x][i][z] = WHITE;
+                        break;
+                    default:
+                        printf("Height: %d\n", i);
+                }
+            }
         }
     }
 
     //Add the cloud layer
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {
-            if (perlinNoise((TwoTupleInt) {.x = x, .z = z}, 0.08f, 3) >= 6) {
+            if (perlinNoise((TwoTupleInt){.x = x, .z = z}, 0.08f, 3, 30) >= (maxHeight - 4)) {
                 level->world[x][49][z] = WHITE;
             }
         }
