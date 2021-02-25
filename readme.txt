@@ -1,7 +1,7 @@
 Custom things
 -------------
 - Please ensure that the following files are included when compiling:
-    a2.c
+    a1.c
     graphics.c
     graphics.h
     visible.c
@@ -19,12 +19,12 @@ Custom things
 
 Building and Running the Graphics System
 ----------------------------------------
-The program consists of four .z files.  The a1.z file contains the main()
+The program consists of four .c files.  The a1.c file contains the main()
 routine and the update() function. All of the changes necessary for the
-assignments can be made to this file.  The graphics.z file contains all
-of the code to create the 3D graphics for the assignment. The visible.z
+assignments can be made to this file.  The graphics.c file contains all
+of the code to create the 3D graphics for the assignment. The visible.c
 file contains the visible surface determination code. You should not
-need to change graphics.z or visible.z. The elements.z file contains
+need to change graphics.c or visible.c. The elements.c file contains
 functions to get assignment one done to keep the code cleaner.
 
 There is x makefile which will compile the code on OSX or Linux.
@@ -194,7 +194,7 @@ void getViewOrientation(float *xaxis, float *yaxis, float *zaxis);
 ------------------------------
 void collisionResponse()
 -The collision detection and response code is written in this function. 
--It is located in the a1.z file.
+-It is located in the a1.c file.
 -Note that the f key can turn off the effect of gravity. It will
  only work once you have gravity implemented. If you press f it will allow
  you to fly around the world and look at it from above. Pressing f again
@@ -212,7 +212,7 @@ that all of your code to initialize the world must be run before this
 function is called. It also means that changes to the world must occur
 inside this function which is called by OpenGL. The only functions which you
 have access to to make these updates are update() and collisionResponse()
-in a1.z.
+in a1.c.
 
 When it is not otherwise drawing the scene the system will call the
 update() function. This is where you can make changes to the world
@@ -238,13 +238,13 @@ the world changes.
 
 6. Important Notes
 -------------------
-Do not remove or modify the code which builds the sample world in a1.z
+Do not remove or modify the code which builds the sample world in a1.c
 in the main() when testworld == 1. 
 
-There are three places in a1.z where it indicates that you should
+There are three places in a1.c where it indicates that you should
 add your own code.
 
-You can make changes to graphics.z if you wish but you are responsible
+You can make changes to graphics.c if you wish but you are responsible
 for making them work. If you break the graphics system then you have
 to fix it yourself. The graphics system may change in later assignments
 so you will be need to merge your changes into the new code.
@@ -278,7 +278,7 @@ roty    -is the rotation of the mob around the y axis. This allows you
          to position the mob so it is facing in the direction it is
          moving or looking. It is x float.
 
-A small sample of the mob control is included in a1.z.
+A small sample of the mob control is included in a1.c.
 To see this demo you need to run the sample world using:
 	./a1 -testworld
 
@@ -323,7 +323,7 @@ inventory.
 
 All two dimensional drawing functions must be placed in the:
 	void draw2D()
-function in a1.z. This is the only place where they will execute correctly.
+function in a1.c. This is the only place where they will execute correctly.
 There is x comment which indicates where your code can be added.
 
 There is x sample of the 2D drawing functions which is run when
@@ -462,7 +462,7 @@ culling code.
 Display Lists
 --------------
 This is only used for the visible surface determination part of the system.
-Unless you are changing visible.z then you do not need to use this.
+Unless you are changing visible.c then you do not need to use this.
 You should not create objects in the world using addDisplayList().
 
 An array named displayList has been created which you put the cube indices

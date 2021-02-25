@@ -49,7 +49,7 @@ LIBS = -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/De
 #LIBS = -lGL -lGLU -lglut -lm -D__LINUX__
 
 # Additional files
-FILES = a2.c graphics.c LinkedListAPI.c outside.c underground.c utilities.c visible.c
+FILES = a1.c graphics.c LinkedListAPI.c outside.c underground.c utilities.c visible.c
 HEADERS = graphics.h LinkedListAPI.h outside.h underground.h utilities.h
 
 a2: $(FILES) $(HEADERS)
