@@ -12,10 +12,22 @@
 #define NEGATE(x) (x * -1)
 
 //OpenGL functions
+#ifndef SET_USR_COLOUR
+#define SET_USR_COLOUR
 extern int setUserColour(int, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat);
+#endif
+#ifndef SET_VPOS
+#define SET_VPOS
 extern void setViewPosition(float, float, float);
+#endif
+#ifndef SET_OLD_VPOS
+#define SET_OLD_VPOS
 extern void setOldViewPosition(float, float, float);
+#endif
+#ifndef GET_VPOS
+#define GET_VPOS
 extern void getViewPosition(float*, float*, float*);
+#endif
 
 //Colours
 static const GLubyte EMPTY = 0;

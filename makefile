@@ -48,15 +48,20 @@ LIBS = -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/De
 # on your distribution.
 #LIBS = -lGL -lGLU -lglut -lm -D__LINUX__
 
-# Additional files
-FILES = a1.c graphics.c LinkedListAPI.c outside.c underground.c utilities.c visible.c
-HEADERS = graphics.h LinkedListAPI.h outside.h underground.h utilities.h
 
-a2: $(FILES) $(HEADERS)
-	gcc $(FILES) -o out/a2 $(LIBS) -ggdb
+#a1: a1.c graphics.c visible.c mesh.c graphics.h mesh.h fast_obj.h
+#	gcc a1.c graphics.c visible.c mesh.c LinkedListAPI.c outside.c underground.c utilities.c $(LIBS) -o a1
 
-a2-debug: $(FILES) $(HEADERS)
-	gcc $(FILES) -o out/a2-debug $(LIBS) -DDEBUG -ggdb
+MY_FILES = LinkedListAPI.c outside.c underground.c utilities.c
+MY_HEADERS = LinkedListAPI.h outside.h underground.h utilities.h
+SUPPLIED_FILES = a1.c graphics.c visible.c mesh.c
+SUPPLIED_HEADERS = graphics.h mesh.h fast_obj.h
+
+a1: $(MY_FILES) $(MY_HEADERS) $(SUPPLIED_FILES) $(SUPPLIED_HEADERS)
+	gcc $(MY_FILES) $(SUPPLIED_FILES) $(LIBS) -ggdb -o a1
+
+a1-debug: $(MY_FILES) $(MY_HEADERS) $(SUPPLIED_FILES) $(SUPPLIED_HEADERS)
+	gcc $(MY_FILES) $(SUPPLIED_FILES) $(LIBS) -DDEBUG -ggdb -o a1-debug
 
 clean:
 	rm -rfv out/*
