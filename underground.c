@@ -13,7 +13,7 @@ Level* generateUndergroundLevel() {
     //Build a platform
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {
-            level->world[x][0][z] = ((x + z) % 2) ? DARK_BROWN : LIGHT_BROWN; //Checker board for light/dark grey
+            level->world[x][0][z] = CONCRETE;
         }
     }
 
@@ -61,9 +61,9 @@ void connectTopBottom(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100])
     //Draws a solid hallway
     for (int x = -1; x <= 1; ++x) {
         for (int y = 1; y <= 3; ++y) {
-            drawLineZ(hallwayOneStartX + x, y, roomOne->origin.z + roomOne->length.z, roomTwo->origin.z - 1 - distanceOneTwo, world, LIGHT_BROWN);
-            drawLineZ(hallwayTwoStartX + x, y, roomTwo->origin.z, roomOne->origin.z + roomOne->length.z + 1 + distanceTwoOne, world, LIGHT_BROWN);
-            drawLineX(hallwayOneStartX + (hallwayOneStartX <= hallwayTwoStartX ? -1 : 1), hallwayTwoStartX + (hallwayTwoStartX < hallwayOneStartX ? -1 : 1), y, distanceOneTwo + roomOne->origin.z + roomOne->length.z + abs(distanceOneTwo - distanceTwoOne) + x, world, LIGHT_BROWN);
+            drawLineZ(hallwayOneStartX + x, y, roomOne->origin.z + roomOne->length.z, roomTwo->origin.z - 1 - distanceOneTwo, world, STONE_BRICK);
+            drawLineZ(hallwayTwoStartX + x, y, roomTwo->origin.z, roomOne->origin.z + roomOne->length.z + 1 + distanceTwoOne, world, STONE_BRICK);
+            drawLineX(hallwayOneStartX + (hallwayOneStartX <= hallwayTwoStartX ? -1 : 1), hallwayTwoStartX + (hallwayTwoStartX < hallwayOneStartX ? -1 : 1), y, distanceOneTwo + roomOne->origin.z + roomOne->length.z + abs(distanceOneTwo - distanceTwoOne) + x, world, STONE_BRICK);
         }
     }
 
@@ -84,9 +84,9 @@ void connectLeftRight(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100])
     //Draws a solid hallway
     for (int z = -1; z <= 1; ++z) {
         for (int y = 1; y <= 3; ++y) {
-            drawLineX(roomOne->origin.x + roomOne->length.x, roomTwo->origin.x - 1 - distanceOneTwo, y, hallwayOneStartZ + z, world, LIGHT_BROWN);
-            drawLineX(roomTwo->origin.x, roomOne->origin.x + roomOne->length.x + 1 + distanceTwoOne, y, hallwayTwoStartZ + z, world, LIGHT_BROWN);
-            drawLineZ(roomOne->origin.x + roomOne->length.x + distanceOneTwo + abs(distanceOneTwo - distanceTwoOne) + z, y, hallwayOneStartZ + (hallwayOneStartZ <= hallwayTwoStartZ ? -1 : 1), hallwayTwoStartZ + (hallwayTwoStartZ < hallwayOneStartZ ? -1 : 1), world, LIGHT_BROWN);
+            drawLineX(roomOne->origin.x + roomOne->length.x, roomTwo->origin.x - 1 - distanceOneTwo, y, hallwayOneStartZ + z, world, STONE_BRICK);
+            drawLineX(roomTwo->origin.x, roomOne->origin.x + roomOne->length.x + 1 + distanceTwoOne, y, hallwayTwoStartZ + z, world, STONE_BRICK);
+            drawLineZ(roomOne->origin.x + roomOne->length.x + distanceOneTwo + abs(distanceOneTwo - distanceTwoOne) + z, y, hallwayOneStartZ + (hallwayOneStartZ <= hallwayTwoStartZ ? -1 : 1), hallwayTwoStartZ + (hallwayTwoStartZ < hallwayOneStartZ ? -1 : 1), world, STONE_BRICK);
         }
     }
 
@@ -108,15 +108,15 @@ Room* createRoom() {
 
 void drawRoom(Room* room, GLubyte world[100][50][100]) {
     for (int y = 1; y <= ROOM_HEIGHT; ++y) {
-        drawLineX(room->origin.x, room->origin.x + room->length.x, y, room->origin.z, world, BEIGE);
-        drawLineX(room->origin.x, room->origin.x + room->length.x, y, room->origin.z + room->length.z, world, BEIGE);
-        drawLineZ(room->origin.x, y, room->origin.z, room->origin.z + room->length.z, world, BEIGE);
-        drawLineZ(room->origin.x + room->length.x, y, room->origin.z, room->origin.z + room->length.z, world, BEIGE);
+        drawLineX(room->origin.x, room->origin.x + room->length.x, y, room->origin.z, world, STONE_BRICK);
+        drawLineX(room->origin.x, room->origin.x + room->length.x, y, room->origin.z + room->length.z, world, STONE_BRICK);
+        drawLineZ(room->origin.x, y, room->origin.z, room->origin.z + room->length.z, world, STONE_BRICK);
+        drawLineZ(room->origin.x + room->length.x, y, room->origin.z, room->origin.z + room->length.z, world, STONE_BRICK);
 
         //Roof
         if (y == ROOM_HEIGHT) {
             for (int zOffset = 0; zOffset <= room->length.z; ++zOffset) {
-                drawLineX(room->origin.x, room->origin.x + room->length.x, y, room->origin.z + zOffset, world, BLACK);
+                drawLineX(room->origin.x, room->origin.x + room->length.x, y, room->origin.z + zOffset, world, ASPHALT);
             }
         }
     }
@@ -132,13 +132,13 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
         //Choose x random colour for the block
         switch (rand() % 3) {
             case 0:
-                world[room->origin.x + offsetX + 1][1][room->origin.z + offsetZ + 1] = RED;
+                world[room->origin.x + offsetX + 1][1][room->origin.z + offsetZ + 1] = SUN_MOON_BOX;
                 break;
             case 1:
-                world[room->origin.x + offsetX + 1][1][room->origin.z + offsetZ + 1] = GREEN;
+                world[room->origin.x + offsetX + 1][1][room->origin.z + offsetZ + 1] = FLOWER_BOX;
                 break;
             case 2:
-                world[room->origin.x + offsetX + 1][1][room->origin.z + offsetZ + 1] = BLUE;
+                world[room->origin.x + offsetX + 1][1][room->origin.z + offsetZ + 1] = TREE_BOX;
                 break;
         }
     }

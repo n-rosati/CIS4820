@@ -55,10 +55,10 @@ Level* generateOutsideLevel() {
             for (int i = height; i > height - 3; --i) {
                 switch (i) {
                     case 0 ... (int)(maxHeight * (0.2f)) + 5:
-                        level->world[x][i][z] = DARK_BROWN;
+                        level->world[x][i][z] = DIRT;
                         break;
                     case (int)(maxHeight * (0.2f)) + 6 ... (int)(maxHeight * (0.8f)) + 5:
-                        level->world[x][i][z] = GREEN;
+                        level->world[x][i][z] = GRASS;
                         break;
                     case (int)(maxHeight * (0.8f)) + 6 ... (int)maxHeight + 5:
                         level->world[x][i][z] = WHITE;
@@ -73,7 +73,7 @@ Level* generateOutsideLevel() {
     //Add the cloud layer
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {
-            if (perlinNoise((TwoTupleInt){.x = x, .z = z}, 0.08f, 3, 30) >= (maxHeight - 4)) {
+            if (perlinNoise((TwoTupleInt){.x = x, .z = z}, 0.08f, 3, 30) >= (int) (maxHeight - 4)) {
                 level->world[x][49][z] = WHITE;
             }
         }

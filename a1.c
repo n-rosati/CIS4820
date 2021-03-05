@@ -72,7 +72,9 @@ extern void  draw2Dtriangle(int, int, int, int, int, int);
 extern void  set2Dcolour(float []);
 
 	/* texture functions */
+#ifndef SET_TEXTURE
 extern int setAssignedTexture(int, int);
+#endif
 extern void unsetAssignedTexture(int);
 extern int getAssignedTexture(int);
 extern void setTextureOffset(int, float, float);
@@ -325,16 +327,15 @@ float x, y, z;
            moveUp(levels, world);
        }
 
-
-       //Save CPU cycles when not on the outside level
-       if (levels->head->previous == NULL) {
-           //Cloud animation
-           struct timespec currentTime;
-           clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &currentTime);
-
-           while (lastUpdate.tv_nsec >= 500000000) {
-               if ((labs(lastUpdate.tv_nsec - currentTime.tv_nsec) >= 500000000) ||
-                   (labs(lastUpdate.tv_nsec - currentTime.tv_nsec) <= 500000000 && (lastUpdate.tv_sec - currentTime.tv_sec) != 0)) {
+       const long timeDiff = 500000000;
+       struct timespec currentTime;
+       clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &currentTime);
+       while (lastUpdate.tv_nsec >= timeDiff) {
+           //Save CPU cycles when not on the outside level
+           if (levels->head->previous == NULL) {
+               //Cloud animation
+               if ((labs(lastUpdate.tv_nsec - currentTime.tv_nsec) >= timeDiff) ||
+                   (labs(lastUpdate.tv_nsec - currentTime.tv_nsec) <= timeDiff && (lastUpdate.tv_sec - currentTime.tv_sec) != 0)) {
                    for (int a = 0; a < WORLDX; ++a) {
                        GLubyte end = world[a][49][WORLDZ - 1];
                        for (int b = WORLDZ - 1; b > 0; --b) {
@@ -343,12 +344,10 @@ float x, y, z;
                        world[a][49][0] = end;
                    }
                }
-
-               lastUpdate.tv_nsec -= 500000000;
            }
-
-           lastUpdate = currentTime;
+           lastUpdate.tv_nsec -= timeDiff;
        }
+       lastUpdate = currentTime;
    }
 }
 
@@ -527,6 +526,18 @@ int i, j, k;
        setUserColourRGBA(BEIGE, 120, 120, 98, 1);
        setUserColourRGBA(GREY, 100, 100, 100, 1);
 
+       //Set textures
+       setTexture(41, GRASS);
+       setTexture(37, DIRT);
+       setTexture(18, STONE_BRICK);
+       setTexture(23, DIRTY_FLOOR);
+       setTexture(52, ASPHALT);
+       setTexture(53, CONCRETE);
+       setTexture(20, SUN_MOON_BOX);
+       setTexture(25, FLOWER_BOX);
+       setTexture(50, TREE_BOX);
+
+
        //Prep the levels list
        levels = initializeList(printLevel, deleteLevel, compareLevels);
 
@@ -538,7 +549,7 @@ int i, j, k;
 
 	/* starts the graphics processing loop */
 	/* code after this will not run until the program exits */
-   glutMainLoop();
+    glutMainLoop();
 
     //Free memory
     freeList(levels);

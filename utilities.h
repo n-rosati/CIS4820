@@ -28,6 +28,10 @@ extern void setOldViewPosition(float, float, float);
 #define GET_VPOS
 extern void getViewPosition(float*, float*, float*);
 #endif
+#ifndef SET_TEXTURE
+#define SET_TEXTURE
+extern int setAssignedTexture(int, int);
+#endif
 
 //Colours
 static const GLubyte EMPTY = 0;
@@ -39,6 +43,17 @@ static const GLubyte WHITE = 5;
 static const GLubyte PURPLE = 6;
 static const GLubyte ORANGE = 7;
 static const GLubyte YELLOW = 8;
+
+//Textures
+static const GLubyte GRASS = 20;
+static const GLubyte DIRT = 21;
+static const GLubyte STONE_BRICK = 22;
+static const GLubyte DIRTY_FLOOR = 23;
+static const GLubyte ASPHALT = 24;
+static const GLubyte CONCRETE = 25;
+static const GLubyte SUN_MOON_BOX = 26;
+static const GLubyte FLOWER_BOX = 27;
+static const GLubyte TREE_BOX = 28;
 
 static const GLubyte LIGHT_BROWN = 9;
 static const GLubyte DARK_BROWN = 10;
@@ -109,6 +124,8 @@ typedef struct Level {
  * @return
  */
 void setUserColourRGBA(int colourNumber, int red, int green, int blue, float alpha);
+
+void setTexture(int textureID, int colourID);
 
 /**
  * Removes all blocks in the world.

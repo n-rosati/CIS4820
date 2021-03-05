@@ -16,6 +16,11 @@ void setUserColourRGBA(int colourNumber, int red, int green, int blue, float alp
                   alpha / 2.0f);
 }
 
+void setTexture(int textureID, int colourID) {
+    setUserColourRGBA(colourID, 255, 255, 255, 1.0f);
+    setAssignedTexture(colourID, textureID);
+}
+
 void clearWorld(GLubyte world[100][50][100]) {
     for (int x = 0; x < WORLDX; ++x)
         for (int y = 0; y < WORLDY; ++y)
