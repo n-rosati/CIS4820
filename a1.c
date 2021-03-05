@@ -123,7 +123,7 @@ extern void hideMesh(int);
 /********* end of extern variable declarations **************/
 
 List* levels;
-int cloudTick = 0;
+struct timespec lastUpdate = (struct timespec) {.tv_sec = 0, .tv_nsec = 0};
 
 	/*** collisionResponse() ***/
 	/* -performs collision detection and response */
@@ -329,16 +329,25 @@ float x, y, z;
        //Save CPU cycles when not on the outside level
        if (levels->head->previous == NULL) {
            //Cloud animation
-           if (cloudTick % CLOUD_SPEED == 0) {
-               for (int a = 0; a < WORLDX; ++a) {
-                   GLubyte end = world[a][49][WORLDZ - 1];
-                   for (int b = WORLDZ - 1; b > 0; --b) {
-                       world[a][49][b] = world[a][49][b - 1];
+           struct timespec currentTime;
+           clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &currentTime);
+
+           while (lastUpdate.tv_nsec >= 500000000) {
+               if ((labs(lastUpdate.tv_nsec - currentTime.tv_nsec) >= 500000000) ||
+                   (labs(lastUpdate.tv_nsec - currentTime.tv_nsec) <= 500000000 && (lastUpdate.tv_sec - currentTime.tv_sec) != 0)) {
+                   for (int a = 0; a < WORLDX; ++a) {
+                       GLubyte end = world[a][49][WORLDZ - 1];
+                       for (int b = WORLDZ - 1; b > 0; --b) {
+                           world[a][49][b] = world[a][49][b - 1];
+                       }
+                       world[a][49][0] = end;
                    }
-                   world[a][49][0] = end;
                }
+
+               lastUpdate.tv_nsec -= 500000000;
            }
-           cloudTick++;
+
+           lastUpdate = currentTime;
        }
    }
 }
