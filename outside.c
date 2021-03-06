@@ -61,7 +61,7 @@ Level* generateOutsideLevel() {
                         level->world[x][i][z] = GRASS;
                         break;
                     case (int)(maxHeight * (0.8f)) + 6 ... (int)maxHeight + 5:
-                        level->world[x][i][z] = WHITE;
+                        level->world[x][i][z] = SNOW;
                         break;
                     default:
                         printf("Height: %d\n", i);

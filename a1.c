@@ -324,13 +324,11 @@ void update() {
             moveUp(levels, world);
         }
 
+        const long minUpdateTime = 1000000 / 2; //1000000 microsecond = 1 second; Update 2 times per second
         struct timespec currentTime;
         clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &currentTime);
-
         static struct timespec lastUpdate = (struct timespec) {.tv_sec = 0, .tv_nsec = 0};
-        static long long deltaT;
-
-        const long minUpdateTime = 1000000 / 2; //Update 2 times per second
+        static long long deltaT = 0;
 
         deltaT += ((currentTime.tv_nsec - lastUpdate.tv_nsec) + (1000000000 * (currentTime.tv_sec - lastUpdate.tv_sec))) / 1000; //1000 ns = 1 μs
 
@@ -538,6 +536,7 @@ int main(int argc, char** argv)
         setTexture(20, SUN_MOON_BOX);
         setTexture(25, FLOWER_BOX);
         setTexture(50, TREE_BOX);
+        setTexture(54, SNOW);
 
 
         //Prep the levels list

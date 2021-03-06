@@ -44,6 +44,11 @@ static const GLubyte PURPLE = 6;
 static const GLubyte ORANGE = 7;
 static const GLubyte YELLOW = 8;
 
+static const GLubyte LIGHT_BROWN = 9;
+static const GLubyte DARK_BROWN = 10;
+static const GLubyte BEIGE = 11;
+static const GLubyte GREY = 12;
+
 //Textures
 static const GLubyte GRASS = 20;
 static const GLubyte DIRT = 21;
@@ -54,11 +59,7 @@ static const GLubyte CONCRETE = 25;
 static const GLubyte SUN_MOON_BOX = 26;
 static const GLubyte FLOWER_BOX = 27;
 static const GLubyte TREE_BOX = 28;
-
-static const GLubyte LIGHT_BROWN = 9;
-static const GLubyte DARK_BROWN = 10;
-static const GLubyte BEIGE = 11;
-static const GLubyte GREY = 12;
+static const GLubyte SNOW = 29;
 
 static const float GRAVITY_AMT = 0.1f;
 
