@@ -139,7 +139,7 @@ short tubeVisible[TUBE_COUNT];
 	/* flag indicating the user wants the cube in front of them removed */
 int space = 0;
         /* flag indicates if map is to be printed */
-int displayMap = 1;
+int displayMap = 0;
 	/* flag indicating a fixed viewpoint - not updated by mouse/keyboard */
 int fixedVP = 0;
 

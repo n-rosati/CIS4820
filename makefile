@@ -52,6 +52,8 @@ LIBS = -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/De
 #a1: a1.c graphics.c visible.c mesh.c graphics.h mesh.h fast_obj.h
 #	gcc a1.c graphics.c visible.c mesh.c LinkedListAPI.c outside.c underground.c utilities.c $(LIBS) -o a1
 
+.PHONY: clean
+
 MY_FILES = LinkedListAPI.c outside.c underground.c utilities.c
 MY_HEADERS = LinkedListAPI.h outside.h underground.h utilities.h
 SUPPLIED_FILES = a1.c graphics.c visible.c mesh.c
@@ -64,4 +66,4 @@ a1-debug: $(MY_FILES) $(MY_HEADERS) $(SUPPLIED_FILES) $(SUPPLIED_HEADERS)
 	gcc $(MY_FILES) $(SUPPLIED_FILES) $(LIBS) -DDEBUG -ggdb -o a1-debug
 
 clean:
-	rm -rfv out/*
+	rm -rfv a1 a1-debug a1-debug.dSYM a1.dSYM
