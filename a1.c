@@ -160,8 +160,8 @@ void collisionResponse() {
 /*	draw2Dtriangle(int, int, int, int, int, int);	*/
 /*	set2Dcolour(float[] colour); 				*/
 /* colour must be set before other functions are called	*/
+//(0,0) is bottom left of screen, (screenWidth, screenHeight) is top right of screen
 void draw2D() {
-
     if (testWorld) {
         /* draw some sample 2d shapes */
         if (displayMap == 1) {
@@ -175,50 +175,52 @@ void draw2D() {
             draw2Dbox(500, 380, 524, 388);
         }
     } else {
-        //(0,0) is bottom left of screen, (screenWidth, screenHeight) is top right of screen
-        int mapDimension = MIN(screenWidth, screenHeight) / MAP_SCALE;
-        if (displayMap == 1) { //All map
-            //Draw dungeons
-            if (levels->head->previous != NULL) {
-                for (int x = 0; x < WORLDX; ++x) {
-                    for (int z = 0; z < WORLDZ; ++z) {
-                        TwoTupleInt blockX = get2DScreenPosFromBlock(mapDimension, x);
-                        TwoTupleInt blockY = get2DScreenPosFromBlock(mapDimension, z);
-                        switch(world[x][1][z]) {
-                            case STONE_BRICK:
-                                set2Dcolour((float[]){0.38f, 0.33f, 0.28f, 1.0f});
-                                draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
-                                break;
-                            case FLOWER_BOX:
-                                set2Dcolour((float[]){0.74f, 0.73f, 0.0f, 1.0f});
-                                draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
-                                break;
-                            case TREE_BOX:
-                                set2Dcolour((float[]){0.36f, 0.525f, 0.08f, 1.0f});
-                                draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
-                                break;
-                            case SUN_MOON_BOX:
-                                set2Dcolour((float[]){0.17f, 0.49f, 0.55f, 1.0f});
-                                draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
-                                break;
-                            default:
-                                break;
+        if (displayMap == 1 || displayMap == 2) { //All map
+            int mapDimension = MIN(screenWidth, screenHeight) / MAP_SCALE;
+
+            if (displayMap == 1) { //All map
+                //Draw dungeons if underground
+                if (levels->head->previous != NULL) {
+                    for (int x = 0; x < WORLDX; ++x) {
+                        for (int z = 0; z < WORLDZ; ++z) {
+                            TwoTupleInt blockX = get2DScreenPosFromBlock(mapDimension, x);
+                            TwoTupleInt blockY = get2DScreenPosFromBlock(mapDimension, z);
+                            switch(world[x][1][z]) {
+                                case STONE_BRICK:
+                                    set2Dcolour((float[]){0.38f, 0.33f, 0.28f, 1.0f});
+                                    break;
+                                case FLOWER_BOX:
+                                    set2Dcolour((float[]){0.74f, 0.73f, 0.0f, 1.0f});
+                                    break;
+                                case TREE_BOX:
+                                    set2Dcolour((float[]){0.36f, 0.525f, 0.08f, 1.0f});
+                                    break;
+                                case SUN_MOON_BOX:
+                                    set2Dcolour((float[]){0.17f, 0.49f, 0.55f, 1.0f});
+                                    break;
+                                default:
+                                    break;
+                            }
+                            draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
                         }
                     }
                 }
-            }
 
-            //Draw stairs
-            TwoTupleInt stairsDownX = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsDown.x));
-            TwoTupleInt stairsDownY = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsDown.z));
-            set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 1.0f});
-            draw2Dbox(stairsDownX.x, stairsDownY.x, stairsDownX.z, stairsDownY.z);
 
-            if (levels->head->previous != NULL) { //Not above ground
-                TwoTupleInt stairsUpX = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsUp.x));
-                TwoTupleInt stairsUpY = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsUp.z));
-                set2Dcolour((float[]){0.8f, 0.8f, 0.8f, 1.0f});
-                draw2Dbox(stairsUpX.x, stairsUpY.x, stairsUpX.z, stairsUpY.z);
+                //Draw stairs
+                TwoTupleInt stairsDownX = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsDown.x));
+                TwoTupleInt stairsDownY = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsDown.z));
+                set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 1.0f});
+                draw2Dbox(stairsDownX.x, stairsDownY.x, stairsDownX.z, stairsDownY.z);
+
+                if (levels->head->previous != NULL) { //if underground
+                    TwoTupleInt stairsUpX = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsUp.x));
+                    TwoTupleInt stairsUpY = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsUp.z));
+                    set2Dcolour((float[]){0.8f, 0.8f, 0.8f, 1.0f});
+                    draw2Dbox(stairsUpX.x, stairsUpY.x, stairsUpX.z, stairsUpY.z);
+                }
+            } else { //Fog of war map
+                //TODO
             }
 
             //Draw player
@@ -232,10 +234,7 @@ void draw2D() {
             //Background for map
             set2Dcolour((float[]){0.25f, 0.25f, 0.25f, 0.75f});
             draw2Dbox(0, 0, mapDimension, mapDimension);
-        } else if (displayMap == 2) { //Fog of war map
-            //TODO
         }
-
     }
 }
 
