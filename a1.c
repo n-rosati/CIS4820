@@ -66,10 +66,10 @@ extern void hideTube(int);
 extern void showTube(int);
 
 /* 2D drawing functions */
-extern void  draw2Dline(int, int, int, int, int);
-extern void  draw2Dbox(int, int, int, int);
-extern void  draw2Dtriangle(int, int, int, int, int, int);
-extern void  set2Dcolour(float []);
+extern void  draw2Dline(int x1, int y1, int x2, int y2, int lineWidth);
+extern void  draw2Dbox(int x1, int y1, int x2, int y2);
+extern void  draw2Dtriangle(int x1, int y1, int x2, int y2, int x3, int y3);
+extern void  set2Dcolour(float colourv[]);
 
 /* texture functions */
 #ifndef SET_TEXTURE
@@ -131,6 +131,7 @@ List* levels;
 /* note that the world coordinates returned from getViewPosition()
    will be the negative value of the array indices */
 void collisionResponse() {
+    //TODO: check to make sure the player doesn't move camera out of bounds
 #ifndef DEBUG
     float oldX = 0, oldY = 0, oldZ = 0;
     getOldViewPosition(&oldX, &oldY, &oldZ);
@@ -154,10 +155,10 @@ void collisionResponse() {
 /******* draw2D() *******/
 /* draws 2D shapes on screen */
 /* use the following functions: 			*/
-/*	draw2Dline(int, int, int, int, int);		*/
+/*	draw2Dline(int x1, int y1, int x2, int y2, int lineWidth);		*/
 /*	draw2Dbox(int, int, int, int);			*/
 /*	draw2Dtriangle(int, int, int, int, int, int);	*/
-/*	set2Dcolour(float []); 				*/
+/*	set2Dcolour(float[] colour); 				*/
 /* colour must be set before other functions are called	*/
 void draw2D() {
 
@@ -174,9 +175,30 @@ void draw2D() {
             draw2Dbox(500, 380, 524, 388);
         }
     } else {
+        //(0,0) is bottom left of screen, (screenWidth, screenHeight) is top right of screen
+        switch(displayMap) {
+            case 1: //All map
+                set2Dcolour((float[]) {0.1f, 0.1f, 0.1f, 1.0f});
+                TwoTupleInt blockPosX = get2DScreenPosFromBlock(MIN(screenWidth, screenHeight) / MAP_SCALE, (((Level*)(levels->head->data))->stairsDown.x));
+                TwoTupleInt blockPosY = get2DScreenPosFromBlock(MIN(screenWidth, screenHeight) / MAP_SCALE, (((Level*)(levels->head->data))->stairsDown.z));
+                draw2Dbox(blockPosX.x, blockPosY.x, blockPosX.z, blockPosY.z);
 
-        /* your code goes here */
+                float x = 0, y = 0, z = 0;
+                getViewPosition(&x, &y, &z);
+                set2Dcolour((float[]) {0.5f, 0.2f, 0.2f, 1.0f});
+                TwoTupleInt playerPositionX = get2DScreenPosFromBlock(MIN(screenWidth, screenHeight) / MAP_SCALE, NEGATE(floorf(x)));
+                TwoTupleInt playerPositionY = get2DScreenPosFromBlock(MIN(screenWidth, screenHeight) / MAP_SCALE, NEGATE(floorf(z)));
+                draw2Dbox(playerPositionX.x, playerPositionY.x, playerPositionX.z, playerPositionY.z);
 
+                set2Dcolour((float[]) {0.5f, 0.5f, 0.5f, 0.75f});
+                draw2Dbox(0, 0, MIN(screenWidth, screenHeight) / MAP_SCALE, MIN(screenWidth, screenHeight) / MAP_SCALE);
+                break;
+            case 2: //Fog of war map
+
+                break;
+            default: //No map
+                break;
+        }
     }
 
 }
@@ -324,6 +346,7 @@ void update() {
             moveUp(levels, world);
         }
 
+        //Timing
         const long minUpdateTime = 1000000 / 2; //1000000 microsecond = 1 second; Update 2 times per second
         struct timespec currentTime;
         clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &currentTime);

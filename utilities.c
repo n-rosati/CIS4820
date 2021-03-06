@@ -82,6 +82,11 @@ void loadLevel(Level* level, GLubyte world[100][50][100]) {
     }
 }
 
+TwoTupleInt get2DScreenPosFromBlock(int mapSize, int blockPosition)  {
+    return (TwoTupleInt) {.x = mapSize - (0 + ((blockPosition + 1)* (mapSize / WORLDX))),
+                          .z = mapSize - (0 + ((blockPosition) * (mapSize / WORLDX)))};
+}
+
 //Dummy LinkedList functions
 char* printLevel(void* level) {
     return calloc(1, sizeof(char));

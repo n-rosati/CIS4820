@@ -10,6 +10,8 @@
 #include "LinkedListAPI.h"
 
 #define NEGATE(x) (x * -1)
+#define MAX(x,y) (x > y ? x : y)
+#define MIN(x,y) (x < y ? x : y)
 
 //OpenGL functions
 #ifndef SET_USR_COLOUR
@@ -61,7 +63,9 @@ static const GLubyte FLOWER_BOX = 27;
 static const GLubyte TREE_BOX = 28;
 static const GLubyte SNOW = 29;
 
+//Other
 static const float GRAVITY_AMT = 0.1f;
+static const float MAP_SCALE = 1.5f;
 
 /**
  * Two tuple of integers x and z
@@ -155,6 +159,14 @@ void moveUp(List* levels, GLubyte world[100][50][100]);
  * @param world World to load the level into.
  */
 void loadLevel(Level* level, GLubyte world[100][50][100]);
+
+/**
+ * Returns the coordinate on the screen that a block starts at.
+ * @param mapSize One of the sizes of the screen, length or width.
+ * @param blockPosition The position in the world the block is at.
+ * @return The coordinate of the start and end.
+ */
+TwoTupleInt get2DScreenPosFromBlock(int mapSize, int blockPosition);
 
 
 //Functions for the LinkedListAPI
