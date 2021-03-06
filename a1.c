@@ -532,7 +532,6 @@ int main(int argc, char** argv)
         setTexture(18, STONE_BRICK);
         setTexture(23, DIRTY_FLOOR);
         setTexture(52, ASPHALT);
-        setTexture(53, CONCRETE);
         setTexture(20, SUN_MOON_BOX);
         setTexture(25, FLOWER_BOX);
         setTexture(50, TREE_BOX);

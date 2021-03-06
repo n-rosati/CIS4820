@@ -13,7 +13,7 @@ Level* generateUndergroundLevel() {
     //Build a platform
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {
-            level->world[x][0][z] = CONCRETE;
+            level->world[x][0][z] = DIRTY_FLOOR;
         }
     }
 
