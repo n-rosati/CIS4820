@@ -125,6 +125,7 @@ void drawRoom(Room* room, GLubyte world[100][50][100]) {
 }
 
 void populateRoom(Room* room, GLubyte world[100][50][100]) {
+    //Place cubes
     for (int i = 0; i < 2; i++) {
         int offsetX = rand() % (room->length.x - 2);
         int offsetZ = rand() % (room->length.z - 2);
@@ -142,6 +143,30 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
                 break;
         }
     }
+
+    //Place a mob
+    static int mobCount = 0;
+    float posX = (float) ((rand() % (room->length.x - 4 + 1) + 2) + room->origin.x);
+    float posZ = (float) ((rand() % (room->length.z - 4 + 1) + 2) + room->origin.z);
+    switch (rand() % 4) {
+        case 0:
+            setMeshID(mobCount, COW, posX, 1.5f, posZ);
+            break;
+        case 1:
+            setMeshID(mobCount, FISH, posX, 1.5f, posZ);
+            break;
+        case 2:
+            setMeshID(mobCount, BAT, posX, 1.0f, posZ);
+            break;
+        case 3:
+            setMeshID(mobCount, CACTUS, posX, 1.0f, posZ);
+            break;
+    }
+    setScaleMesh(mobCount, 0.6f);
+    room->mobID = mobCount;
+    drawMesh(mobCount);
+    mobCount++;
+//    hideMesh(mobCount);
 }
 
 void placeStairs(Level* level, int roomNumber) {

@@ -386,11 +386,8 @@ void update() {
 
         //Check if the player is on stairs
         Level* currentLevel = levels->head->data;
-#ifdef DEBUG
-        printf("At: %d %d (%d) %d\tStairs down: %d %d %d\tStairs up: %d %d %d\n", currentX, currentY, currentY - 2, currentZ, currentLevel->stairsDown.x, currentLevel->stairsDown.y, currentLevel->stairsDown.z, currentLevel->stairsUp.x, currentLevel->stairsUp.y, currentLevel->stairsUp.z);
-#endif
         if (currentX == currentLevel->stairsDown.x && (currentY - 2) == currentLevel->stairsDown.y && currentZ == currentLevel->stairsDown.z) {
-            moveDown(levels, world, generateUndergroundLevel());
+            moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
         } else if (currentX == currentLevel->stairsUp.x && (currentY - 2) == currentLevel->stairsUp.y && currentZ == currentLevel->stairsUp.z) {
             moveUp(levels, world);
         }
@@ -416,7 +413,11 @@ void update() {
                 }
             }
 
-           deltaT -= minUpdateTime;
+            deltaT -= minUpdateTime;
+
+#ifdef DEBUG
+            printf("At: %d %d (%d) %d\tStairs down: %d %d %d\tStairs up: %d %d %d\n", currentX, currentY, currentY - 2, currentZ, currentLevel->stairsDown.x, currentLevel->stairsDown.y, currentLevel->stairsDown.z, currentLevel->stairsUp.x, currentLevel->stairsUp.y, currentLevel->stairsUp.z);
+#endif
         }
 
         lastUpdate = currentTime;
@@ -444,6 +445,14 @@ void mouse(int button, int state, int x, int y) {
         printf("down - ");
 
     printf("%d %d\n", x, y);
+
+#ifdef DEBUG
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+        moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
+    } else if (button == GLUT_RIGHT_BUTTON && state == GLUT_UP) {
+        moveUp(levels, world);
+    }
+#endif
 }
 
 

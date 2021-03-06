@@ -47,7 +47,21 @@ void moveDown(List* levels, GLubyte world[100][50][100], Level* newLevel) {
         currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][1][currentLevel->stairsDown.z + 1] == 0) ? 1 : -1;
     }
 
+    //Hide old meshes if the current level is not the above ground level
+    if (levels->head->previous != NULL) {
+        for (int i = 0; i < 9; ++i) {
+            hideMesh(currentLevel->rooms[i]->mobID);
+        }
+    }
+
     levels->head = levels->head->next;
+    currentLevel = levels->head->data;
+
+    //Show new meshes
+    for (int i = 0; i < 9; ++i) {
+        drawMesh(currentLevel->rooms[i]->mobID);
+    }
+
     loadLevel(levels->head->data, world);
 }
 
@@ -61,7 +75,21 @@ void moveUp(List* levels, GLubyte world[100][50][100]) {
         currentLevel->viewport.x -= (world[currentLevel->stairsDown.x + 1][1][currentLevel->stairsDown.z] == 0) ? 1 : -1;
         currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][1][currentLevel->stairsDown.z + 1] == 0) ? 1 : -1;
 
+        //Hide old meshes
+        for (int i = 0; i < 9; ++i) {
+            hideMesh(currentLevel->rooms[i]->mobID);
+        }
+
         levels->head = levels->head->previous;
+        currentLevel = levels->head->data;
+
+        //Show new meshes if the new level is not the underground level
+        if (levels->head->previous != NULL) {
+            for (int i = 0; i < 9; ++i) {
+                drawMesh(currentLevel->rooms[i]->mobID);
+            }
+        }
+
         loadLevel(levels->head->data, world);
     }
 }

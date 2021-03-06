@@ -34,6 +34,35 @@ extern void getViewPosition(float*, float*, float*);
 #define SET_TEXTURE
 extern int setAssignedTexture(int, int);
 #endif
+#ifndef SET_MESH_ID
+#define SET_MESH_ID
+extern void setMeshID(int, int, float, float, float);
+#endif
+#ifndef UNSET_MESH_ID
+#define UNSET_MESH_ID
+extern void unsetMeshID(int);
+#endif
+#ifndef SET_TRANSLATE_MESH
+#define SET_TRANSLATE_MESH
+extern void setTranslateMesh(int, float, float, float);
+#endif
+#ifndef SET_ROTATE_MESH
+#define SET_ROTATE_MESH
+extern void setRotateMesh(int, float, float, float);
+#endif
+#ifndef SET_SCALE_MESH
+#define SET_SCALE_MESH
+extern void setScaleMesh(int, float);
+#endif
+#ifndef DRAW_MESH
+#define DRAW_MESH
+extern void drawMesh(int);
+#endif
+#ifndef HIDE_MESH
+#define HIDE_MESH
+extern void hideMesh(int);
+#endif
+
 
 //Colours
 static const GLubyte EMPTY = 0;
@@ -62,6 +91,12 @@ static const GLubyte SUN_MOON_BOX = 26;
 static const GLubyte FLOWER_BOX = 27;
 static const GLubyte TREE_BOX = 28;
 static const GLubyte SNOW = 29;
+
+//Meshes
+static const int COW = 0;
+static const int FISH = 1;
+static const int BAT = 2;
+static const int CACTUS = 3;
 
 //Other
 static const float GRAVITY_AMT = 0.1f;
@@ -101,6 +136,8 @@ typedef struct Room {
     TwoTupleInt length;
     /**Absolute starting coordinate of the room*/
     TwoTupleInt origin;
+    /**Mob ID*/
+    int mobID;
 } Room;
 
 /**Level details.*/
