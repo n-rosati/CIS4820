@@ -29,6 +29,8 @@ Level* generateUndergroundLevel() {
             level->rooms[roomNumber]->origin.x = col * CELL_SIZE + xOffset;
             level->rooms[roomNumber]->origin.z = row * CELL_SIZE + zOffset;
 
+            level->rooms[roomNumber]->mob.id = level->mobCount++;
+
             drawRoom(level->rooms[roomNumber], level->world);
         }
     }
@@ -144,37 +146,59 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
         }
     }
 
-    //Place a mob
-    static int mobCount = 0;
-    float posX = (float) ((rand() % (room->length.x - 4 + 1) + 2) + room->origin.x);
-    float posZ = (float) ((rand() % (room->length.z - 4 + 1) + 2) + room->origin.z);
+    //Generate mobs
+    room->mob.position.x = ((float) ((rand() % (room->length.x - 4 + 1) + 2) + room->origin.x)) + 0.5f;
+    room->mob.position.z = ((float) ((rand() % (room->length.z - 4 + 1) + 2) + room->origin.z)) + 0.5f;
+
     switch (rand() % 4) {
         case 0:
-            setMeshID(mobCount, COW, posX, 1.5f, posZ);
-            room->mobPos.y = 1.5f;
+            printf("%d\n", COW);
+            setMeshID(room->mob.id, COW, room->mob.position.x, 1.0f, room->mob.position.z);
+            room->mob.type = COW;
+            room->mob.position.y = 1.5f;
+            room->mob.velocity.y = 0.175f;
+            room->mob.scale = 0.5f;
             break;
         case 1:
-            setMeshID(mobCount, FISH, posX, 1.5f, posZ);
-            room->mobPos.y = 1.5f;
+            printf("%d\n", FISH);
+            setMeshID(room->mob.id, FISH, room->mob.position.x, 1.0f, room->mob.position.z);
+            room->mob.type = FISH;
+            room->mob.position.y = 1.5f;
+            room->mob.velocity.y = 0.175f;
+            room->mob.scale = 0.5f;
             break;
         case 2:
-            setMeshID(mobCount, BAT, posX, 1.0f, posZ);
-            room->mobPos.y = 1.0f;
+            printf("%d\n", BAT);
+            setMeshID(room->mob.id, BAT, room->mob.position.x, 1.0f, room->mob.position.z);
+            room->mob.type = BAT;
+            room->mob.position.y = 1.75f;
+            room->mob.velocity.y = 0.35f;
+            room->mob.scale = 0.5f;
             break;
         case 3:
-            setMeshID(mobCount, CACTUS, posX, 1.0f, posZ);
-            room->mobPos.y = 1.0f;
+            printf("%d\n", CACTUS);
+            setMeshID(room->mob.id, CACTUS, room->mob.position.x, 1.0f, room->mob.position.z);
+            room->mob.type = CACTUS;
+            room->mob.position.y = 1.25f;
+            room->mob.velocity.y = 0.2f;
+            room->mob.scale = 0.5f;
             break;
     }
-    setScaleMesh(mobCount, 0.6f);
-    room->mobID = mobCount;
-    room->mobPos.x = posX;
-    room->mobPos.z = posZ;
+    setScaleMesh(room->mob.id, room->mob.scale);
+    hideMesh(room->mob.id);
+    room->mob.isVisible = false;
 
-    hideMesh(room->mobID);
-    room->isMobVisible = false;
+    //Movement velocity
+//    switch (rand() % 2) {
+//        case 0:
+//            room->mob.velocity.x = ((float) ((rand() % 75 - 25 + 1) + 25)) / 175.0f;
+//            break;
+//        case 1:
+//            room->mob.velocity.z = ((float) ((rand() % 75 - 25 + 1) + 25)) / 175.0f;
+//            break;
+//    }
+            room->mob.velocity.x = 0.2f;
 
-    mobCount++;
 }
 
 void placeStairs(Level* level, int roomNumber) {

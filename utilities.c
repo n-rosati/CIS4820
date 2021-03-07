@@ -47,19 +47,21 @@ void moveDown(List* levels, GLubyte world[100][50][100], Level* newLevel) {
         currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][1][currentLevel->stairsDown.z + 1] == 0) ? 1 : -1;
     }
 
-    //Hide old meshes if the current level is not the above ground level
+    //Unset old meshes if the old level is not the above ground level
     if (levels->head->previous != NULL) {
         for (int i = 0; i < 9; ++i) {
-            hideMesh(currentLevel->rooms[i]->mobID);
+            unsetMeshID(currentLevel->rooms[i]->mob.id);
+            currentLevel->rooms[i]->mob.isVisible = false;
         }
     }
 
     levels->head = levels->head->next;
     currentLevel = levels->head->data;
 
-    //Show new meshes
+    //Set new meshes
     for (int i = 0; i < 9; ++i) {
-        drawMesh(currentLevel->rooms[i]->mobID);
+        setMeshID(currentLevel->rooms[i]->mob.id, currentLevel->rooms[i]->mob.type, currentLevel->rooms[i]->mob.position.x, currentLevel->rooms[i]->mob.position.y, currentLevel->rooms[i]->mob.position.z);
+        setScaleMesh(currentLevel->rooms[i]->mob.id, currentLevel->rooms[i]->mob.scale);
     }
 
     loadLevel(levels->head->data, world);
@@ -75,21 +77,21 @@ void moveUp(List* levels, GLubyte world[100][50][100]) {
         currentLevel->viewport.x -= (world[currentLevel->stairsDown.x + 1][1][currentLevel->stairsDown.z] == 0) ? 1 : -1;
         currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][1][currentLevel->stairsDown.z + 1] == 0) ? 1 : -1;
 
-        //Hide old meshes
+        //Unset old meshes
         for (int i = 0; i < 9; ++i) {
-            hideMesh(currentLevel->rooms[i]->mobID);
-            currentLevel->rooms[i]->isMobVisible = false;
+            unsetMeshID(currentLevel->rooms[i]->mob.id);
+            currentLevel->rooms[i]->mob.isVisible = false;
         }
 
         levels->head = levels->head->previous;
-        currentLevel = levels->head->data;
 
-        //Show new meshes if the new level is not the underground level
-//        if (levels->head->previous != NULL) {
-//            for (int i = 0; i < 9; ++i) {
-//                drawMesh(currentLevel->rooms[i]->mobID);
-//            }
-//        }
+        //Set new meshes if an under ground level
+        if (levels->head->previous != NULL) {
+            for (int i = 0; i < 9; ++i) {
+                setMeshID(currentLevel->rooms[i]->mob.id, currentLevel->rooms[i]->mob.type, currentLevel->rooms[i]->mob.position.x, currentLevel->rooms[i]->mob.position.y, currentLevel->rooms[i]->mob.position.z);
+                setScaleMesh(currentLevel->rooms[i]->mob.id, currentLevel->rooms[i]->mob.scale);
+            }
+        }
 
         loadLevel(levels->head->data, world);
     }

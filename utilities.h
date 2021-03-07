@@ -48,7 +48,7 @@ extern void setTranslateMesh(int, float, float, float);
 #endif
 #ifndef SET_ROTATE_MESH
 #define SET_ROTATE_MESH
-extern void setRotateMesh(int, float, float, float);
+extern void setRotateMesh(int id, float x, float y, float z);
 #endif
 #ifndef SET_SCALE_MESH
 #define SET_SCALE_MESH
@@ -64,40 +64,48 @@ extern void hideMesh(int);
 #endif
 extern int PointInFrustum( float x, float y, float z );
 
-
 //Colours
-static const GLubyte EMPTY = 0;
-static const GLubyte GREEN = 1;
-static const GLubyte BLUE = 2;
-static const GLubyte RED = 3;
-static const GLubyte BLACK = 4;
-static const GLubyte WHITE = 5;
-static const GLubyte PURPLE = 6;
-static const GLubyte ORANGE = 7;
-static const GLubyte YELLOW = 8;
-
-static const GLubyte LIGHT_BROWN = 9;
-static const GLubyte DARK_BROWN = 10;
-static const GLubyte BEIGE = 11;
-static const GLubyte GREY = 12;
+typedef enum {
+    EMPTY = 0,
+    GREEN = 1,
+    BLUE = 2,
+    RED = 3,
+    BLACK = 4,
+    WHITE = 5,
+    PURPLE = 6,
+    ORANGE = 7,
+    YELLOW = 8,
+    LIGHT_BROWN = 9,
+    DARK_BROWN = 10,
+    BEIGE = 11,
+    GREY = 12
+} Colour;
 
 //Textures
-static const GLubyte GRASS = 20;
-static const GLubyte DIRT = 21;
-static const GLubyte STONE_BRICK = 22;
-static const GLubyte DIRTY_FLOOR = 23;
-static const GLubyte ASPHALT = 24;
-static const GLubyte CONCRETE = 25;
-static const GLubyte SUN_MOON_BOX = 26;
-static const GLubyte FLOWER_BOX = 27;
-static const GLubyte TREE_BOX = 28;
-static const GLubyte SNOW = 29;
+typedef enum {
+    GRASS = 20,
+    DIRT = 21,
+    STONE_BRICK = 22,
+    DIRTY_FLOOR = 23,
+    ASPHALT = 24,
+    CONCRETE = 25,
+    SUN_MOON_BOX = 26,
+    FLOWER_BOX = 27,
+    TREE_BOX = 28,
+    SNOW = 29
+} Texture;
 
 //Meshes
-static const int COW = 0;
-static const int FISH = 1;
-static const int BAT = 2;
-static const int CACTUS = 3;
+typedef enum {
+    COW = 0,
+    FISH = 1,
+    BAT = 2,
+    CACTUS = 3
+} Mesh;
+static const float MESH_OFFSET = 0.75f;
+
+//Mob stuff
+//static int mobCount = 0;
 
 //Other
 static const float GRAVITY_AMT = 0.1f;
@@ -131,18 +139,32 @@ typedef struct {
     float x, y, z;
 } ThreeTupleFloat;
 
+/**Mob details*/
+typedef struct {
+    /**Mob ID*/
+    int id;
+    /**Mob type*/
+    Mesh type;
+    /**Mob visibility*/
+    bool isVisible;
+    /**Mob location*/
+    ThreeTupleFloat position;
+    /**Mob velocity*/
+    ThreeTupleFloat velocity;
+    /**Mob Rotation*/
+    ThreeTupleFloat rotation;
+    /**Mob scale*/
+    float scale;
+} Mob;
+
 /**Room details.*/
 typedef struct {
     /**Lengths of the room*/
     TwoTupleInt length;
     /**Absolute starting coordinate of the room*/
     TwoTupleInt origin;
-    /**Mob ID*/
-    int mobID;
-    /**Mob location*/
-    ThreeTupleFloat mobPos;
-    /**Mob visibility*/
-    bool isMobVisible;
+    /**Room's mob*/
+    Mob mob;
 } Room;
 
 /**Level details.*/
@@ -159,6 +181,8 @@ typedef struct {
     ThreeTupleInt stairsDown;
     /**Stairs up location*/
     ThreeTupleInt stairsUp;
+    /**Mob count*/
+    int mobCount;
 } Level;
 
 /**
@@ -210,6 +234,7 @@ void loadLevel(Level* level, GLubyte world[100][50][100]);
  */
 TwoTupleInt get2DScreenPosFromBlock(int mapSize, int blockPosition);
 
+//TODO: Make function(s) to get int position from float position
 
 //Functions for the LinkedListAPI
 /**Dummy function. No functionality.*/
