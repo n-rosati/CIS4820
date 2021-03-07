@@ -248,7 +248,7 @@ void draw2D() {
             set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 0.75f});
             draw2Dbox(0, 0, mapDimension, mapDimension);
         } else if (displayMap == 2) { //Fog of war map
-            //TODO
+            //TODO: Fog of war map
         }
 
     }
@@ -423,61 +423,15 @@ void update() {
             }
 
             //Mob movement
-//            if (levels->head->previous != NULL) {
-//                for (int l = 0; l < 9; ++l) {
-//                    Room* room = ((Level*)(levels->head->data))->rooms[l];
-//                    if (room->mob.velocity.x != 0) {
-//                        if (room->mob.velocity.x > 0) {
-//                            if((world[(int)(ceilf(room->mob.position.x + room->mob.velocity.x + MESH_OFFSET))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z))] != 0) ||
-//                               (world[(int)(ceilf(room->mob.position.x - room->mob.velocity.x + MESH_OFFSET))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z))] != 0)) {
-//                                room->mob.velocity.x *= -1;
-//                            }
-//                        } else {
-//                            if((world[(int)(ceilf(room->mob.position.x + room->mob.velocity.x - MESH_OFFSET))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z))] != 0) ||
-//                               (world[(int)(ceilf(room->mob.position.x - room->mob.velocity.x - MESH_OFFSET))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z))] != 0)) {
-//                                room->mob.velocity.x *= -1;
-//                            }
-//                        }
-//
-//                        room->mob.position.x += room->mob.velocity.x;
-//                    } else {
-//                        if (room->mob.velocity.z > 0) {
-//                            if((world[(int)(ceilf(room->mob.position.x))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z + room->mob.velocity.z + MESH_OFFSET))] != 0) ||
-//                               (world[(int)(ceilf(room->mob.position.x))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z - room->mob.velocity.z + MESH_OFFSET))] != 0)) {
-//                                room->mob.velocity.x *= -1;
-////                                setRotateMesh(room->mob.id, 0, 270, 0);
-//
-//                            }
-//                        } else {
-//                            if((world[(int)(ceilf(room->mob.position.x))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z + room->mob.velocity.z - MESH_OFFSET))] != 0) ||
-//                                world[(int)(ceilf(room->mob.position.x))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z - room->mob.velocity.z - MESH_OFFSET))] != 0) {
-//                                room->mob.velocity.x *= -1;
-////                                setRotateMesh(room->mob.id, 0, 90, 0);
-//                            }
-//                        }
-//
-//                        room->mob.position.z += room->mob.velocity.z;
-//                    }
-//
-//                    if ((room->mob.position.y + room->mob.velocity.y >= 2.0f) || (room->mob.position.y + room->mob.velocity.y <= 1.0f) ||
-//                        (world[(int)ceilf(room->mob.position.x)][(int)floorf(room->mob.position.y + room->mob.velocity.y - MESH_OFFSET)][(int)ceilf(room->mob.position.z)] != 0)){
-//                        room->mob.velocity.y *= -1;
-//                    }
-//                    room->mob.position.y += room->mob.velocity.y;
-//
-//                    setTranslateMesh(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z);
-//                    if (room->mob.velocity.x > 0) {
-//                        setMobPosition(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z, 180);
-//                    } else if (room->mob.velocity.x < 0) {
-//                        setMobPosition(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z, 0);
-//                    } else if (room->mob.velocity.z > 0) {
-//                        setMobPosition(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z, 90);
-//                    } else if (room->mob.velocity.z < 0) {
-//                        setMobPosition(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z, 0);
-//                    }
-//                }
-//            }
-
+            if (!currentLevel->isOutside){
+                for (int l = 0; l < 9; ++l) {
+                    if ((currentLevel->rooms[l]->mob.position.y >= 2.25f) ||
+                        world[(int) floorf(currentLevel->rooms[l]->mob.position.x)][(int) floorf(currentLevel->rooms[l]->mob.position.y)][(int) floorf(currentLevel->rooms[l]->mob.position.z)] != 0) {
+                        currentLevel->rooms[l]->mob.velocity.y *= -1.0f;
+                    }
+                    currentLevel->rooms[l]->mob.position.y += currentLevel->rooms[l]->mob.velocity.y;
+                }
+            }
 
             //Mob visibility checking
             if (!currentLevel->isOutside) {
@@ -502,6 +456,11 @@ void update() {
                     }
                 }
             }
+        }
+
+        //Update mob positions
+        for (int l = 0; l < 9; ++l) {
+            setMobPosition(currentLevel->rooms[l]->mob.id, currentLevel->rooms[l]->mob.position.x, currentLevel->rooms[l]->mob.position.y, currentLevel->rooms[l]->mob.position.z, 0/*FIXME: mob rotation*/);
         }
 
         lastUpdate = currentTime;

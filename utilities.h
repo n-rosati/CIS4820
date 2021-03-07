@@ -237,7 +237,7 @@ void loadLevel(Level* level, GLubyte world[100][50][100]);
  */
 TwoTupleInt get2DScreenPosFromBlock(int mapSize, int blockPosition);
 
-//TODO: Make function(s) to get int position from float position
+//TODO: Make function(s) to get int position (world cube) from float position (like a camera)
 
 //Functions for the LinkedListAPI
 /**Dummy function. No functionality.*/
