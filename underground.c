@@ -10,6 +10,8 @@ Level* generateUndergroundLevel() {
     level->seed = time(NULL);
     srand(level->seed);
 
+    level->isOutside = false;
+
     //Build a platform
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {
@@ -152,53 +154,39 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
 
     switch (rand() % 4) {
         case 0:
-            printf("%d\n", COW);
-            setMeshID(room->mob.id, COW, room->mob.position.x, 1.0f, room->mob.position.z);
             room->mob.type = COW;
             room->mob.position.y = 1.5f;
             room->mob.velocity.y = 0.175f;
-            room->mob.scale = 0.5f;
             break;
         case 1:
-            printf("%d\n", FISH);
-            setMeshID(room->mob.id, FISH, room->mob.position.x, 1.0f, room->mob.position.z);
             room->mob.type = FISH;
             room->mob.position.y = 1.5f;
             room->mob.velocity.y = 0.175f;
-            room->mob.scale = 0.5f;
             break;
         case 2:
-            printf("%d\n", BAT);
-            setMeshID(room->mob.id, BAT, room->mob.position.x, 1.0f, room->mob.position.z);
             room->mob.type = BAT;
             room->mob.position.y = 1.75f;
             room->mob.velocity.y = 0.35f;
-            room->mob.scale = 0.5f;
             break;
         case 3:
-            printf("%d\n", CACTUS);
-            setMeshID(room->mob.id, CACTUS, room->mob.position.x, 1.0f, room->mob.position.z);
             room->mob.type = CACTUS;
-            room->mob.position.y = 1.25f;
+            room->mob.position.y = 1.5f;
             room->mob.velocity.y = 0.2f;
-            room->mob.scale = 0.5f;
             break;
     }
-    setScaleMesh(room->mob.id, room->mob.scale);
-    hideMesh(room->mob.id);
+
+    room->mob.scale = 0.5f;
     room->mob.isVisible = false;
 
     //Movement velocity
-//    switch (rand() % 2) {
-//        case 0:
-//            room->mob.velocity.x = ((float) ((rand() % 75 - 25 + 1) + 25)) / 175.0f;
-//            break;
-//        case 1:
-//            room->mob.velocity.z = ((float) ((rand() % 75 - 25 + 1) + 25)) / 175.0f;
-//            break;
-//    }
+    switch (rand() % 2) {
+        case 0:
             room->mob.velocity.x = 0.2f;
-
+            break;
+        case 1:
+            room->mob.velocity.z = 0.2f;
+            break;
+    }
 }
 
 void placeStairs(Level* level, int roomNumber) {

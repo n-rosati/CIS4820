@@ -37,7 +37,7 @@ void moveDown(List* levels, GLubyte world[100][50][100], Level* newLevel) {
     getViewPosition(&currentLevel->viewport.x, &currentLevel->viewport.y, &currentLevel->viewport.z);
 
     //This prevents the user from getting stuck in an up <-> down loop when going up stairs
-    if (levels->head->previous == NULL) {
+    if (currentLevel->isOutside) {
         //Outdoor level
         currentLevel->viewport.x -= 3;
         currentLevel->viewport.y -= 2;
@@ -47,28 +47,13 @@ void moveDown(List* levels, GLubyte world[100][50][100], Level* newLevel) {
         currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][1][currentLevel->stairsDown.z + 1] == 0) ? 1 : -1;
     }
 
-    //Unset old meshes if the old level is not the above ground level
-    if (levels->head->previous != NULL) {
-        for (int i = 0; i < 9; ++i) {
-            unsetMeshID(currentLevel->rooms[i]->mob.id);
-            currentLevel->rooms[i]->mob.isVisible = false;
-        }
-    }
-
     levels->head = levels->head->next;
-    currentLevel = levels->head->data;
-
-    //Set new meshes
-    for (int i = 0; i < 9; ++i) {
-        setMeshID(currentLevel->rooms[i]->mob.id, currentLevel->rooms[i]->mob.type, currentLevel->rooms[i]->mob.position.x, currentLevel->rooms[i]->mob.position.y, currentLevel->rooms[i]->mob.position.z);
-        setScaleMesh(currentLevel->rooms[i]->mob.id, currentLevel->rooms[i]->mob.scale);
-    }
 
     loadLevel(levels->head->data, world);
 }
 
 void moveUp(List* levels, GLubyte world[100][50][100]) {
-    if (levels->head->previous != NULL) {
+    if (!((Level *)(levels->head->data))->isOutside) {
         //Save viewport position
         Level* currentLevel = levels->head->data;
         getViewPosition(&currentLevel->viewport.x, &currentLevel->viewport.y, &currentLevel->viewport.z);
@@ -77,21 +62,7 @@ void moveUp(List* levels, GLubyte world[100][50][100]) {
         currentLevel->viewport.x -= (world[currentLevel->stairsDown.x + 1][1][currentLevel->stairsDown.z] == 0) ? 1 : -1;
         currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][1][currentLevel->stairsDown.z + 1] == 0) ? 1 : -1;
 
-        //Unset old meshes
-        for (int i = 0; i < 9; ++i) {
-            unsetMeshID(currentLevel->rooms[i]->mob.id);
-            currentLevel->rooms[i]->mob.isVisible = false;
-        }
-
         levels->head = levels->head->previous;
-
-        //Set new meshes if an under ground level
-        if (levels->head->previous != NULL) {
-            for (int i = 0; i < 9; ++i) {
-                setMeshID(currentLevel->rooms[i]->mob.id, currentLevel->rooms[i]->mob.type, currentLevel->rooms[i]->mob.position.x, currentLevel->rooms[i]->mob.position.y, currentLevel->rooms[i]->mob.position.z);
-                setScaleMesh(currentLevel->rooms[i]->mob.id, currentLevel->rooms[i]->mob.scale);
-            }
-        }
 
         loadLevel(levels->head->data, world);
     }
@@ -104,11 +75,19 @@ void loadLevel(Level* level, GLubyte world[100][50][100]) {
     setViewPosition(level->viewport.x, level->viewport.y, level->viewport.z);
     setOldViewPosition(level->viewport.x, level->viewport.y, level->viewport.z);
 
+    //Copy saved level to loaded level
     for (int x = 0; x < WORLDX; ++x) {
         for (int y = 0; y < WORLDY; ++y) {
             for (int z = 0; z < WORLDZ; ++z) {
                 world[x][y][z] = level->world[x][y][z];
             }
+        }
+    }
+
+    //Set mobs
+    if (!level->isOutside) {
+        for (int i = 0; i < 9; ++i) {
+            setMobPosition(level->rooms[i]->mob.id, level->rooms[i]->mob.position.x, level->rooms[i]->mob.position.y, level->rooms[i]->mob.position.z, 0/*FIXME*/);
         }
     }
 }

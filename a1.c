@@ -50,7 +50,9 @@ extern void addDisplayList(int, int, int);
 
 /* mob controls */
 extern void createMob(int, float, float, float, float);
+#ifndef SET_MOB_POS
 extern void setMobPosition(int, float, float, float, float);
+#endif
 extern void hideMob(int);
 extern void showMob(int);
 
@@ -192,7 +194,7 @@ void draw2D() {
         int mapDimension = MIN(screenWidth, screenHeight) / MAP_SCALE;
         if (displayMap == 1) { //All map
             //Draw dungeons
-            if (levels->head->previous != NULL) {
+            if (!((Level*)(levels->head->data))->isOutside) {
                 for (int x = 0; x < WORLDX; ++x) {
                     for (int z = 0; z < WORLDZ; ++z) {
                         TwoTupleInt blockX = get2DScreenPosFromBlock(mapDimension, x);
@@ -227,7 +229,7 @@ void draw2D() {
             set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 1.0f});
             draw2Dbox(stairsDownX.x, stairsDownY.x, stairsDownX.z, stairsDownY.z);
 
-            if (levels->head->previous != NULL) { //Not above ground
+            if (!((Level*)(levels->head->data))->isOutside) {
                 TwoTupleInt stairsUpX = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsUp.x));
                 TwoTupleInt stairsUpY = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsUp.z));
                 set2Dcolour((float[]){0.8f, 0.8f, 0.8f, 1.0f});
@@ -393,7 +395,7 @@ void update() {
         }
 
         //Timing
-        const long minUpdateTime = 1000000 / 8; //1000000 microsecond = 1 second; Update 2 times per second
+        const long minUpdateTime = 1000000 / 64; //1000000 microsecond = 1 second; Update 64 times per second
         struct timespec currentTime;
         clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &currentTime);
         static struct timespec lastUpdate = (struct timespec) {.tv_sec = 0, .tv_nsec = 0};
@@ -406,9 +408,9 @@ void update() {
             deltaT -= minUpdateTime;
 
             //Clouds
-            if (levels->head->previous == NULL) {
+            if (currentLevel->isOutside) {
                 static int cloudTick = 0;
-                if (cloudTick++ == 4) {
+                if (cloudTick++ == 32) {
                     for (int a = 0; a < WORLDX; ++a) {
                         GLubyte end = world[a][49][WORLDZ - 1];
                         for (int b = WORLDZ - 1; b > 0; --b) {
@@ -416,67 +418,69 @@ void update() {
                         }
                         world[a][49][0] = end;
                     }
+                    cloudTick = 0;
                 }
             }
 
             //Mob movement
-            if (levels->head->previous != NULL) {
-                for (int l = 0; l < 9; ++l) {
-                    Room* room = ((Level*)(levels->head->data))->rooms[l];
-                    if (room->mob.velocity.x != 0) {
-                        if (room->mob.velocity.x > 0) {
-                            if((world[(int)(ceilf(room->mob.position.x + room->mob.velocity.x + MESH_OFFSET))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z))] != 0) ||
-                               (world[(int)(ceilf(room->mob.position.x - room->mob.velocity.x + MESH_OFFSET))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z))] != 0)) {
-                                room->mob.velocity.x *= -1;
-                            }
-                        } else {
-                            if((world[(int)(ceilf(room->mob.position.x + room->mob.velocity.x - MESH_OFFSET))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z))] != 0) ||
-                               (world[(int)(ceilf(room->mob.position.x - room->mob.velocity.x - MESH_OFFSET))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z))] != 0)) {
-                                room->mob.velocity.x *= -1;
-                            }
-                        }
+//            if (levels->head->previous != NULL) {
+//                for (int l = 0; l < 9; ++l) {
+//                    Room* room = ((Level*)(levels->head->data))->rooms[l];
+//                    if (room->mob.velocity.x != 0) {
+//                        if (room->mob.velocity.x > 0) {
+//                            if((world[(int)(ceilf(room->mob.position.x + room->mob.velocity.x + MESH_OFFSET))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z))] != 0) ||
+//                               (world[(int)(ceilf(room->mob.position.x - room->mob.velocity.x + MESH_OFFSET))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z))] != 0)) {
+//                                room->mob.velocity.x *= -1;
+//                            }
+//                        } else {
+//                            if((world[(int)(ceilf(room->mob.position.x + room->mob.velocity.x - MESH_OFFSET))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z))] != 0) ||
+//                               (world[(int)(ceilf(room->mob.position.x - room->mob.velocity.x - MESH_OFFSET))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z))] != 0)) {
+//                                room->mob.velocity.x *= -1;
+//                            }
+//                        }
+//
+//                        room->mob.position.x += room->mob.velocity.x;
+//                    } else {
+//                        if (room->mob.velocity.z > 0) {
+//                            if((world[(int)(ceilf(room->mob.position.x))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z + room->mob.velocity.z + MESH_OFFSET))] != 0) ||
+//                               (world[(int)(ceilf(room->mob.position.x))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z - room->mob.velocity.z + MESH_OFFSET))] != 0)) {
+//                                room->mob.velocity.x *= -1;
+////                                setRotateMesh(room->mob.id, 0, 270, 0);
+//
+//                            }
+//                        } else {
+//                            if((world[(int)(ceilf(room->mob.position.x))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z + room->mob.velocity.z - MESH_OFFSET))] != 0) ||
+//                                world[(int)(ceilf(room->mob.position.x))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z - room->mob.velocity.z - MESH_OFFSET))] != 0) {
+//                                room->mob.velocity.x *= -1;
+////                                setRotateMesh(room->mob.id, 0, 90, 0);
+//                            }
+//                        }
+//
+//                        room->mob.position.z += room->mob.velocity.z;
+//                    }
+//
+//                    if ((room->mob.position.y + room->mob.velocity.y >= 2.0f) || (room->mob.position.y + room->mob.velocity.y <= 1.0f) ||
+//                        (world[(int)ceilf(room->mob.position.x)][(int)floorf(room->mob.position.y + room->mob.velocity.y - MESH_OFFSET)][(int)ceilf(room->mob.position.z)] != 0)){
+//                        room->mob.velocity.y *= -1;
+//                    }
+//                    room->mob.position.y += room->mob.velocity.y;
+//
+//                    setTranslateMesh(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z);
+//                    if (room->mob.velocity.x > 0) {
+//                        setMobPosition(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z, 180);
+//                    } else if (room->mob.velocity.x < 0) {
+//                        setMobPosition(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z, 0);
+//                    } else if (room->mob.velocity.z > 0) {
+//                        setMobPosition(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z, 90);
+//                    } else if (room->mob.velocity.z < 0) {
+//                        setMobPosition(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z, 0);
+//                    }
+//                }
+//            }
 
-                        room->mob.position.x += room->mob.velocity.x;
-                    } else {
-                        if (room->mob.velocity.z > 0) {
-                            if((world[(int)(ceilf(room->mob.position.x))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z + room->mob.velocity.z + MESH_OFFSET))] != 0) ||
-                               (world[(int)(ceilf(room->mob.position.x))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z - room->mob.velocity.z + MESH_OFFSET))] != 0)) {
-                                room->mob.velocity.x *= -1;
-//                                setRotateMesh(room->mob.id, 0, 270, 0);
-
-                            }
-                        } else {
-                            if((world[(int)(ceilf(room->mob.position.x))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z + room->mob.velocity.z - MESH_OFFSET))] != 0) ||
-                                world[(int)(ceilf(room->mob.position.x))][(int)(floorf(room->mob.position.y))][(int)(ceilf(room->mob.position.z - room->mob.velocity.z - MESH_OFFSET))] != 0) {
-                                room->mob.velocity.x *= -1;
-//                                setRotateMesh(room->mob.id, 0, 90, 0);
-                            }
-                        }
-
-                        room->mob.position.z += room->mob.velocity.z;
-                    }
-
-                    if ((room->mob.position.y + room->mob.velocity.y >= 2.0f) || (room->mob.position.y + room->mob.velocity.y <= 1.0f) ||
-                        (world[(int)ceilf(room->mob.position.x)][(int)floorf(room->mob.position.y + room->mob.velocity.y - MESH_OFFSET)][(int)ceilf(room->mob.position.z)] != 0)){
-                        room->mob.velocity.y *= -1;
-                    }
-                    room->mob.position.y += room->mob.velocity.y;
-
-                    setTranslateMesh(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z);
-                    if (room->mob.velocity.x > 0) {
-                        setMobPosition(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z, 180);
-                    } else if (room->mob.velocity.x < 0) {
-                        setMobPosition(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z, 0);
-                    } else if (room->mob.velocity.z > 0) {
-                        setMobPosition(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z, 90);
-                    } else if (room->mob.velocity.z < 0) {
-                        setMobPosition(room->mob.id, room->mob.position.x, room->mob.position.y, room->mob.position.z, 0);
-                    }
-                }
-            }
 
             //Mob visibility checking
-            if (levels->head->previous != NULL) {
+            if (!currentLevel->isOutside) {
                 for (int l = 0; l < 9; ++l) {
                     Room* room = ((Level*)(levels->head->data))->rooms[l];
                     float distanceMobPlayer = sqrtf(powf(room->mob.position.x - NEGATE(oldX), 2) + powf(room->mob.position.z - NEGATE(oldZ), 2));
@@ -484,15 +488,15 @@ void update() {
                     if (distanceMobPlayer <= roomDiagonal) {
                         if (PointInFrustum(room->mob.position.x, room->mob.position.y, room->mob.position.z)) {
                             if (!room->mob.isVisible) {
-                                drawMesh(room->mob.id);
+                                showMob(room->mob.id);
                                 room->mob.isVisible = true;
-                                printf("Mesh %d now visible.\n", room->mob.id);
+                                printf("Mob %d now visible.\n", room->mob.id);
                             }
                         } else {
                             if (room->mob.isVisible) {
-                                hideMesh(room->mob.id);
+                                hideMob(room->mob.id);
                                 room->mob.isVisible = false;
-                                printf("Mesh %d now hidden.\n", room->mob.id);
+                                printf("Mob %d now hidden.\n", room->mob.id);
                             }
                         }
                     }
@@ -705,6 +709,11 @@ int main(int argc, char** argv)
         setTexture(50, TREE_BOX);
         setTexture(54, SNOW);
 
+        //Create mobs
+        for (int l = 0; l < 9; ++l) {
+            createMob(l, 0, 0, 0, 0);
+            hideMob(l);
+        }
 
         //Prep the levels list
         levels = initializeList(printLevel, deleteLevel, compareLevels);

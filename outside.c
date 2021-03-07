@@ -46,6 +46,8 @@ Level* generateOutsideLevel() {
     level->seed = time(NULL);
     srand(level->seed);
 
+    level->isOutside = true;
+
     //Generate terrain
     const float maxHeight = 20.0f;
     for (int x = 0; x < WORLDX; ++x) {

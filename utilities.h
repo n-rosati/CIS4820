@@ -63,6 +63,10 @@ extern void drawMesh(int);
 extern void hideMesh(int);
 #endif
 extern int PointInFrustum( float x, float y, float z );
+#ifndef SET_MOB_POS
+#define SET_MOB_POS
+extern void setMobPosition(int id, float x, float y, float z, float rotation);
+#endif
 
 //Colours
 typedef enum {
@@ -151,8 +155,6 @@ typedef struct {
     ThreeTupleFloat position;
     /**Mob velocity*/
     ThreeTupleFloat velocity;
-    /**Mob Rotation*/
-    ThreeTupleFloat rotation;
     /**Mob scale*/
     float scale;
 } Mob;
@@ -169,6 +171,7 @@ typedef struct {
 
 /**Level details.*/
 typedef struct {
+    bool isOutside;
     /**World associated with level*/
     GLubyte world[100][50][100];
     /**Rooms in level. NULL if outdoor level.*/
