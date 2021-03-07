@@ -443,6 +443,8 @@ void update() {
                         if(world[mobX1][mobY][mobZ] != 0 || world[mobX2][mobY][mobZ] != 0) {
                             currentLevel->rooms[l]->mob.velocity.x *= -1.0f;
                         }
+
+                        currentLevel->rooms[l]->mob.rotation = (currentLevel->rooms[l]->mob.velocity.x > 0.0f ? 90.0f : 270.0f);
                     }
                     //Z axis movement
                     {
@@ -453,10 +455,12 @@ void update() {
                         if(world[mobX][mobY][mobZ1] != 0 || world[mobX][mobY][mobZ2] != 0) {
                             currentLevel->rooms[l]->mob.velocity.z *= -1.0f;
                         }
+
+                        currentLevel->rooms[l]->mob.rotation = (currentLevel->rooms[l]->mob.velocity.z > 0.0f ? 0.0f : 180.0f);
                     }
 
-                    currentLevel->rooms[l]->mob.position.y += currentLevel->rooms[l]->mob.velocity.y;
                     currentLevel->rooms[l]->mob.position.x += currentLevel->rooms[l]->mob.velocity.x;
+                    currentLevel->rooms[l]->mob.position.y += currentLevel->rooms[l]->mob.velocity.y;
                     currentLevel->rooms[l]->mob.position.z += currentLevel->rooms[l]->mob.velocity.z;
                 }
             }
@@ -493,8 +497,7 @@ void update() {
         //Update mob positions if under ground
         if (!currentLevel->isOutside) {
             for (int l = 0; l < 9; ++l) {
-                setMobPosition(currentLevel->rooms[l]->mob.id, currentLevel->rooms[l]->mob.position.x, currentLevel->rooms[l]->mob.position.y,
-                               currentLevel->rooms[l]->mob.position.z, 0/*FIXME: mob rotation*/);
+                setMobPosition(currentLevel->rooms[l]->mob.id, currentLevel->rooms[l]->mob.position.x, currentLevel->rooms[l]->mob.position.y, currentLevel->rooms[l]->mob.position.z, currentLevel->rooms[l]->mob.rotation);
             }
         }
 
