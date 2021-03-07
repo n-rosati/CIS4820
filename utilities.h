@@ -109,12 +109,9 @@ typedef enum {
 
 static const float MESH_OFFSET = 0.15f;
 
-//Mob stuff
-//static int mobCount = 0;
-
 //Other
 static const float GRAVITY_AMT = 0.1f;
-static const float MAP_SCALE = 1.5f;
+static const float MAP_SCALE = 1.1f; //Bigger number = smaller map
 
 /**
  * Two tuple of integers x and z

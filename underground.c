@@ -151,6 +151,7 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
     //Generate mobs
     room->mob.position.x = ((float) ((rand() % (room->length.x - 4 + 1) + 2) + room->origin.x) + 0.5f);
     room->mob.position.z = ((float) ((rand() % (room->length.z - 4 + 1) + 2) + room->origin.z) + 0.5f);
+    //TODO: Make the meshes able to be different
 
 //    switch (rand() % 4) {
 //        case 0:

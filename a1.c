@@ -239,10 +239,20 @@ void draw2D() {
             //Draw player
             float x = 0, y = 0, z = 0;
             getViewPosition(&x, &y, &z);
-            set2Dcolour((float[]){1.0f, 0.2f, 0.2f, 1.0f});
-            TwoTupleInt playerPositionX = get2DScreenPosFromBlock(mapDimension, NEGATE(floorf(x + 0.5)));
-            TwoTupleInt playerPositionY = get2DScreenPosFromBlock(mapDimension, NEGATE(floorf(z + 0.5)));
+            set2Dcolour((float[]){0.4f, 0.0f, 1.0f, 1.0f});
+            TwoTupleInt playerPositionX = get2DScreenPosFromBlock(mapDimension, NEGATE(floorf(x + 0.5f)));
+            TwoTupleInt playerPositionY = get2DScreenPosFromBlock(mapDimension, NEGATE(floorf(z + 0.5f)));
             draw2Dbox(playerPositionX.x, playerPositionY.x, playerPositionX.z, playerPositionY.z);
+
+            //Draw mobs if in an underground level
+            if (!((Level*)(levels->head->data))->isOutside) {
+                for (int i = 0; i < 9; ++i) {
+                    set2Dcolour((float[]){1.0f, 0.1f, 0.1f, 1.0f});
+                    TwoTupleInt mobX = get2DScreenPosFromBlock(mapDimension, (int) floorf(((Level*)(levels->head->data))->rooms[i]->mob.position.x + 0.5f));
+                    TwoTupleInt mobY = get2DScreenPosFromBlock(mapDimension, (int) floorf(((Level*)(levels->head->data))->rooms[i]->mob.position.z + 0.5f));
+                    draw2Dbox(mobX.x, mobY.x, mobX.z, mobY.z);
+                }
+            }
 
             //Background for map
             set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 0.75f});
