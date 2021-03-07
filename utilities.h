@@ -36,7 +36,7 @@ extern int setAssignedTexture(int, int);
 #endif
 #ifndef SET_MESH_ID
 #define SET_MESH_ID
-extern void setMeshID(int, int, float, float, float);
+extern void setMeshID(int id, int meshNumber, float xpos, float ypos, float zpos);
 #endif
 #ifndef UNSET_MESH_ID
 #define UNSET_MESH_ID
@@ -44,7 +44,7 @@ extern void unsetMeshID(int);
 #endif
 #ifndef SET_TRANSLATE_MESH
 #define SET_TRANSLATE_MESH
-extern void setTranslateMesh(int, float, float, float);
+extern void setTranslateMesh(int id, float xpos, float ypos, float zpos);
 #endif
 #ifndef SET_ROTATE_MESH
 #define SET_ROTATE_MESH

@@ -115,7 +115,7 @@ extern void getUserColour(int, GLfloat *, GLfloat *, GLfloat *, GLfloat *, GLflo
 
 /* mesh creation, translatio, rotation functions */
 #ifndef SET_MESH_ID
-extern void setMeshID(int, int, float, float, float);
+extern void setMeshID(int id, int meshNumber, float xpos, float ypos, float zpos);
 #endif
 #ifndef UNSET_MESH_ID
 extern void unsetMeshID(int);
@@ -435,7 +435,7 @@ void update() {
 
                     int mobY = (int) floorf(currentLevel->rooms[l]->mob.position.y);
                     //X axis movement
-                    {
+                    if (currentLevel->rooms[l]->mob.velocity.x >= 0.0001f || currentLevel->rooms[l]->mob.velocity.x <= -0.0001f) {
                         int mobX1 = (int) floorf(currentLevel->rooms[l]->mob.position.x - MESH_OFFSET);
                         int mobX2 = (int) ceilf(currentLevel->rooms[l]->mob.position.x + MESH_OFFSET);
                         int mobZ = (int) floorf(currentLevel->rooms[l]->mob.position.z);
@@ -447,7 +447,7 @@ void update() {
                         currentLevel->rooms[l]->mob.rotation = (currentLevel->rooms[l]->mob.velocity.x > 0.0f ? 90.0f : 270.0f);
                     }
                     //Z axis movement
-                    {
+                    if (currentLevel->rooms[l]->mob.velocity.z >= 0.0001f || currentLevel->rooms[l]->mob.velocity.z <= -0.0001f) {
                         int mobX = (int) floorf(currentLevel->rooms[l]->mob.position.x);
                         int mobZ1 = (int) floorf(currentLevel->rooms[l]->mob.position.z - MESH_OFFSET);
                         int mobZ2 = (int) ceilf(currentLevel->rooms[l]->mob.position.z + MESH_OFFSET);
@@ -470,26 +470,47 @@ void update() {
                 for (int l = 0; l < 9; ++l) {
                     Room* room = ((Level*)(levels->head->data))->rooms[l];
                     float distanceMobPlayer = sqrtf(powf(room->mob.position.x - NEGATE(oldX), 2) + powf(room->mob.position.z - NEGATE(oldZ), 2));
-#ifndef DISABLE_VISIBILITY
                     if (distanceMobPlayer <= roomDiagonal) {
                         if (PointInFrustum(room->mob.position.x, room->mob.position.y, room->mob.position.z)) {
                             if (!room->mob.isVisible) {
-                                showMob(room->mob.id);
+                                drawMesh(room->mob.id);
                                 room->mob.isVisible = true;
-                                printf("Mob %d now visible.\n", room->mob.id);
+                                switch (room->mob.type) {
+                                    case COW:
+                                        printf("Cow mesh #%d now visible.\n", room->mob.id);
+                                        break;
+                                    case FISH:
+                                        printf("Fish mesh #%d now visible.\n", room->mob.id);
+                                        break;
+                                    case BAT:
+                                        printf("Bat mesh #%d now visible.\n", room->mob.id);
+                                        break;
+                                    case CACTUS:
+                                        printf("Cactus mesh #%d now visible.\n", room->mob.id);
+                                        break;
+                                }
                             }
                         } else {
                             if (room->mob.isVisible) {
-                                hideMob(room->mob.id);
+                                hideMesh(room->mob.id);
                                 room->mob.isVisible = false;
-                                printf("Mob %d now hidden.\n", room->mob.id);
+                                switch (room->mob.type) {
+                                    case COW:
+                                        printf("Cow mesh #%d now hidden.\n", room->mob.id);
+                                        break;
+                                    case FISH:
+                                        printf("Fish mesh #%d now hidden.\n", room->mob.id);
+                                        break;
+                                    case BAT:
+                                        printf("Bat mesh #%d now hidden.\n", room->mob.id);
+                                        break;
+                                    case CACTUS:
+                                        printf("Cactus mesh #%d now hidden.\n", room->mob.id);
+                                        break;
+                                }
                             }
                         }
                     }
-#endif
-#ifdef DISABLE_VISIBILITY
-                    showMob(room->mob.id);
-#endif
                 }
             }
         }
@@ -497,7 +518,8 @@ void update() {
         //Update mob positions if under ground
         if (!currentLevel->isOutside) {
             for (int l = 0; l < 9; ++l) {
-                setMobPosition(currentLevel->rooms[l]->mob.id, currentLevel->rooms[l]->mob.position.x, currentLevel->rooms[l]->mob.position.y, currentLevel->rooms[l]->mob.position.z, currentLevel->rooms[l]->mob.rotation);
+                setTranslateMesh(currentLevel->rooms[l]->mob.id, currentLevel->rooms[l]->mob.position.x, currentLevel->rooms[l]->mob.position.y, currentLevel->rooms[l]->mob.position.z);
+                setRotateMesh(currentLevel->rooms[l]->mob.id, 0, currentLevel->rooms[l]->mob.rotation, 0);
             }
         }
 
@@ -708,8 +730,10 @@ int main(int argc, char** argv)
 
         //Create mobs
         for (int l = 0; l < 9; ++l) {
-            createMob(l, 0, 0, 0, 0);
-            hideMob(l);
+//            createMob(l, 0, 0, 0, 0);
+            setMeshID(l, CACTUS, 0, 0, 0);
+            hideMesh(l);
+//            hideMob(l);
         }
 
         //Prep the levels list

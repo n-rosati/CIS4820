@@ -87,7 +87,10 @@ void loadLevel(Level* level, GLubyte world[100][50][100]) {
     //Set mobs
     if (!level->isOutside) {
         for (int i = 0; i < 9; ++i) {
-            setMobPosition(level->rooms[i]->mob.id, level->rooms[i]->mob.position.x, level->rooms[i]->mob.position.y, level->rooms[i]->mob.position.z, level->rooms[i]->mob.rotation);
+            setTranslateMesh(level->rooms[i]->mob.id, level->rooms[i]->mob.position.x, level->rooms[i]->mob.position.y, level->rooms[i]->mob.position.z);
+            setRotateMesh(level->rooms[i]->mob.id, 0, level->rooms[i]->mob.rotation, 0);
+            setScaleMesh(level->rooms[i]->mob.id, level->rooms[i]->mob.scale);
+//            setMobPosition(level->rooms[i]->mob.id, level->rooms[i]->mob.position.x, level->rooms[i]->mob.position.y, level->rooms[i]->mob.position.z, level->rooms[i]->mob.rotation);
         }
     }
 }

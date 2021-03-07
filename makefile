@@ -63,7 +63,7 @@ a1: $(MY_FILES) $(MY_HEADERS) $(SUPPLIED_FILES) $(SUPPLIED_HEADERS)
 	gcc $(MY_FILES) $(SUPPLIED_FILES) $(LIBS) -ggdb -o a1
 
 a1-debug: $(MY_FILES) $(MY_HEADERS) $(SUPPLIED_FILES) $(SUPPLIED_HEADERS)
-	gcc $(MY_FILES) $(SUPPLIED_FILES) $(LIBS) -DDEBUG -DDISABLE_VISIBILITY -ggdb -o a1-debug
+	gcc $(MY_FILES) $(SUPPLIED_FILES) $(LIBS) -DDEBUG -ggdb -o a1-debug
 
 clean:
 	rm -rfv a1 a1-debug a1-debug.dSYM a1.dSYM

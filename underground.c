@@ -118,13 +118,11 @@ void drawRoom(Room* room, GLubyte world[100][50][100]) {
         drawLineZ(room->origin.x + room->length.x, y, room->origin.z, room->origin.z + room->length.z, world, STONE_BRICK);
 
         //Roof
-#ifndef DISABLE_VISIBILITY
         if (y == ROOM_HEIGHT) {
             for (int zOffset = 0; zOffset <= room->length.z; ++zOffset) {
                 drawLineX(room->origin.x, room->origin.x + room->length.x, y, room->origin.z + zOffset, world, ASPHALT);
             }
         }
-#endif
     }
 
     populateRoom(room, world);
@@ -151,33 +149,36 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
     }
 
     //Generate mobs
-    room->mob.position.x = ((float) ((rand() % (room->length.x - 4 + 1) + 2) + room->origin.x));
-    room->mob.position.z = ((float) ((rand() % (room->length.z - 4 + 1) + 2) + room->origin.z));
+    room->mob.position.x = ((float) ((rand() % (room->length.x - 4 + 1) + 2) + room->origin.x) + 0.5f);
+    room->mob.position.z = ((float) ((rand() % (room->length.z - 4 + 1) + 2) + room->origin.z) + 0.5f);
 
-    switch (rand() % 4) {
-        case 0:
-            room->mob.type = COW;
-            room->mob.position.y = 1.5f;
-            room->mob.velocity.y = 0.05f;
-            break;
-        case 1:
-            room->mob.type = FISH;
-            room->mob.position.y = 1.5f;
-            room->mob.velocity.y = 0.05f;
-            break;
-        case 2:
-            room->mob.type = BAT;
-            room->mob.position.y = 1.75f;
-            room->mob.velocity.y = 0.05f;
-            break;
-        case 3:
+//    switch (rand() % 4) {
+//        case 0:
+//            room->mob.type = COW;
+//            room->mob.position.y = 1.5f;
+//            room->mob.velocity.y = 0.05f;
+//            room->mob.scale = 0.5f;
+//            break;
+//        case 1:
+//            room->mob.type = FISH;
+//            room->mob.position.y = 1.5f;
+//            room->mob.velocity.y = 0.05f;
+//            room->mob.scale = 0.5f;
+//            break;
+//        case 2:
+//            room->mob.type = BAT;
+//            room->mob.position.y = 1.75f;
+//            room->mob.velocity.y = 0.1f;
+//            room->mob.scale = 0.5f;
+//            break;
+//        case 3:
             room->mob.type = CACTUS;
             room->mob.position.y = 1.5f;
             room->mob.velocity.y = 0.05f;
-            break;
-    }
+            room->mob.scale = 0.5f;
+//            break;
+//    }
 
-    room->mob.scale = 0.5f;
     room->mob.isVisible = false;
 
     //Movement velocity
