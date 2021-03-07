@@ -151,22 +151,30 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
     switch (rand() % 4) {
         case 0:
             setMeshID(mobCount, COW, posX, 1.5f, posZ);
+            room->mobPos.y = 1.5f;
             break;
         case 1:
             setMeshID(mobCount, FISH, posX, 1.5f, posZ);
+            room->mobPos.y = 1.5f;
             break;
         case 2:
             setMeshID(mobCount, BAT, posX, 1.0f, posZ);
+            room->mobPos.y = 1.0f;
             break;
         case 3:
             setMeshID(mobCount, CACTUS, posX, 1.0f, posZ);
+            room->mobPos.y = 1.0f;
             break;
     }
     setScaleMesh(mobCount, 0.6f);
     room->mobID = mobCount;
-    drawMesh(mobCount);
+    room->mobPos.x = posX;
+    room->mobPos.z = posZ;
+
+    hideMesh(room->mobID);
+    room->isMobVisible = false;
+
     mobCount++;
-//    hideMesh(mobCount);
 }
 
 void placeStairs(Level* level, int roomNumber) {

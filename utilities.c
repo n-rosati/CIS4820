@@ -78,17 +78,18 @@ void moveUp(List* levels, GLubyte world[100][50][100]) {
         //Hide old meshes
         for (int i = 0; i < 9; ++i) {
             hideMesh(currentLevel->rooms[i]->mobID);
+            currentLevel->rooms[i]->isMobVisible = false;
         }
 
         levels->head = levels->head->previous;
         currentLevel = levels->head->data;
 
         //Show new meshes if the new level is not the underground level
-        if (levels->head->previous != NULL) {
-            for (int i = 0; i < 9; ++i) {
-                drawMesh(currentLevel->rooms[i]->mobID);
-            }
-        }
+//        if (levels->head->previous != NULL) {
+//            for (int i = 0; i < 9; ++i) {
+//                drawMesh(currentLevel->rooms[i]->mobID);
+//            }
+//        }
 
         loadLevel(levels->head->data, world);
     }

@@ -416,8 +416,33 @@ void update() {
             deltaT -= minUpdateTime;
 
 #ifdef DEBUG
-            printf("At: %d %d (%d) %d\tStairs down: %d %d %d\tStairs up: %d %d %d\n", currentX, currentY, currentY - 2, currentZ, currentLevel->stairsDown.x, currentLevel->stairsDown.y, currentLevel->stairsDown.z, currentLevel->stairsUp.x, currentLevel->stairsUp.y, currentLevel->stairsUp.z);
+            //printf("At: %d %d (%d) %d\tStairs down: %d %d %d\tStairs up: %d %d %d\n", currentX, currentY, currentY - 2, currentZ, currentLevel->stairsDown.x, currentLevel->stairsDown.y, currentLevel->stairsDown.z, currentLevel->stairsUp.x, currentLevel->stairsUp.y, currentLevel->stairsUp.z);
 #endif
+
+            float roomDiagonal = sqrtf(powf((float) ROOM_MAX_LENGTH, 2) + powf((float) ROOM_MAX_WIDTH, 2));
+            //Check if mobs are in view area
+            if (levels->head->previous != NULL) {
+                for (int l = 0; l < 9; ++l) {
+                    Room* room = ((Level*)(levels->head->data))->rooms[l];
+                    float distanceMobPlayer = sqrtf(powf(room->mobPos.x - NEGATE(oldX), 2) + powf(room->mobPos.z - NEGATE(oldZ), 2));
+
+                    if (distanceMobPlayer <= roomDiagonal) {
+                        if (PointInFrustum(room->mobPos.x, room->mobPos.y, room->mobPos.z)) {
+                            if (!room->isMobVisible) {
+                                drawMesh(room->mobID);
+                                room->isMobVisible = true;
+                                printf("Mesh %d now visible.\n", room->mobID);
+                            }
+                        } else {
+                            if (room->isMobVisible) {
+                                hideMesh(room->mobID);
+                                room->isMobVisible = false;
+                                printf("Mesh %d now hidden.\n", room->mobID);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         lastUpdate = currentTime;

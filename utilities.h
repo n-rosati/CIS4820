@@ -62,6 +62,7 @@ extern void drawMesh(int);
 #define HIDE_MESH
 extern void hideMesh(int);
 #endif
+extern int PointInFrustum( float x, float y, float z );
 
 
 //Colours
@@ -105,43 +106,47 @@ static const float MAP_SCALE = 1.5f;
 /**
  * Two tuple of integers x and z
  */
-typedef struct TwoTupleInt {
+typedef struct {
     int x, z;
 } TwoTupleInt;
 
 /**
  * Three tuple of integers x, z, and z
  */
-typedef struct ThreeTupleInt {
+typedef struct {
     int x, y, z;
 } ThreeTupleInt;
 
 /**
  * Two tuple of floats x and z
  */
-typedef struct TwoTupleFloat {
+typedef struct {
     float x, z;
 } TwoTupleFloat;
 
 /**
  * Three tuple of floats x, z, and z
  */
-typedef struct ThreeTupleFloat {
+typedef struct {
     float x, y, z;
 } ThreeTupleFloat;
 
 /**Room details.*/
-typedef struct Room {
+typedef struct {
     /**Lengths of the room*/
     TwoTupleInt length;
     /**Absolute starting coordinate of the room*/
     TwoTupleInt origin;
     /**Mob ID*/
     int mobID;
+    /**Mob location*/
+    ThreeTupleFloat mobPos;
+    /**Mob visibility*/
+    bool isMobVisible;
 } Room;
 
 /**Level details.*/
-typedef struct Level {
+typedef struct {
     /**World associated with level*/
     GLubyte world[100][50][100];
     /**Rooms in level. NULL if outdoor level.*/
