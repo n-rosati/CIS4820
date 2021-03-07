@@ -16,6 +16,7 @@ Custom things
 
 - Moving through the hallways is a little bit tricky without the ability for the camera to 'slide' along walls
 - The LinkedListAPI is from the W20 offering of CIS*2750. Denis Nikitenko gave his permission to use this outside of his class
+- The only feature NOT implemented is the Fog of War map type.
 
 Building and Running the Graphics System
 ----------------------------------------
