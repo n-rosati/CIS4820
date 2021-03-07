@@ -425,11 +425,39 @@ void update() {
             //Mob movement
             if (!currentLevel->isOutside){
                 for (int l = 0; l < 9; ++l) {
-                    if ((currentLevel->rooms[l]->mob.position.y >= 2.25f) ||
-                        world[(int) floorf(currentLevel->rooms[l]->mob.position.x)][(int) floorf(currentLevel->rooms[l]->mob.position.y)][(int) floorf(currentLevel->rooms[l]->mob.position.z)] != 0) {
-                        currentLevel->rooms[l]->mob.velocity.y *= -1.0f;
+                    //Y axis movement
+                    {
+                        if ((currentLevel->rooms[l]->mob.position.y >= 2.0f) ||
+                            world[(int)floorf(currentLevel->rooms[l]->mob.position.x)][(int)floorf(currentLevel->rooms[l]->mob.position.y - MESH_OFFSET)][(int)floorf(currentLevel->rooms[l]->mob.position.z)] != 0) {
+                            currentLevel->rooms[l]->mob.velocity.y *= -1.0f;
+                        }
                     }
+
+                    int mobY = (int) floorf(currentLevel->rooms[l]->mob.position.y);
+                    //X axis movement
+                    {
+                        int mobX1 = (int) floorf(currentLevel->rooms[l]->mob.position.x - MESH_OFFSET);
+                        int mobX2 = (int) ceilf(currentLevel->rooms[l]->mob.position.x + MESH_OFFSET);
+                        int mobZ = (int) floorf(currentLevel->rooms[l]->mob.position.z);
+
+                        if(world[mobX1][mobY][mobZ] != 0 || world[mobX2][mobY][mobZ] != 0) {
+                            currentLevel->rooms[l]->mob.velocity.x *= -1.0f;
+                        }
+                    }
+                    //Z axis movement
+                    {
+                        int mobX = (int) floorf(currentLevel->rooms[l]->mob.position.x);
+                        int mobZ1 = (int) floorf(currentLevel->rooms[l]->mob.position.z - MESH_OFFSET);
+                        int mobZ2 = (int) ceilf(currentLevel->rooms[l]->mob.position.z + MESH_OFFSET);
+
+                        if(world[mobX][mobY][mobZ1] != 0 || world[mobX][mobY][mobZ2] != 0) {
+                            currentLevel->rooms[l]->mob.velocity.z *= -1.0f;
+                        }
+                    }
+
                     currentLevel->rooms[l]->mob.position.y += currentLevel->rooms[l]->mob.velocity.y;
+                    currentLevel->rooms[l]->mob.position.x += currentLevel->rooms[l]->mob.velocity.x;
+                    currentLevel->rooms[l]->mob.position.z += currentLevel->rooms[l]->mob.velocity.z;
                 }
             }
 
@@ -438,7 +466,7 @@ void update() {
                 for (int l = 0; l < 9; ++l) {
                     Room* room = ((Level*)(levels->head->data))->rooms[l];
                     float distanceMobPlayer = sqrtf(powf(room->mob.position.x - NEGATE(oldX), 2) + powf(room->mob.position.z - NEGATE(oldZ), 2));
-
+#ifndef DISABLE_VISIBILITY
                     if (distanceMobPlayer <= roomDiagonal) {
                         if (PointInFrustum(room->mob.position.x, room->mob.position.y, room->mob.position.z)) {
                             if (!room->mob.isVisible) {
@@ -454,13 +482,20 @@ void update() {
                             }
                         }
                     }
+#endif
+#ifdef DISABLE_VISIBILITY
+                    showMob(room->mob.id);
+#endif
                 }
             }
         }
 
-        //Update mob positions
-        for (int l = 0; l < 9; ++l) {
-            setMobPosition(currentLevel->rooms[l]->mob.id, currentLevel->rooms[l]->mob.position.x, currentLevel->rooms[l]->mob.position.y, currentLevel->rooms[l]->mob.position.z, 0/*FIXME: mob rotation*/);
+        //Update mob positions if under ground
+        if (!currentLevel->isOutside) {
+            for (int l = 0; l < 9; ++l) {
+                setMobPosition(currentLevel->rooms[l]->mob.id, currentLevel->rooms[l]->mob.position.x, currentLevel->rooms[l]->mob.position.y,
+                               currentLevel->rooms[l]->mob.position.z, 0/*FIXME: mob rotation*/);
+            }
         }
 
         lastUpdate = currentTime;

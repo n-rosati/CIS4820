@@ -106,7 +106,8 @@ typedef enum {
     BAT = 2,
     CACTUS = 3
 } Mesh;
-static const float MESH_OFFSET = 0.75f;
+
+static const float MESH_OFFSET = 0.15f;
 
 //Mob stuff
 //static int mobCount = 0;
