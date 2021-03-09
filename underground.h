@@ -95,5 +95,21 @@ void drawLineX(int xStart, int xEnd, int y, int z, GLubyte world[100][50][100], 
  */
 void drawLineZ(int x, int y, int zStart, int zEnd, GLubyte world[100][50][100], GLubyte color);
 
+/**
+ * Checks if a given coordinate is in a room
+ * @param coordinate The coordinate to check
+ * @param level Level to look through
+ * @return The room number the coordinate is in, -1 if not in a room.
+ */
+int isInRoom(TwoTupleInt coordinate, Level* level);
+
+/**
+ * Checks if the given coordinate is within the start and end coordinates, exclusively
+ * @param coordinate Coordinate to check
+ * @param startCoordinate Starting coordinate
+ * @param endCoordinate Ending coordinate
+ * @return True if the given point is within, false oherwise.
+ */
+bool isInArea(TwoTupleInt coordinate, TwoTupleInt startCoordinate, TwoTupleInt endCoordinate);
 
 #endif //CIS4820_UNDERGROUND_H

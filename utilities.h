@@ -92,7 +92,6 @@ typedef enum {
     STONE_BRICK = 22,
     DIRTY_FLOOR = 23,
     ASPHALT = 24,
-    CONCRETE = 25,
     SUN_MOON_BOX = 26,
     FLOWER_BOX = 27,
     TREE_BOX = 28,
@@ -167,6 +166,8 @@ typedef struct {
     TwoTupleInt origin;
     /**Room's mob*/
     Mob mob;
+    /**Marker to check if the user has been to this room before*/;
+    bool visited;
 } Room;
 
 /**Level details.*/

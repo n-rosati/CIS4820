@@ -12,12 +12,17 @@ Level* generateUndergroundLevel() {
 
     level->isOutside = false;
 
+//    //Build a platform
+//    for (int x = 0; x < WORLDX; x++) {
+//        for (int z = 0; z < WORLDZ; z++) {
+//            level->world[x][0][z] = DIRTY_FLOOR;
+//        }
+//    }
     //Build a platform
-    for (int x = 0; x < WORLDX; x++) {
-        for (int z = 0; z < WORLDZ; z++) {
-            level->world[x][0][z] = DIRTY_FLOOR;
-        }
-    }
+    for (int x = 0; x < WORLDX; x++)
+        for (int z = 0; z < WORLDZ; z++)
+            level->world[x][0][z] = ((x + z) % 2) ? DARK_BROWN : LIGHT_BROWN; //Checker board for light/dark grey
+
 
     //Make and place rooms
     for (int row = 0; row < 3; ++row) {
@@ -112,15 +117,15 @@ Room* createRoom() {
 
 void drawRoom(Room* room, GLubyte world[100][50][100]) {
     for (int y = 1; y <= ROOM_HEIGHT; ++y) {
-        drawLineX(room->origin.x, room->origin.x + room->length.x, y, room->origin.z, world, STONE_BRICK);
-        drawLineX(room->origin.x, room->origin.x + room->length.x, y, room->origin.z + room->length.z, world, STONE_BRICK);
-        drawLineZ(room->origin.x, y, room->origin.z, room->origin.z + room->length.z, world, STONE_BRICK);
-        drawLineZ(room->origin.x + room->length.x, y, room->origin.z, room->origin.z + room->length.z, world, STONE_BRICK);
+        drawLineX(room->origin.x, room->origin.x + room->length.x - 1, y, room->origin.z, world, STONE_BRICK);
+        drawLineX(room->origin.x, room->origin.x + room->length.x - 1, y, room->origin.z + room->length.z - 1, world, STONE_BRICK);
+        drawLineZ(room->origin.x, y, room->origin.z, room->origin.z + room->length.z - 1, world, STONE_BRICK);
+        drawLineZ(room->origin.x + room->length.x - 1, y, room->origin.z, room->origin.z + room->length.z, world, STONE_BRICK);
 
         //Roof
         if (y == ROOM_HEIGHT) {
-            for (int zOffset = 0; zOffset <= room->length.z; ++zOffset) {
-                drawLineX(room->origin.x, room->origin.x + room->length.x, y, room->origin.z + zOffset, world, ASPHALT);
+            for (int zOffset = 0; zOffset <= room->length.z - 1; ++zOffset) {
+                drawLineX(room->origin.x, room->origin.x + room->length.x - 1, y, room->origin.z + zOffset, world, ASPHALT);
             }
         }
     }
@@ -149,10 +154,10 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
     }
 
     //Generate mobs
-    room->mob.position.x = ((float) ((rand() % (room->length.x - 4 + 1) + 2) + room->origin.x) + 0.5f);
-    room->mob.position.z = ((float) ((rand() % (room->length.z - 4 + 1) + 2) + room->origin.z) + 0.5f);
-    //TODO: Make the meshes able to be different
+    room->mob.position.x = ((float) ((rand() % (room->length.x - 4) + 2) + room->origin.x) + 0.5f);
+    room->mob.position.z = ((float) ((rand() % (room->length.z - 4) + 2) + room->origin.z) + 0.5f);
 
+    //TODO: Make the meshes able to be different
 //    switch (rand() % 4) {
 //        case 0:
 //            room->mob.type = COW;
@@ -230,4 +235,21 @@ void drawLineZ(int x, int y, int zStart, int zEnd, GLubyte world[100][50][100], 
             world[x][y][z] = color;
         }
     }
+}
+
+int isInRoom(TwoTupleInt coordinate, Level* level) {
+    for (int i = 0; i < NUM_ROOMS; ++i) {
+        if (isInArea(coordinate, (TwoTupleInt) {.x = level->rooms[i]->origin.x + 1, .z = level->rooms[i]->origin.z + 1}, (TwoTupleInt) {.x = level->rooms[i]->origin.x - 2, .z = level->rooms[i]->length.z - 2})){
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+bool isInArea(TwoTupleInt coordinate, TwoTupleInt startCoordinate, TwoTupleInt endCoordinate) {
+    bool isInX = coordinate.x > startCoordinate.x && coordinate.x < endCoordinate.x;
+    bool isInZ = coordinate.z > startCoordinate.z && coordinate.z < endCoordinate.z;
+
+    return isInX && isInZ;
 }
