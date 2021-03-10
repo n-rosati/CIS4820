@@ -238,6 +238,13 @@ void loadLevel(Level* level, GLubyte world[100][50][100]);
  */
 TwoTupleInt get2DScreenPosFromBlock(int mapSize, int blockPosition);
 
+/**
+ * Returns the integer coordinate of a floating poit coordinate
+ * @param coordinate Floating point coordinate
+ * @return Integer coordinate
+ */
+ThreeTupleInt getIntPosFromFloat(ThreeTupleFloat coordinate);
+
 //TODO: Make function(s) to get int position (world cube) from float position (like a camera)
 
 //Functions for the LinkedListAPI

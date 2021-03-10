@@ -2,6 +2,7 @@
 // Created by Nicholas Rosati on 2021-02-17.
 //
 
+#include <math.h>
 #include "utilities.h"
 
 void setUserColourRGBA(int colourNumber, int red, int green, int blue, float alpha) {
@@ -96,9 +97,18 @@ void loadLevel(Level* level, GLubyte world[100][50][100]) {
 }
 
 TwoTupleInt get2DScreenPosFromBlock(int mapSize, int blockPosition)  {
-    return (TwoTupleInt) {.x = mapSize - (0 + ((blockPosition + 1)* (mapSize / WORLDX))),
+    return (TwoTupleInt) {.x = mapSize - (0 + ((blockPosition + 1) * (mapSize / WORLDX))),
                           .z = mapSize - (0 + ((blockPosition) * (mapSize / WORLDX)))};
 }
+
+ThreeTupleInt getIntPosFromFloat(ThreeTupleFloat coordinate) {
+    int x = (int) floorf(fabsf(coordinate.x));
+    int y = (int) floorf(fabsf(coordinate.y));
+    int z = (int) floorf(fabsf(coordinate.z));
+
+    return (ThreeTupleInt) {.x = x, .y = y, .z = z};
+}
+
 
 //Dummy LinkedList functions
 char* printLevel(void* level) {
