@@ -101,14 +101,17 @@ TwoTupleInt get2DScreenPosFromBlock(int mapSize, int blockPosition)  {
                           .z = mapSize - (0 + ((blockPosition) * (mapSize / WORLDX)))};
 }
 
-ThreeTupleInt getIntPosFromFloat(ThreeTupleFloat coordinate) {
-    int x = (int) floorf(fabsf(coordinate.x));
-    int y = (int) floorf(fabsf(coordinate.y));
-    int z = (int) floorf(fabsf(coordinate.z));
+ThreeTupleInt getIntPosFromFloat3Tuple(ThreeTupleFloat coordinate) {
+    int x = getIntPosFromFloat(coordinate.x);
+    int y = getIntPosFromFloat(coordinate.y);
+    int z = getIntPosFromFloat(coordinate.z);
 
     return (ThreeTupleInt) {.x = x, .y = y, .z = z};
 }
 
+int getIntPosFromFloat(float position) {
+    return (int) floorf(fabsf(position));
+}
 
 //Dummy LinkedList functions
 char* printLevel(void* level) {

@@ -243,7 +243,14 @@ TwoTupleInt get2DScreenPosFromBlock(int mapSize, int blockPosition);
  * @param coordinate Floating point coordinate
  * @return Integer coordinate
  */
-ThreeTupleInt getIntPosFromFloat(ThreeTupleFloat coordinate);
+ThreeTupleInt getIntPosFromFloat3Tuple(ThreeTupleFloat coordinate);
+
+/**
+ * Gets a integer position value from a floating point position.
+ * @param position Floating point position
+ * @return Integer position
+ */
+int getIntPosFromFloat (float position);
 
 //TODO: Make function(s) to get int position (world cube) from float position (like a camera)
 

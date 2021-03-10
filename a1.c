@@ -197,14 +197,20 @@ void draw2D() {
         //Get player position
         ThreeTupleFloat player;
         getViewPosition(&player.x, &player.y, &player.z);
-        ThreeTupleInt playerInt = getIntPosFromFloat(player);
+        ThreeTupleInt playerInt = getIntPosFromFloat3Tuple(player);
 
-        if (displayMap == 1) { //All map
-            //Draw dungeons
+        if (displayMap == 1 || displayMap == 2) {
             if (!currentLevel->isOutside) {
                 for (int x = 0; x < WORLDX; ++x) {
                     for (int z = 0; z < WORLDZ; ++z) {
                         if (world[x][1][z] == EMPTY) continue;
+
+                        if (displayMap == 2) {
+                            int roomNumber = isInRoom((TwoTupleInt){.x = x, .z = z}, currentLevel);
+                            if (roomNumber == -1) continue; //FIXME: Ignores hallways
+                            if (!currentLevel->rooms[roomNumber]->visited) continue; //Don't draw unvisited rooms
+                        }
+
                         TwoTupleInt blockX = get2DScreenPosFromBlock(mapDimension, x);
                         TwoTupleInt blockY = get2DScreenPosFromBlock(mapDimension, z);
                         switch(world[x][1][z]) {
@@ -226,94 +232,43 @@ void draw2D() {
                         draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
                     }
                 }
-            }
 
-            //Draw stairs
-            TwoTupleInt stairsDownX = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsDown.x));
-            TwoTupleInt stairsDownY = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsDown.z));
-            set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 1.0f});
-            draw2Dbox(stairsDownX.x, stairsDownY.x, stairsDownX.z, stairsDownY.z);
+                //Draw mobs if in an underground currentLevel
+                if (!currentLevel->isOutside) {
+                    int roomNumber = 0;
+                    int roomEnd = 8;
+                    if (displayMap == 2) {
+                        roomNumber = isInRoom((TwoTupleInt){.x = playerInt.x, .z = playerInt.z}, currentLevel);
+                        roomEnd = roomNumber;
+                    }
 
-            if (!currentLevel->isOutside) {
-                TwoTupleInt stairsUpX = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsUp.x));
-                TwoTupleInt stairsUpY = get2DScreenPosFromBlock(mapDimension, (((Level*)(levels->head->data))->stairsUp.z));
-                set2Dcolour((float[]){0.8f, 0.8f, 0.8f, 1.0f});
-                draw2Dbox(stairsUpX.x, stairsUpY.x, stairsUpX.z, stairsUpY.z);
-            }
-
-            //Draw mobs if in an underground currentLevel
-            if (!currentLevel->isOutside) {
-                for (int i = 0; i < 9; ++i) {
-                    set2Dcolour((float[]){1.0f, 0.1f, 0.1f, 1.0f});
-                    TwoTupleInt mobX = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->rooms[i]->mob.position.x));
-                    TwoTupleInt mobY = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->rooms[i]->mob.position.z));
-                    draw2Dbox(mobX.x, mobY.x, mobX.z, mobY.z);
-                }
-            }
-
-            //Draw player
-            set2Dcolour((float[]){0.4f, 0.0f, 1.0f, 1.0f});
-            TwoTupleInt playerPositionX = get2DScreenPosFromBlock(mapDimension, playerInt.x);
-            TwoTupleInt playerPositionY = get2DScreenPosFromBlock(mapDimension, playerInt.z);
-            draw2Dbox(playerPositionX.x, playerPositionY.x, playerPositionX.z, playerPositionY.z);
-
-            //Background for map
-            set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 0.75f});
-            draw2Dbox(0, 0, mapDimension, mapDimension);
-        } else if (displayMap == 2) { //Fog of war map
-            if (!currentLevel->isOutside) {
-                for (int x = 0; x < WORLDX; ++x) {
-                    for (int z = 0; z < WORLDZ; ++z) {
-                        if (world[x][1][z] == EMPTY) continue;
-
-                        int roomNumber = isInRoom((TwoTupleInt) {.x = x, .z = z}, currentLevel);
-
-                        if (roomNumber == -1) continue; //FIXME: Ignores hallways
-
-                        if (!currentLevel->rooms[roomNumber]->visited) continue; //Don't draw unvisited rooms
-
-                        TwoTupleInt blockX = get2DScreenPosFromBlock(mapDimension, x);
-                        TwoTupleInt blockY = get2DScreenPosFromBlock(mapDimension, z);
-                        switch(world[x][1][z]) {
-                            case STONE_BRICK:
-                                set2Dcolour((float[]){0.38f, 0.33f, 0.28f, 1.0f});
-                                break;
-                            case FLOWER_BOX:
-                                set2Dcolour((float[]){0.74f, 0.73f, 0.0f, 1.0f});
-                                break;
-                            case TREE_BOX:
-                                set2Dcolour((float[]){0.36f, 0.525f, 0.08f, 1.0f});
-                                break;
-                            case SUN_MOON_BOX:
-                                set2Dcolour((float[]){0.17f, 0.49f, 0.55f, 1.0f});
-                                break;
-                            default:
-                                break;
+                    if (roomNumber != -1) {
+                        for (int i = roomNumber; i <= roomEnd; ++i) {
+                            set2Dcolour((float[]){1.0f, 0.1f, 0.1f, 1.0f});
+                            TwoTupleInt mobX = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->rooms[i]->mob.position.x));
+                            TwoTupleInt mobY = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->rooms[i]->mob.position.z));
+                            draw2Dbox(mobX.x, mobY.x, mobX.z, mobY.z);
                         }
-                        draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
                     }
                 }
             } else {
-                //Draw stairs for outside
-                TwoTupleInt stairsDownX = get2DScreenPosFromBlock(mapDimension, currentLevel->stairsDown.x);
-                TwoTupleInt stairsDownY = get2DScreenPosFromBlock(mapDimension, currentLevel->stairsDown.z);
+                //Draw outside stairs
+                TwoTupleInt stairsDownX = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.x));
+                TwoTupleInt stairsDownY = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.z));
                 set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 1.0f});
                 draw2Dbox(stairsDownX.x, stairsDownY.x, stairsDownX.z, stairsDownY.z);
-            }
 
-            //Draw mobs in current room
-            if (!currentLevel->isOutside) {
-                int roomNumber = isInRoom((TwoTupleInt){.x = playerInt.x, .z = playerInt.z}, currentLevel);
-                if (roomNumber != -1) {
-                    if (!currentLevel->isOutside) {
-                        set2Dcolour((float[]){1.0f, 0.1f, 0.1f, 1.0f});
-                        TwoTupleInt mobX = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->rooms[roomNumber]->mob.position.x));
-                        TwoTupleInt mobY = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->rooms[roomNumber]->mob.position.z));
-                        draw2Dbox(mobX.x, mobY.x, mobX.z, mobY.z);
-                    }
+                if (displayMap == 1 && !currentLevel->isOutside) {
+                    TwoTupleInt stairsUpX = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsUp.x));
+                    TwoTupleInt stairsUpY = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsUp.z));
+                    set2Dcolour((float[]){0.8f, 0.8f, 0.8f, 1.0f});
+                    draw2Dbox(stairsUpX.x, stairsUpY.x, stairsUpX.z, stairsUpY.z);
                 }
             }
+        }
 
+        //Common things
+        if (displayMap == 1 || displayMap == 2) {
             //Draw player
             set2Dcolour((float[]){0.4f, 0.0f, 1.0f, 1.0f});
             TwoTupleInt playerPositionX = get2DScreenPosFromBlock(mapDimension, playerInt.x);
@@ -444,29 +399,25 @@ void update() {
     } else {
         Level* currentLevel = levels->head->data;
 
-        //TODO: Update this block
-        {
-            float oldX = 0, oldY = 0, oldZ = 0;
-            getOldViewPosition(&oldX, &oldY, &oldZ);
-            int currentX = (int)NEGATE(ceilf((float)oldX));
-            int currentY = (int)NEGATE(floorf((float)oldY));
-            int currentZ = (int)NEGATE(ceilf((float)oldZ));
+        ThreeTupleFloat oldView;
+        getOldViewPosition(&oldView.x, &oldView.y, &oldView.z);
+        ThreeTupleInt newViewInt = getIntPosFromFloat3Tuple(oldView);
+
 #ifndef DEBUG
-            //Check if the current block and block under the view port are air
-            //If so, do gravity
-            if (world[currentX][currentY][currentZ] == 0 &&
-                world[currentX][currentY - 2][currentZ] == 0) {
-                setOldViewPosition(oldX, oldY + GRAVITY_AMT, oldZ);
-                setViewPosition(oldX, oldY + GRAVITY_AMT, oldZ);
-            }
+        //Check if the current block and block under the view port are air
+        //If so, do gravity
+        if (world[newViewInt.x][newViewInt.y][newViewInt.z] == 0 &&
+            world[newViewInt.x][newViewInt.y - 2][newViewInt.z] == 0) {
+            setOldViewPosition(oldView.x, oldView.y + GRAVITY_AMT, oldView.z);
+            setViewPosition(oldView.x, oldView.y + GRAVITY_AMT, oldView.z);
+        }
 #endif
 
-            //Check if the player is on stairs
-            if (currentX == currentLevel->stairsDown.x && (currentY - 2) == currentLevel->stairsDown.y && currentZ == currentLevel->stairsDown.z) {
-                moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
-            } else if (currentX == currentLevel->stairsUp.x && (currentY - 2) == currentLevel->stairsUp.y && currentZ == currentLevel->stairsUp.z) {
-                moveUp(levels, world);
-            }
+        //Check if the player is on stairs
+        if (newViewInt.x == currentLevel->stairsDown.x && (newViewInt.y - 2) == currentLevel->stairsDown.y && newViewInt.z == currentLevel->stairsDown.z) {
+            moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
+        } else if (newViewInt.x == currentLevel->stairsUp.x && (newViewInt.y - 2) == currentLevel->stairsUp.y && newViewInt.z == currentLevel->stairsUp.z) {
+            moveUp(levels, world);
         }
 
         //Timing
@@ -502,30 +453,34 @@ void update() {
                 for (int l = 0; l < 9; ++l) {
                     //Y axis movement
                     {
-                        if ((currentLevel->rooms[l]->mob.position.y >= 2.0f) ||
-                            world[(int)floorf(currentLevel->rooms[l]->mob.position.x)][(int)floorf(currentLevel->rooms[l]->mob.position.y - MESH_OFFSET)][(int)floorf(currentLevel->rooms[l]->mob.position.z)] != 0) {
+                        ThreeTupleInt mobPosition = getIntPosFromFloat3Tuple((ThreeTupleFloat){.x = currentLevel->rooms[l]->mob.position.x,
+                                .y = currentLevel->rooms[l]->mob.position.y,
+                                .z = currentLevel->rooms[l]->mob.position.z});
+
+                        if ((currentLevel->rooms[l]->mob.position.y >= 2.0f) || world[mobPosition.x][mobPosition.y][mobPosition.z] != EMPTY) {
                             currentLevel->rooms[l]->mob.velocity.y *= -1.0f;
                         }
                     }
 
-                    int mobY = (int) floorf(currentLevel->rooms[l]->mob.position.y);
+                    int mobY = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.y);
                     //X axis movement
-                    if (currentLevel->rooms[l]->mob.velocity.x >= 0.0001f || currentLevel->rooms[l]->mob.velocity.x <= -0.0001f) {
-                        int mobX1 = (int) floorf(currentLevel->rooms[l]->mob.position.x - MESH_OFFSET);
-                        int mobX2 = (int) ceilf(currentLevel->rooms[l]->mob.position.x + MESH_OFFSET);
-                        int mobZ = (int) floorf(currentLevel->rooms[l]->mob.position.z);
+                    if (currentLevel->rooms[l]->mob.velocity.x >= 0.0001f || currentLevel->rooms[l]->mob.velocity.x <= -0.0001f) { //If X velocity is not 0
+                        int mobX1 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.x - MESH_OFFSET);
+                        int mobX2 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.x + MESH_OFFSET);
+                        int mobZ = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.z);
 
                         if(world[mobX1][mobY][mobZ] != 0 || world[mobX2][mobY][mobZ] != 0) {
                             currentLevel->rooms[l]->mob.velocity.x *= -1.0f;
                         }
 
-                        currentLevel->rooms[l]->mob.rotation = (currentLevel->rooms[l]->mob.velocity.x > 0.0f ? 90.0f : 270.0f);
+                        currentLevel->rooms[l]->mob.rotation = (currentLevel->rooms[l]->mob.velocity.x > 0.0001f ? 90.0f : 270.0f);
                     }
+
                     //Z axis movement
-                    if (currentLevel->rooms[l]->mob.velocity.z >= 0.0001f || currentLevel->rooms[l]->mob.velocity.z <= -0.0001f) {
-                        int mobX = (int) floorf(currentLevel->rooms[l]->mob.position.x);
-                        int mobZ1 = (int) floorf(currentLevel->rooms[l]->mob.position.z - MESH_OFFSET);
-                        int mobZ2 = (int) ceilf(currentLevel->rooms[l]->mob.position.z + MESH_OFFSET);
+                    if (currentLevel->rooms[l]->mob.velocity.z >= 0.0001f || currentLevel->rooms[l]->mob.velocity.z <= -0.0001f) { //If Z velocity is not 0
+                        int mobX = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.x);
+                        int mobZ1 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.z - MESH_OFFSET);
+                        int mobZ2 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.z + MESH_OFFSET);
 
                         if(world[mobX][mobY][mobZ1] != 0 || world[mobX][mobY][mobZ2] != 0) {
                             currentLevel->rooms[l]->mob.velocity.z *= -1.0f;
@@ -534,6 +489,7 @@ void update() {
                         currentLevel->rooms[l]->mob.rotation = (currentLevel->rooms[l]->mob.velocity.z > 0.0f ? 0.0f : 180.0f);
                     }
 
+                    //Do mob movement
                     currentLevel->rooms[l]->mob.position.x += currentLevel->rooms[l]->mob.velocity.x;
                     currentLevel->rooms[l]->mob.position.y += currentLevel->rooms[l]->mob.velocity.y;
                     currentLevel->rooms[l]->mob.position.z += currentLevel->rooms[l]->mob.velocity.z;
@@ -541,67 +497,65 @@ void update() {
             }
 
             //Mob visibility checking
-//            if (!currentLevel->isOutside) {
-//                for (int l = 0; l < 9; ++l) {
-//                    Room* room = ((Level*)(levels->head->data))->rooms[l];
-//                    float distanceMobPlayer = sqrtf(powf(room->mob.position.x - NEGATE(oldX), 2) + powf(room->mob.position.z - NEGATE(oldZ), 2));
-//                    if (distanceMobPlayer <= roomDiagonal) {
-//                        if (PointInFrustum(room->mob.position.x, room->mob.position.y, room->mob.position.z)) {
-//                            if (!room->mob.isVisible) {
-//                                drawMesh(room->mob.id);
-//                                room->mob.isVisible = true;
-//                                switch (room->mob.type) {
-//                                    case COW:
-//                                        printf("Cow mesh #%d now visible.\n", room->mob.id);
-//                                        break;
-//                                    case FISH:
-//                                        printf("Fish mesh #%d now visible.\n", room->mob.id);
-//                                        break;
-//                                    case BAT:
-//                                        printf("Bat mesh #%d now visible.\n", room->mob.id);
-//                                        break;
-//                                    case CACTUS:
-//                                        printf("Cactus mesh #%d now visible.\n", room->mob.id);
-//                                        break;
-//                                }
-//                            }
-//                        } else {
-//                            if (room->mob.isVisible) {
-//                                hideMesh(room->mob.id);
-//                                room->mob.isVisible = false;
-//                                switch (room->mob.type) {
-//                                    case COW:
-//                                        printf("Cow mesh #%d now hidden.\n", room->mob.id);
-//                                        break;
-//                                    case FISH:
-//                                        printf("Fish mesh #%d now hidden.\n", room->mob.id);
-//                                        break;
-//                                    case BAT:
-//                                        printf("Bat mesh #%d now hidden.\n", room->mob.id);
-//                                        break;
-//                                    case CACTUS:
-//                                        printf("Cactus mesh #%d now hidden.\n", room->mob.id);
-//                                        break;
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
+            if (!currentLevel->isOutside) {
+                for (int l = 0; l < 9; ++l) {
+                    Room* room = ((Level*)(levels->head->data))->rooms[l];
+                    float distanceMobPlayer = sqrtf(powf(room->mob.position.x - NEGATE(oldView.x), 2) + powf(room->mob.position.z - NEGATE(oldView.z), 2)); //c = √(a² + b²)
+                    if (distanceMobPlayer <= roomDiagonal) {
+                        if (PointInFrustum(room->mob.position.x, room->mob.position.y, room->mob.position.z)) {
+                            if (!room->mob.isVisible) {
+                                drawMesh(room->mob.id);
+                                room->mob.isVisible = true;
+                                switch (room->mob.type) {
+                                    case COW:
+                                        printf("Cow mesh #%d now visible.\n", room->mob.id);
+                                        break;
+                                    case FISH:
+                                        printf("Fish mesh #%d now visible.\n", room->mob.id);
+                                        break;
+                                    case BAT:
+                                        printf("Bat mesh #%d now visible.\n", room->mob.id);
+                                        break;
+                                    case CACTUS:
+                                        printf("Cactus mesh #%d now visible.\n", room->mob.id);
+                                        break;
+                                }
+                            }
+                        } else {
+                            if (room->mob.isVisible) {
+                                hideMesh(room->mob.id);
+                                room->mob.isVisible = false;
+                                switch (room->mob.type) {
+                                    case COW:
+                                        printf("Cow mesh #%d now hidden.\n", room->mob.id);
+                                        break;
+                                    case FISH:
+                                        printf("Fish mesh #%d now hidden.\n", room->mob.id);
+                                        break;
+                                    case BAT:
+                                        printf("Bat mesh #%d now hidden.\n", room->mob.id);
+                                        break;
+                                    case CACTUS:
+                                        printf("Cactus mesh #%d now hidden.\n", room->mob.id);
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             //Player room visited tracking
             if (!currentLevel->isOutside) {
                 ThreeTupleFloat playerPos;
                 getViewPosition(&playerPos.x, &playerPos.y, &playerPos.z);
-                ThreeTupleInt playerPosInt = getIntPosFromFloat(playerPos);
+                ThreeTupleInt playerPosInt = getIntPosFromFloat3Tuple(playerPos);
 
                 int roomNumber = isInRoom((TwoTupleInt){.x = playerPosInt.x, .z = playerPosInt.z}, currentLevel);
-//                printf("X: %d Y:%d Z: %d\t\tRoom: %d\n", playerPosInt.x, playerPosInt.y, playerPosInt.z, roomNumber);
                 if (roomNumber != -1) {
-//                    printf("Visited room %d\n", roomNumber);
                     currentLevel->rooms[roomNumber]->visited = true;
                 }
-            }
+            } //TODO: Hallway tracking
         }
 
         //Update mob positions if under ground
