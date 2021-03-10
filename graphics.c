@@ -1599,4 +1599,3 @@ void hideMesh(int id) {
     // mesh data structures
     userMesh[id].drawMesh = 0;
 }
-
