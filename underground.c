@@ -250,8 +250,8 @@ int isInRoom(TwoTupleInt coordinate, Level* level) {
 }
 
 bool isInArea(TwoTupleInt coordinate, TwoTupleInt startCoordinate, TwoTupleInt endCoordinate) {
-    bool isInX = coordinate.x > startCoordinate.x && coordinate.x < endCoordinate.x;
-    bool isInZ = coordinate.z > startCoordinate.z && coordinate.z < endCoordinate.z;
+    bool isInX = coordinate.x >= startCoordinate.x && coordinate.x <= endCoordinate.x;
+    bool isInZ = coordinate.z >= startCoordinate.z && coordinate.z <= endCoordinate.z;
 
     return isInX && isInZ;
 }
