@@ -433,132 +433,136 @@ void update() {
         while (deltaT >= minUpdateTime) { //Do the timing loop
             deltaT -= minUpdateTime;
 
-            //Clouds
             if (currentLevel->isOutside) {
-                static int cloudTick = 0;
-                if (cloudTick++ == 32) {
-                    for (int a = 0; a < WORLDX; ++a) {
-                        GLubyte end = world[a][49][WORLDZ - 1];
-                        for (int b = WORLDZ - 1; b > 0; --b) {
-                            world[a][49][b] = world[a][49][b - 1];
-                        }
-                        world[a][49][0] = end;
-                    }
-                    cloudTick = 0;
-                }
-            }
-
-            //Mob movement
-            if (!currentLevel->isOutside){
-                for (int l = 0; l < 9; ++l) {
-                    //Y axis movement
-                    {
-                        ThreeTupleInt mobPosition = getIntPosFromFloat3Tuple((ThreeTupleFloat){.x = currentLevel->rooms[l]->mob.position.x,
-                                .y = currentLevel->rooms[l]->mob.position.y,
-                                .z = currentLevel->rooms[l]->mob.position.z});
-
-                        if ((currentLevel->rooms[l]->mob.position.y >= 2.0f) || world[mobPosition.x][mobPosition.y][mobPosition.z] != EMPTY) {
-                            currentLevel->rooms[l]->mob.velocity.y *= -1.0f;
-                        }
-                    }
-
-                    int mobY = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.y);
-                    //X axis movement
-                    if (currentLevel->rooms[l]->mob.velocity.x >= 0.0001f || currentLevel->rooms[l]->mob.velocity.x <= -0.0001f) { //If X velocity is not 0
-                        int mobX1 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.x - MESH_OFFSET);
-                        int mobX2 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.x + MESH_OFFSET);
-                        int mobZ = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.z);
-
-                        if(world[mobX1][mobY][mobZ] != 0 || world[mobX2][mobY][mobZ] != 0) {
-                            currentLevel->rooms[l]->mob.velocity.x *= -1.0f;
-                        }
-
-                        currentLevel->rooms[l]->mob.rotation = (currentLevel->rooms[l]->mob.velocity.x > 0.0001f ? 90.0f : 270.0f);
-                    }
-
-                    //Z axis movement
-                    if (currentLevel->rooms[l]->mob.velocity.z >= 0.0001f || currentLevel->rooms[l]->mob.velocity.z <= -0.0001f) { //If Z velocity is not 0
-                        int mobX = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.x);
-                        int mobZ1 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.z - MESH_OFFSET);
-                        int mobZ2 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.z + MESH_OFFSET);
-
-                        if(world[mobX][mobY][mobZ1] != 0 || world[mobX][mobY][mobZ2] != 0) {
-                            currentLevel->rooms[l]->mob.velocity.z *= -1.0f;
-                        }
-
-                        currentLevel->rooms[l]->mob.rotation = (currentLevel->rooms[l]->mob.velocity.z > 0.0f ? 0.0f : 180.0f);
-                    }
-
-                    //Do mob movement
-                    currentLevel->rooms[l]->mob.position.x += currentLevel->rooms[l]->mob.velocity.x;
-                    currentLevel->rooms[l]->mob.position.y += currentLevel->rooms[l]->mob.velocity.y;
-                    currentLevel->rooms[l]->mob.position.z += currentLevel->rooms[l]->mob.velocity.z;
-                }
-            }
-
-            //Mob visibility checking
-            if (!currentLevel->isOutside) {
-                for (int l = 0; l < 9; ++l) {
-                    Room* room = ((Level*)(levels->head->data))->rooms[l];
-                    float distanceMobPlayer = sqrtf(powf(room->mob.position.x - NEGATE(oldView.x), 2) + powf(room->mob.position.z - NEGATE(oldView.z), 2)); //c = √(a² + b²)
-                    if (distanceMobPlayer <= roomDiagonal) {
-                        if (PointInFrustum(room->mob.position.x, room->mob.position.y, room->mob.position.z)) {
-                            if (!room->mob.isVisible) {
-                                drawMesh(room->mob.id);
-                                room->mob.isVisible = true;
-                                switch (room->mob.type) {
-                                    case COW:
-                                        printf("Cow mesh #%d now visible.\n", room->mob.id);
-                                        break;
-                                    case FISH:
-                                        printf("Fish mesh #%d now visible.\n", room->mob.id);
-                                        break;
-                                    case BAT:
-                                        printf("Bat mesh #%d now visible.\n", room->mob.id);
-                                        break;
-                                    case CACTUS:
-                                        printf("Cactus mesh #%d now visible.\n", room->mob.id);
-                                        break;
-                                }
+                //Clouds
+                {
+                    static int cloudTick = 0;
+                    if (cloudTick++ == 32) {
+                        for (int a = 0; a < WORLDX; ++a) {
+                            GLubyte end = world[a][49][WORLDZ - 1];
+                            for (int b = WORLDZ - 1; b > 0; --b) {
+                                world[a][49][b] = world[a][49][b - 1];
                             }
-                        } else {
-                            if (room->mob.isVisible) {
-                                hideMesh(room->mob.id);
-                                room->mob.isVisible = false;
-                                switch (room->mob.type) {
-                                    case COW:
-                                        printf("Cow mesh #%d now hidden.\n", room->mob.id);
-                                        break;
-                                    case FISH:
-                                        printf("Fish mesh #%d now hidden.\n", room->mob.id);
-                                        break;
-                                    case BAT:
-                                        printf("Bat mesh #%d now hidden.\n", room->mob.id);
-                                        break;
-                                    case CACTUS:
-                                        printf("Cactus mesh #%d now hidden.\n", room->mob.id);
-                                        break;
-                                }
+                            world[a][49][0] = end;
+                        }
+                        cloudTick = 0;
+                    }
+                }
+            } else {
+                //Mob movement
+                {
+                    for (int l = 0; l < 9; ++l) {
+                        //Y axis movement
+                        {
+                            ThreeTupleInt mobPosition = getIntPosFromFloat3Tuple((ThreeTupleFloat){.x = currentLevel->rooms[l]->mob.position.x,
+                                    .y = currentLevel->rooms[l]->mob.position.y,
+                                    .z = currentLevel->rooms[l]->mob.position.z});
+
+                            if ((currentLevel->rooms[l]->mob.position.y >= 2.0f) || world[mobPosition.x][mobPosition.y][mobPosition.z] != EMPTY) {
+                                currentLevel->rooms[l]->mob.velocity.y *= -1.0f;
                             }
                         }
+
+                        int mobY = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.y);
+                        //X axis movement
+                        if (currentLevel->rooms[l]->mob.velocity.x >= 0.0001f || currentLevel->rooms[l]->mob.velocity.x <= -0.0001f) { //If X velocity is not 0
+                            int mobX1 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.x - MESH_OFFSET);
+                            int mobX2 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.x + MESH_OFFSET);
+                            int mobZ = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.z);
+
+                            if(world[mobX1][mobY][mobZ] != 0 || world[mobX2][mobY][mobZ] != 0) {
+                                currentLevel->rooms[l]->mob.velocity.x *= -1.0f;
+                            }
+
+                            currentLevel->rooms[l]->mob.rotation = (currentLevel->rooms[l]->mob.velocity.x > 0.0001f ? 90.0f : 270.0f);
+                        }
+
+                        //Z axis movement
+                        if (currentLevel->rooms[l]->mob.velocity.z >= 0.0001f || currentLevel->rooms[l]->mob.velocity.z <= -0.0001f) { //If Z velocity is not 0
+                            int mobX = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.x);
+                            int mobZ1 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.z - MESH_OFFSET);
+                            int mobZ2 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.z + MESH_OFFSET);
+
+                            if(world[mobX][mobY][mobZ1] != 0 || world[mobX][mobY][mobZ2] != 0) {
+                                currentLevel->rooms[l]->mob.velocity.z *= -1.0f;
+                            }
+
+                            currentLevel->rooms[l]->mob.rotation = (currentLevel->rooms[l]->mob.velocity.z > 0.0f ? 0.0f : 180.0f);
+                        }
+
+                        //Do mob movement
+                        currentLevel->rooms[l]->mob.position.x += currentLevel->rooms[l]->mob.velocity.x;
+                        currentLevel->rooms[l]->mob.position.y += currentLevel->rooms[l]->mob.velocity.y;
+                        currentLevel->rooms[l]->mob.position.z += currentLevel->rooms[l]->mob.velocity.z;
                     }
                 }
-            }
 
-            //Player room visited tracking
-            if (!currentLevel->isOutside) {
-                ThreeTupleFloat playerPos;
-                getViewPosition(&playerPos.x, &playerPos.y, &playerPos.z);
-                ThreeTupleInt playerPosInt = getIntPosFromFloat3Tuple(playerPos);
-
-                int roomNumber = isInRoom((TwoTupleInt){.x = playerPosInt.x, .z = playerPosInt.z}, currentLevel);
-                if (roomNumber != -1) {
-                    currentLevel->rooms[roomNumber]->visited = true;
+                //Mob visibility checking
+                {
+                    for (int l = 0; l < 9; ++l) {
+                        Room* room = ((Level*)(levels->head->data))->rooms[l];
+                        float distanceMobPlayer = sqrtf(powf(room->mob.position.x - NEGATE(oldView.x), 2) + powf(room->mob.position.z - NEGATE(oldView.z), 2)); //c = √(a² + b²)
+                        if (distanceMobPlayer <= roomDiagonal) {
+                            if (PointInFrustum(room->mob.position.x, room->mob.position.y, room->mob.position.z)) {
+                                if (!room->mob.isVisible) {
+                                    drawMesh(room->mob.id);
+                                    room->mob.isVisible = true;
+                                    switch (room->mob.type) {
+                                        case COW:
+                                            printf("Cow mesh #%d now visible.\n", room->mob.id);
+                                            break;
+                                        case FISH:
+                                            printf("Fish mesh #%d now visible.\n", room->mob.id);
+                                            break;
+                                        case BAT:
+                                            printf("Bat mesh #%d now visible.\n", room->mob.id);
+                                            break;
+                                        case CACTUS:
+                                            printf("Cactus mesh #%d now visible.\n", room->mob.id);
+                                            break;
+                                    }
+                                }
+                            } else {
+                                if (room->mob.isVisible) {
+                                    hideMesh(room->mob.id);
+                                    room->mob.isVisible = false;
+                                    switch (room->mob.type) {
+                                        case COW:
+                                            printf("Cow mesh #%d now hidden.\n", room->mob.id);
+                                            break;
+                                        case FISH:
+                                            printf("Fish mesh #%d now hidden.\n", room->mob.id);
+                                            break;
+                                        case BAT:
+                                            printf("Bat mesh #%d now hidden.\n", room->mob.id);
+                                            break;
+                                        case CACTUS:
+                                            printf("Cactus mesh #%d now hidden.\n", room->mob.id);
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
-            } //TODO: Hallway tracking
+
+                //Player tracking
+                {
+                    ThreeTupleFloat playerPos;
+                    getViewPosition(&playerPos.x, &playerPos.y, &playerPos.z);
+                    ThreeTupleInt playerPosInt = getIntPosFromFloat3Tuple(playerPos);
+
+                    int roomNumber = isInRoom((TwoTupleInt){.x = playerPosInt.x, .z = playerPosInt.z}, currentLevel);
+                    if (roomNumber != -1) {
+                        currentLevel->rooms[roomNumber]->visited = true;
+                    }
+
+                    //TODO: Hallway tracking
+                }
+            }
         }
 
-        //Update mob positions if under ground
+        //Update mob rotations and translations in OpenGL (if underground)
         if (!currentLevel->isOutside) {
             for (int l = 0; l < 9; ++l) {
                 setTranslateMesh(currentLevel->rooms[l]->mob.id, currentLevel->rooms[l]->mob.position.x, currentLevel->rooms[l]->mob.position.y, currentLevel->rooms[l]->mob.position.z);
