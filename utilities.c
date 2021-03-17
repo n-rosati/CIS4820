@@ -113,6 +113,27 @@ int getIntPosFromFloat(float position) {
     return (int) floorf(fabsf(position));
 }
 
+float clampf(float num, float min, float max) {
+    if (num > max) {
+        return max;
+    } else if (num < min) {
+        return min;
+    } else {
+        return num;
+    }
+}
+
+int clamp(int num, int min, int max) {
+    if (num > max) {
+        return max;
+    } else if (num < min) {
+        return min;
+    } else {
+        return num;
+    }
+}
+
+
 //Dummy LinkedList functions
 char* printLevel(void* level) {
     return calloc(1, sizeof(char));

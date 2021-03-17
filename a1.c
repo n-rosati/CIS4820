@@ -147,7 +147,6 @@ List* levels;
 /* note that the world coordinates returned from getViewPosition()
    will be the negative value of the array indices */
 void collisionResponse() {
-    //TODO: check to make sure the player doesn't move camera out of bounds
 #ifndef DEBUG
     float oldX = 0, oldY = 0, oldZ = 0;
     getOldViewPosition(&oldX, &oldY, &oldZ);
@@ -155,9 +154,19 @@ void collisionResponse() {
     float newX = 0, newY = 0, newZ = 0;
     getViewPosition(&newX, &newY, &newZ);
 
+    //Handle out of bounds
+    if ((NEGATE(newX) >= WORLDX - 1 || NEGATE(newY) >= WORLDY - 1 || NEGATE(newZ) >= WORLDZ - 1) || ((NEGATE(newX) <= 1) || (NEGATE(newY) <= 1) || (NEGATE(newZ) <= 1))) {
+        newX = NEGATE(clampf(NEGATE(newX), 1, WORLDX - 1));
+        newY = NEGATE(clampf(NEGATE(newY), 1, WORLDY - 1));
+        newZ = NEGATE(clampf(NEGATE(newZ), 1, WORLDZ - 1));
+
+        setViewPosition(newX, newY, newZ);
+        return;
+    }
+
     const float LOOK_AHEAD = 0.25f;
-    //Look ahead of where the player is moving and check for x block there. If there is x block at eye level, don't go there
-    //Otherwise, if there is no block at eye level but there is x block at foot level, move up onto it
+    //Look ahead of where the player is moving and check for a block there. If there is a block at eye level, don't go there
+    //Otherwise, if there is no block at eye level but there is a block at foot level, move up onto it
     if (world[(int) NEGATE(ceilf(newX + LOOK_AHEAD))][(int) NEGATE(floorf(newY))][(int) NEGATE(ceilf(newZ + LOOK_AHEAD))] != 0 ||
         world[(int) NEGATE(ceilf(newX - LOOK_AHEAD))][(int) NEGATE(floorf(newY))][(int) NEGATE(ceilf(newZ - LOOK_AHEAD))] != 0) {
         setViewPosition(oldX, oldY, oldZ);
@@ -201,47 +210,47 @@ void draw2D() {
 
         if (displayMap == 1 || displayMap == 2) {
             if (!currentLevel->isOutside) {
-                for (int x = 0; x < WORLDX; ++x) {
-                    for (int z = 0; z < WORLDZ; ++z) {
-                        if (world[x][1][z] == EMPTY) continue;
+                //Draw rooms
+                for (int i = 0; i < NUM_ROOMS; ++i) {
+                    if (displayMap == 2 && !currentLevel->rooms[i]->visited) continue;
 
-                        if (displayMap == 2) {
-                            int roomNumber = isInRoom((TwoTupleInt){.x = x, .z = z}, currentLevel);
-                            if (roomNumber == -1) continue; //FIXME: Ignores hallways
-                            if (!currentLevel->rooms[roomNumber]->visited) continue; //Don't draw unvisited rooms
-                        }
+                    //Draw the room
+                    Room* currentRoom = currentLevel->rooms[i];
+                    for (int x = currentRoom->origin.x; x < currentRoom->origin.x + currentRoom->length.x; ++x) {
+                        for (int z = currentRoom->origin.z; z < currentRoom->origin.z + currentRoom->length.z; ++z) {
+                            if (world[x][1][z] == EMPTY) continue;
 
-                        TwoTupleInt blockX = get2DScreenPosFromBlock(mapDimension, x);
-                        TwoTupleInt blockY = get2DScreenPosFromBlock(mapDimension, z);
-                        switch(world[x][1][z]) {
-                            case STONE_BRICK:
-                                set2Dcolour((float[]){0.38f, 0.33f, 0.28f, 1.0f});
-                                break;
-                            case FLOWER_BOX:
-                                set2Dcolour((float[]){0.74f, 0.73f, 0.0f, 1.0f});
-                                break;
-                            case TREE_BOX:
-                                set2Dcolour((float[]){0.36f, 0.525f, 0.08f, 1.0f});
-                                break;
-                            case SUN_MOON_BOX:
-                                set2Dcolour((float[]){0.17f, 0.49f, 0.55f, 1.0f});
-                                break;
-                            default:
-                                break;
+                            TwoTupleInt blockX = get2DScreenPosFromBlock(mapDimension, x);
+                            TwoTupleInt blockY = get2DScreenPosFromBlock(mapDimension, z);
+                            switch(world[x][1][z]) {
+                                case STONE_BRICK:
+                                    set2Dcolour((float[]){0.38f, 0.33f, 0.28f, 1.00f});
+                                    break;
+                                case FLOWER_BOX:
+                                    set2Dcolour((float[]){0.74f, 0.73f, 0.00f, 1.00f});
+                                    break;
+                                case TREE_BOX:
+                                    set2Dcolour((float[]){0.36f, 0.53f, 0.08f, 1.00f});
+                                    break;
+                                case SUN_MOON_BOX:
+                                    set2Dcolour((float[]){0.17f, 0.49f, 0.55f, 1.00f});
+                                    break;
+                                default:
+                                    break;
+                            }
+                            draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
                         }
-                        draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
                     }
                 }
 
-                //Draw mobs if in an underground currentLevel
-                if (!currentLevel->isOutside) {
+                //Only show mob movement for mobs in current room
+                {
                     int roomNumber = 0;
                     int roomEnd = 8;
                     if (displayMap == 2) {
                         roomNumber = isInRoom((TwoTupleInt){.x = playerInt.x, .z = playerInt.z}, currentLevel);
                         roomEnd = roomNumber;
                     }
-
                     if (roomNumber != -1) {
                         for (int i = roomNumber; i <= roomEnd; ++i) {
                             set2Dcolour((float[]){1.0f, 0.1f, 0.1f, 1.0f});
@@ -252,7 +261,7 @@ void draw2D() {
                     }
                 }
             } else {
-                //Draw outside stairs
+                //Draw stairs
                 TwoTupleInt stairsDownX = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.x));
                 TwoTupleInt stairsDownY = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.z));
                 set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 1.0f});
@@ -406,17 +415,15 @@ void update() {
 #ifndef DEBUG
         //Check if the current block and block under the view port are air
         //If so, do gravity
-        if (world[newViewInt.x][newViewInt.y][newViewInt.z] == 0 &&
-            world[newViewInt.x][newViewInt.y - 2][newViewInt.z] == 0) {
-            setOldViewPosition(oldView.x, oldView.y + GRAVITY_AMT, oldView.z);
+        if (world[newViewInt.x][newViewInt.y][newViewInt.z] == 0 && world[newViewInt.x][newViewInt.y - 1][newViewInt.z] == 0) {
             setViewPosition(oldView.x, oldView.y + GRAVITY_AMT, oldView.z);
         }
 #endif
 
         //Check if the player is on stairs
-        if (newViewInt.x == currentLevel->stairsDown.x && (newViewInt.y - 2) == currentLevel->stairsDown.y && newViewInt.z == currentLevel->stairsDown.z) {
+        if (newViewInt.x == currentLevel->stairsDown.x && (newViewInt.y - 1) == currentLevel->stairsDown.y && newViewInt.z == currentLevel->stairsDown.z) {
             moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
-        } else if (newViewInt.x == currentLevel->stairsUp.x && (newViewInt.y - 2) == currentLevel->stairsUp.y && newViewInt.z == currentLevel->stairsUp.z) {
+        } else if (newViewInt.x == currentLevel->stairsUp.x && (newViewInt.y - 1) == currentLevel->stairsUp.y && newViewInt.z == currentLevel->stairsUp.z) {
             moveUp(levels, world);
         }
 
@@ -428,6 +435,7 @@ void update() {
         static long long deltaT = 0;
 
         deltaT += ((currentTime.tv_nsec - lastUpdate.tv_nsec) + (1000000000 * (currentTime.tv_sec - lastUpdate.tv_sec))) / 1000; //1000 ns = 1 μs
+
         float roomDiagonal = sqrtf(powf((float) ROOM_MAX_LENGTH, 2) + powf((float) ROOM_MAX_WIDTH, 2));
 
         while (deltaT >= minUpdateTime) { //Do the timing loop
@@ -556,8 +564,6 @@ void update() {
                     if (roomNumber != -1) {
                         currentLevel->rooms[roomNumber]->visited = true;
                     }
-
-                    //TODO: Hallway tracking
                 }
             }
         }
@@ -581,27 +587,28 @@ void update() {
 /* -x,y are the screen coordinates when the mouse is pressed or */
 /*  released */
 void mouse(int button, int state, int x, int y) {
-#ifndef DEBUG
-    if (button == GLUT_LEFT_BUTTON)
-        printf("left button - ");
-    else if (button == GLUT_MIDDLE_BUTTON)
-        printf("middle button - ");
-    else
-        printf("right button - ");
-
-    if (state == GLUT_UP)
-        printf("up - ");
-    else
-        printf("down - ");
-
-    printf("%d %d\n", x, y);
-#endif
+    if (testWorld) {
+        if (button == GLUT_LEFT_BUTTON)
+            printf("left button - ");
+        else if (button == GLUT_MIDDLE_BUTTON)
+            printf("middle button - ");
+        else
+            printf("right button - ");
+        if (state == GLUT_UP)
+            printf("up - ");
+        else
+            printf("down - ");
+        printf("%d %d\n", x, y);
+    }
 
 #ifdef DEBUG
     if (button == GLUT_MIDDLE_BUTTON && state == GLUT_UP) {
         float camX = 0, camY = 0, camZ = 0;
         getViewPosition(&camX, &camY, &camZ);
-        printf("x: %.2f\ty: %.2f\t\tz: %.2f\n", NEGATE(camX), NEGATE(camY), NEGATE(camZ));
+        printf("\nFloat cam: X: %.2f\tY: %.2f\tZ: %.2f\n", NEGATE(camX), NEGATE(camY), NEGATE(camZ));
+        ThreeTupleInt camLocation = getIntPosFromFloat3Tuple((ThreeTupleFloat) {.x = camX, .y = camY, .z = camZ});
+        printf("Int cam: X: %d\tY: %d\tZ: %d\n", camLocation.x, camLocation.y, camLocation.z);
+        printf("Stairs down at: X: %d\tY: %d\tZ: %d\n\n", ((Level*)(levels->head->data))->stairsDown.x, ((Level*)(levels->head->data))->stairsDown.y, ((Level*)(levels->head->data))->stairsDown.z);
     }
 
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {

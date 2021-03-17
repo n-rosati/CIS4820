@@ -10,8 +10,8 @@
 #include "LinkedListAPI.h"
 
 #define NEGATE(x) (x * -1)
-#define MAX(x,y) (x > y ? x : y)
-#define MIN(x,y) (x < y ? x : y)
+#define MAX(x, y) (x > y ? x : y)
+#define MIN(x, y) (x < y ? x : y)
 
 //OpenGL functions
 #ifndef SET_USR_COLOUR
@@ -252,7 +252,23 @@ ThreeTupleInt getIntPosFromFloat3Tuple(ThreeTupleFloat coordinate);
  */
 int getIntPosFromFloat (float position);
 
-//TODO: Make function(s) to get int position (world cube) from float position (like a camera)
+/**
+ * Clamps a number
+ * @param num Number to clamp.
+ * @param min Minimum value.
+ * @param max Maximum value.
+ * @return Number that is : min >= num <= max
+ */
+int clamp(int num, int min, int max);
+
+/**
+ * Clamps a number
+ * @param num Number to clamp.
+ * @param min Minimum value.
+ * @param max Maximum value.
+ * @return Number that is : min >= num <= max
+ */
+float clampf(float num, float min, float max);
 
 //Functions for the LinkedListAPI
 /**Dummy function. No functionality.*/

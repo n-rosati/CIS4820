@@ -51,12 +51,11 @@ Level* generateUndergroundLevel() {
 
     //Place the viewport in a random room
     int roomNumber = rand() % 9;
-    level->viewport.x = -((float) ((rand() % level->rooms[roomNumber]->length.x - 1) + level->rooms[roomNumber]->origin.x + 1));
+    level->viewport.x = -((float) level->rooms[roomNumber]->origin.x + ((float) level->rooms[roomNumber]->length.x / 2.0f));
     level->viewport.y = -2.1f;
-    level->viewport.z = -((float) ((rand() % level->rooms[roomNumber]->length.z - 1) + level->rooms[roomNumber]->origin.z + 1));
+    level->viewport.z = -((float) level->rooms[roomNumber]->origin.z + ((float) level->rooms[roomNumber]->length.z / 2.0f));
 
     placeStairs(level, roomNumber);
-
     return level;
 }
 
