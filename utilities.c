@@ -46,6 +46,11 @@ void moveDown(List* levels, GLubyte world[100][50][100], Level* newLevel) {
     } else {
         currentLevel->viewport.x -= (world[currentLevel->stairsDown.x + 1][1][currentLevel->stairsDown.z] == 0) ? 1 : -1;
         currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][1][currentLevel->stairsDown.z + 1] == 0) ? 1 : -1;
+
+        //Unset current mobs
+        for (int i = 0; i < 9; ++i) {
+            unsetMeshID(currentLevel->mobs[i].id);
+        }
     }
 
     levels->head = levels->head->next;
@@ -63,6 +68,11 @@ void moveUp(List* levels, GLubyte world[100][50][100]) {
         currentLevel->viewport.x -= (world[currentLevel->stairsDown.x + 1][1][currentLevel->stairsDown.z] == 0) ? 1 : -1;
         currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][1][currentLevel->stairsDown.z + 1] == 0) ? 1 : -1;
 
+        //Unset current mobs
+        for (int i = 0; i < 9; ++i) {
+            unsetMeshID(currentLevel->mobs[i].id);
+        }
+
         levels->head = levels->head->previous;
 
         loadLevel(levels->head->data, world);
@@ -70,8 +80,7 @@ void moveUp(List* levels, GLubyte world[100][50][100]) {
 }
 
 void loadLevel(Level* level, GLubyte world[100][50][100]) {
-    clearWorld(world);
-
+//    clearWorld(world);
     srand(level->seed);
     setViewPosition(level->viewport.x, level->viewport.y, level->viewport.z);
     setOldViewPosition(level->viewport.x, level->viewport.y, level->viewport.z);
@@ -88,10 +97,11 @@ void loadLevel(Level* level, GLubyte world[100][50][100]) {
     //Set mobs
     if (!level->isOutside) {
         for (int i = 0; i < 9; ++i) {
-            setTranslateMesh(level->rooms[i]->mob.id, level->rooms[i]->mob.position.x, level->rooms[i]->mob.position.y, level->rooms[i]->mob.position.z);
-            setRotateMesh(level->rooms[i]->mob.id, 0, level->rooms[i]->mob.rotation, 0);
-            setScaleMesh(level->rooms[i]->mob.id, level->rooms[i]->mob.scale);
-//            setMobPosition(level->rooms[i]->mob.id, level->rooms[i]->mob.position.x, level->rooms[i]->mob.position.y, level->rooms[i]->mob.position.z, level->rooms[i]->mob.rotation);
+            setMeshID(i, level->mobs[i].type, level->mobs[i].position.x, level->mobs[i].position.y, level->mobs[i].position.z);
+            setTranslateMesh(level->mobs[i].id, level->mobs[i].position.x, level->mobs[i].position.y, level->mobs[i].position.z);
+            setRotateMesh(level->mobs[i].id, 0, level->mobs[i].rotation, 0);
+            setScaleMesh(level->mobs[i].id, level->mobs[i].scale);
+//            setMobPosition(level->mobs[i].id, level->mobs[i].position.x, level->mobs[i].position.y, level->mobs[i].position.z, level->mobs[i].rotation);
         }
     }
 }

@@ -100,11 +100,16 @@ typedef enum {
 
 //Meshes
 typedef enum {
-    COW = 0,
     FISH = 1,
     BAT = 2,
     CACTUS = 3
 } Mesh;
+
+//Rotations
+static const float NORTH = 90.0f;
+static const float SOUTH = 270.0f;
+static const float EAST = 0.0f;
+static const float WEST = 180.0f;
 
 static const float MESH_OFFSET = 0.15f;
 
@@ -151,7 +156,7 @@ typedef struct {
     /**Mob location*/
     ThreeTupleFloat position;
     /**Mob velocity*/
-    ThreeTupleFloat velocity;
+    TwoTupleFloat velocity;
     /**Mob rotation in Y axis*/
     float rotation;
     /**Mob scale*/
@@ -164,8 +169,6 @@ typedef struct {
     TwoTupleInt length;
     /**Absolute starting coordinate of the room*/
     TwoTupleInt origin;
-    /**Room's mob*/
-    Mob mob;
     /**Marker to check if the user has been to this room before*/;
     bool visited;
 } Room;
@@ -185,8 +188,8 @@ typedef struct {
     ThreeTupleInt stairsDown;
     /**Stairs up location*/
     ThreeTupleInt stairsUp;
-    /**Mob count*/
-    int mobCount;
+    /**Level's mobs*/
+    Mob mobs[9];
 } Level;
 
 /**

@@ -35,11 +35,11 @@ Level* generateUndergroundLevel() {
             level->rooms[roomNumber]->origin.x = col * CELL_SIZE + xOffset;
             level->rooms[roomNumber]->origin.z = row * CELL_SIZE + zOffset;
 
-            level->rooms[roomNumber]->mob.id = level->mobCount++;
-
             drawRoom(level->rooms[roomNumber], level->world);
         }
     }
+
+    generateMobs(level);
 
     //Hallways
     for (int row = 0; row < 3; ++row) {
@@ -57,6 +57,35 @@ Level* generateUndergroundLevel() {
 
     placeStairs(level, roomNumber);
     return level;
+}
+
+void generateMobs(Level* level) {
+    for (int i = 0; i < 9; ++i) {
+        level->mobs[i].id = i;
+        do {
+            level->mobs[i].position.x = ((float)((rand() % (level->rooms[i]->length.x - 4)) + 2 + level->rooms[i]->origin.x) + 0.5f);
+            level->mobs[i].position.z = ((float)((rand() % (level->rooms[i]->length.z - 4)) + 2 + level->rooms[i]->origin.z) + 0.5f);
+        } while (level->world[(int) floorf(level->mobs[i].position.x)][1][(int) floorf(level->mobs[i].position.x)] != 0);
+
+        switch (rand() % 3) {
+            case 0:
+                level->mobs[i].type = FISH;
+                level->mobs[i].scale = 0.5f;
+                level->mobs[i].position.y = 1.50f;
+                break;
+            case 1:
+                level->mobs[i].type = BAT;
+                level->mobs[i].scale = 0.4f;
+                level->mobs[i].position.y = 1.00f;
+                break;
+            case 2:
+                level->mobs[i].type = CACTUS;
+                level->mobs[i].scale = 0.5f;
+                level->mobs[i].position.y = 1.00f;
+        }
+
+        level->mobs[i].isVisible = false;
+    }
 }
 
 void connectTopBottom(Room* roomOne, Room* roomTwo, GLubyte world[100][50][100]) {
@@ -149,50 +178,6 @@ void populateRoom(Room* room, GLubyte world[100][50][100]) {
                 world[room->origin.x + offsetX + 1][1][room->origin.z + offsetZ + 1] = TREE_BOX;
                 break;
         }
-    }
-
-    //Generate mobs
-    room->mob.position.x = ((float) ((rand() % (room->length.x - 4) + 2) + room->origin.x) + 0.5f);
-    room->mob.position.z = ((float) ((rand() % (room->length.z - 4) + 2) + room->origin.z) + 0.5f);
-
-    //TODO: Make the meshes able to be different
-//    switch (rand() % 4) {
-//        case 0:
-//            room->mob.type = COW;
-//            room->mob.position.y = 1.5f;
-//            room->mob.velocity.y = 0.05f;
-//            room->mob.scale = 0.5f;
-//            break;
-//        case 1:
-//            room->mob.type = FISH;
-//            room->mob.position.y = 1.5f;
-//            room->mob.velocity.y = 0.05f;
-//            room->mob.scale = 0.5f;
-//            break;
-//        case 2:
-//            room->mob.type = BAT;
-//            room->mob.position.y = 1.75f;
-//            room->mob.velocity.y = 0.1f;
-//            room->mob.scale = 0.5f;
-//            break;
-//        case 3:
-            room->mob.type = CACTUS;
-            room->mob.position.y = 1.5f;
-            room->mob.velocity.y = 0.05f;
-            room->mob.scale = 0.5f;
-//            break;
-//    }
-
-    room->mob.isVisible = false;
-
-    //Movement velocity
-    switch (rand() % 2) {
-        case 0:
-            room->mob.velocity.x = 0.075f;
-            break;
-        case 1:
-            room->mob.velocity.z = 0.075f;
-            break;
     }
 }
 

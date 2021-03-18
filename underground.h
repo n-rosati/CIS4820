@@ -29,6 +29,13 @@ static const int HALL_HEIGHT = 4;
 Level* generateUndergroundLevel();
 
 /**
+ * Generates the mobs in a level
+ * @param level Level to generate mobs in
+ */
+void generateMobs(Level* level);
+
+
+/**
  * Creates a room
  * @return Pointer to a newly created room
  */

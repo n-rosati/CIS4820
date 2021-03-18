@@ -243,19 +243,24 @@ void draw2D() {
                     }
                 }
 
-                //Only show mob movement for mobs in current room
+                //Mob movement. Only show movement for close mobs if map type is 2
                 {
-                    int roomNumber = 0;
-                    int roomEnd = 8;
-                    if (displayMap == 2) {
-                        roomNumber = isInRoom((TwoTupleInt){.x = playerInt.x, .z = playerInt.z}, currentLevel);
-                        roomEnd = roomNumber;
-                    }
-                    if (roomNumber != -1) {
-                        for (int i = roomNumber; i <= roomEnd; ++i) {
+                    float roomDiagonal = sqrtf(powf((float) ROOM_MAX_LENGTH, 2) + powf((float) ROOM_MAX_WIDTH, 2));
+                    for (int i = 0; i < 9; ++i) {
+                        int roomNumber = 0;
+                        int roomEnd = 8;
+
+                        if (displayMap == 2) {
+                            if (sqrtf(powf((currentLevel->viewport.x - currentLevel->mobs[i].position.x), 2) + powf((currentLevel->viewport.z - currentLevel->mobs[i].position.z), 2)) <= roomDiagonal) {
+                                set2Dcolour((float[]){1.0f, 0.1f, 0.1f, 1.0f});
+                                TwoTupleInt mobX = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->mobs[i].position.x));
+                                TwoTupleInt mobY = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->mobs[i].position.z));
+                                draw2Dbox(mobX.x, mobY.x, mobX.z, mobY.z);
+                            }
+                        } else {
                             set2Dcolour((float[]){1.0f, 0.1f, 0.1f, 1.0f});
-                            TwoTupleInt mobX = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->rooms[i]->mob.position.x));
-                            TwoTupleInt mobY = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->rooms[i]->mob.position.z));
+                            TwoTupleInt mobX = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->mobs[i].position.x));
+                            TwoTupleInt mobY = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->mobs[i].position.z));
                             draw2Dbox(mobX.x, mobY.x, mobX.z, mobY.z);
                         }
                     }
@@ -460,92 +465,75 @@ void update() {
                 //Mob movement
                 {
                     for (int l = 0; l < 9; ++l) {
-                        //Y axis movement
-                        {
-                            ThreeTupleInt mobPosition = getIntPosFromFloat3Tuple((ThreeTupleFloat){.x = currentLevel->rooms[l]->mob.position.x,
-                                    .y = currentLevel->rooms[l]->mob.position.y,
-                                    .z = currentLevel->rooms[l]->mob.position.z});
-
-                            if ((currentLevel->rooms[l]->mob.position.y >= 2.0f) || world[mobPosition.x][mobPosition.y][mobPosition.z] != EMPTY) {
-                                currentLevel->rooms[l]->mob.velocity.y *= -1.0f;
-                            }
-                        }
-
-                        int mobY = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.y);
+                        int mobY = 1;
                         //X axis movement
-                        if (currentLevel->rooms[l]->mob.velocity.x >= 0.0001f || currentLevel->rooms[l]->mob.velocity.x <= -0.0001f) { //If X velocity is not 0
-                            int mobX1 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.x - MESH_OFFSET);
-                            int mobX2 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.x + MESH_OFFSET);
-                            int mobZ = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.z);
+                        if (currentLevel->mobs[l].velocity.x >= 0.0001f || currentLevel->mobs[l].velocity.x <= -0.0001f) {
+                            //If X velocity is not 0
+                            int mobX1 = getIntPosFromFloat(currentLevel->mobs[l].position.x - MESH_OFFSET);
+                            int mobX2 = getIntPosFromFloat(currentLevel->mobs[l].position.x + MESH_OFFSET);
+                            int mobZ = getIntPosFromFloat(currentLevel->mobs[l].position.z);
 
                             if(world[mobX1][mobY][mobZ] != 0 || world[mobX2][mobY][mobZ] != 0) {
-                                currentLevel->rooms[l]->mob.velocity.x *= -1.0f;
+                                currentLevel->mobs[l].velocity.x *= -1.0f;
                             }
 
-                            currentLevel->rooms[l]->mob.rotation = (currentLevel->rooms[l]->mob.velocity.x > 0.0001f ? 90.0f : 270.0f);
+                            currentLevel->mobs[l].rotation = (currentLevel->mobs[l].velocity.x > 0.0001f ? NORTH : SOUTH);
                         }
 
                         //Z axis movement
-                        if (currentLevel->rooms[l]->mob.velocity.z >= 0.0001f || currentLevel->rooms[l]->mob.velocity.z <= -0.0001f) { //If Z velocity is not 0
-                            int mobX = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.x);
-                            int mobZ1 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.z - MESH_OFFSET);
-                            int mobZ2 = getIntPosFromFloat(currentLevel->rooms[l]->mob.position.z + MESH_OFFSET);
+                        if (currentLevel->mobs[l].velocity.z >= 0.0001f || currentLevel->mobs[l].velocity.z <= -0.0001f) { //If Z velocity is not 0
+                            int mobX = getIntPosFromFloat(currentLevel->mobs[l].position.x);
+                            int mobZ1 = getIntPosFromFloat(currentLevel->mobs[l].position.z - MESH_OFFSET);
+                            int mobZ2 = getIntPosFromFloat(currentLevel->mobs[l].position.z + MESH_OFFSET);
 
                             if(world[mobX][mobY][mobZ1] != 0 || world[mobX][mobY][mobZ2] != 0) {
-                                currentLevel->rooms[l]->mob.velocity.z *= -1.0f;
+                                currentLevel->mobs[l].velocity.z *= -1.0f;
                             }
 
-                            currentLevel->rooms[l]->mob.rotation = (currentLevel->rooms[l]->mob.velocity.z > 0.0f ? 0.0f : 180.0f);
+                            currentLevel->mobs[l].rotation = (currentLevel->mobs[l].velocity.z > 0.0001f ? EAST : WEST);
                         }
 
                         //Do mob movement
-                        currentLevel->rooms[l]->mob.position.x += currentLevel->rooms[l]->mob.velocity.x;
-                        currentLevel->rooms[l]->mob.position.y += currentLevel->rooms[l]->mob.velocity.y;
-                        currentLevel->rooms[l]->mob.position.z += currentLevel->rooms[l]->mob.velocity.z;
+                        currentLevel->mobs[l].position.x += currentLevel->mobs[l].velocity.x;
+                        currentLevel->mobs[l].position.z += currentLevel->mobs[l].velocity.z;
                     }
                 }
 
                 //Mob visibility checking
                 {
                     for (int l = 0; l < 9; ++l) {
-                        Room* room = ((Level*)(levels->head->data))->rooms[l];
-                        float distanceMobPlayer = sqrtf(powf(room->mob.position.x - NEGATE(oldView.x), 2) + powf(room->mob.position.z - NEGATE(oldView.z), 2)); //c = √(a² + b²)
+                        Mob* mob = &currentLevel->mobs[l];
+                        float distanceMobPlayer = sqrtf(powf(mob->position.x - NEGATE(oldView.x), 2) + powf(mob->position.z - NEGATE(oldView.z), 2)); //Pythagorean theorem
                         if (distanceMobPlayer <= roomDiagonal) {
-                            if (PointInFrustum(room->mob.position.x, room->mob.position.y, room->mob.position.z)) {
-                                if (!room->mob.isVisible) {
-                                    drawMesh(room->mob.id);
-                                    room->mob.isVisible = true;
-                                    switch (room->mob.type) {
-                                        case COW:
-                                            printf("Cow mesh #%d now visible.\n", room->mob.id);
-                                            break;
+                            if (PointInFrustum(mob->position.x, mob->position.y, mob->position.z)) {
+                                if (!mob->isVisible) {
+                                    drawMesh(mob->id);
+                                    mob->isVisible = true;
+                                    switch (mob->type) {
                                         case FISH:
-                                            printf("Fish mesh #%d now visible.\n", room->mob.id);
+                                            printf("Fish mesh #%d now visible.\n", mob->id);
                                             break;
                                         case BAT:
-                                            printf("Bat mesh #%d now visible.\n", room->mob.id);
+                                            printf("Bat mesh #%d now visible.\n", mob->id);
                                             break;
                                         case CACTUS:
-                                            printf("Cactus mesh #%d now visible.\n", room->mob.id);
+                                            printf("Cactus mesh #%d now visible.\n", mob->id);
                                             break;
                                     }
                                 }
                             } else {
-                                if (room->mob.isVisible) {
-                                    hideMesh(room->mob.id);
-                                    room->mob.isVisible = false;
-                                    switch (room->mob.type) {
-                                        case COW:
-                                            printf("Cow mesh #%d now hidden.\n", room->mob.id);
-                                            break;
+                                if (mob->isVisible) {
+                                    hideMesh(mob->id);
+                                    mob->isVisible = false;
+                                    switch (mob->type) {
                                         case FISH:
-                                            printf("Fish mesh #%d now hidden.\n", room->mob.id);
+                                            printf("Fish mesh #%d now hidden.\n", mob->id);
                                             break;
                                         case BAT:
-                                            printf("Bat mesh #%d now hidden.\n", room->mob.id);
+                                            printf("Bat mesh #%d now hidden.\n", mob->id);
                                             break;
                                         case CACTUS:
-                                            printf("Cactus mesh #%d now hidden.\n", room->mob.id);
+                                            printf("Cactus mesh #%d now hidden.\n", mob->id);
                                             break;
                                     }
                                 }
@@ -571,8 +559,8 @@ void update() {
         //Update mob rotations and translations in OpenGL (if underground)
         if (!currentLevel->isOutside) {
             for (int l = 0; l < 9; ++l) {
-                setTranslateMesh(currentLevel->rooms[l]->mob.id, currentLevel->rooms[l]->mob.position.x, currentLevel->rooms[l]->mob.position.y, currentLevel->rooms[l]->mob.position.z);
-                setRotateMesh(currentLevel->rooms[l]->mob.id, 0, currentLevel->rooms[l]->mob.rotation, 0);
+                setTranslateMesh(currentLevel->mobs[l].id, currentLevel->mobs[l].position.x, currentLevel->mobs[l].position.y, currentLevel->mobs[l].position.z);
+                setRotateMesh(currentLevel->mobs[l].id, 0, currentLevel->mobs[l].rotation, 0);
             }
         }
 
@@ -781,14 +769,6 @@ int main(int argc, char** argv)
         setTexture(25, FLOWER_BOX);
         setTexture(50, TREE_BOX);
         setTexture(54, SNOW);
-
-        //Create mobs
-        for (int l = 0; l < 9; ++l) {
-//            createMob(l, 0, 0, 0, 0);
-            setMeshID(l, CACTUS, 0, 0, 0);
-            hideMesh(l);
-//            hideMob(l);
-        }
 
         //Prep the levels list
         levels = initializeList(printLevel, deleteLevel, compareLevels);
