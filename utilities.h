@@ -157,6 +157,7 @@ typedef struct {
     ThreeTupleFloat position;
     /**Mob velocity*/
     TwoTupleFloat velocity;
+    bool doMovement;
     /**Mob rotation in Y axis*/
     float rotation;
     /**Mob scale*/

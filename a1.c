@@ -164,6 +164,7 @@ void collisionResponse() {
         return;
     }
 
+    //Wall collisions
     const float LOOK_AHEAD = 0.25f;
     //Look ahead of where the player is moving and check for a block there. If there is a block at eye level, don't go there
     //Otherwise, if there is no block at eye level but there is a block at foot level, move up onto it
@@ -172,6 +173,20 @@ void collisionResponse() {
         setViewPosition(oldX, oldY, oldZ);
     } else if (world[(int) NEGATE(ceilf(newX))][(int) NEGATE(floorf(newY)) - 1][(int) NEGATE(ceilf(newZ))] != 0) {
         setViewPosition(newX, newY - 1, newZ);
+    }
+
+    //Mob collisions
+    for (int i = 0; i < 9; ++i) {
+        Level* currentLevel = (Level*)(levels->head->data);
+        Mob* mob = &currentLevel->mobs[i];
+        ThreeTupleFloat mobPosition = (ThreeTupleFloat) {.x = mob->position.x, .y = mob->position.y, .z = mob->position.z};
+
+        if (fabsf(mobPosition.x - fabsf(newX)) < 1.00f && fabsf(mobPosition.z - fabsf(newZ)) < 1.00f) {
+            setViewPosition(oldX, oldY, oldZ);
+            mob->doMovement = false;
+        } else if (!mob->doMovement){
+            mob->doMovement = true;
+        }
     }
 #endif
 }
@@ -247,11 +262,9 @@ void draw2D() {
                 {
                     float roomDiagonal = sqrtf(powf((float) ROOM_MAX_LENGTH, 2) + powf((float) ROOM_MAX_WIDTH, 2));
                     for (int i = 0; i < 9; ++i) {
-                        int roomNumber = 0;
-                        int roomEnd = 8;
-
                         if (displayMap == 2) {
-                            if (sqrtf(powf((currentLevel->viewport.x - currentLevel->mobs[i].position.x), 2) + powf((currentLevel->viewport.z - currentLevel->mobs[i].position.z), 2)) <= roomDiagonal) {
+                            if (sqrtf(powf((currentLevel->viewport.x - currentLevel->mobs[i].position.x), 2) +
+                                      powf((currentLevel->viewport.z - currentLevel->mobs[i].position.z), 2)) <= roomDiagonal) {
                                 set2Dcolour((float[]){1.0f, 0.1f, 0.1f, 1.0f});
                                 TwoTupleInt mobX = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->mobs[i].position.x));
                                 TwoTupleInt mobY = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->mobs[i].position.z));
@@ -259,8 +272,8 @@ void draw2D() {
                             }
                         } else {
                             set2Dcolour((float[]){1.0f, 0.1f, 0.1f, 1.0f});
-                            TwoTupleInt mobX = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->mobs[i].position.x));
-                            TwoTupleInt mobY = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->mobs[i].position.z));
+                            TwoTupleInt mobX = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->mobs[i].position.x));
+                            TwoTupleInt mobY = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->mobs[i].position.z));
                             draw2Dbox(mobX.x, mobY.x, mobX.z, mobY.z);
                         }
                     }
@@ -415,20 +428,20 @@ void update() {
 
         ThreeTupleFloat oldView;
         getOldViewPosition(&oldView.x, &oldView.y, &oldView.z);
-        ThreeTupleInt newViewInt = getIntPosFromFloat3Tuple(oldView);
+        ThreeTupleInt oldViewInt = getIntPosFromFloat3Tuple(oldView);
 
 #ifndef DEBUG
         //Check if the current block and block under the view port are air
         //If so, do gravity
-        if (world[newViewInt.x][newViewInt.y][newViewInt.z] == 0 && world[newViewInt.x][newViewInt.y - 1][newViewInt.z] == 0) {
+        if (world[oldViewInt.x][oldViewInt.y][oldViewInt.z] == 0 && world[oldViewInt.x][oldViewInt.y - 1][oldViewInt.z] == 0) {
             setViewPosition(oldView.x, oldView.y + GRAVITY_AMT, oldView.z);
         }
 #endif
 
         //Check if the player is on stairs
-        if (newViewInt.x == currentLevel->stairsDown.x && (newViewInt.y - 1) == currentLevel->stairsDown.y && newViewInt.z == currentLevel->stairsDown.z) {
+        if (oldViewInt.x == currentLevel->stairsDown.x && (oldViewInt.y - 1) == currentLevel->stairsDown.y && oldViewInt.z == currentLevel->stairsDown.z) {
             moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
-        } else if (newViewInt.x == currentLevel->stairsUp.x && (newViewInt.y - 1) == currentLevel->stairsUp.y && newViewInt.z == currentLevel->stairsUp.z) {
+        } else if (oldViewInt.x == currentLevel->stairsUp.x && (oldViewInt.y - 1) == currentLevel->stairsUp.y && oldViewInt.z == currentLevel->stairsUp.z) {
             moveUp(levels, world);
         }
 
@@ -465,37 +478,42 @@ void update() {
                 //Mob movement
                 {
                     for (int l = 0; l < 9; ++l) {
-                        int mobY = 1;
-                        //X axis movement
-                        if (currentLevel->mobs[l].velocity.x >= 0.0001f || currentLevel->mobs[l].velocity.x <= -0.0001f) {
-                            //If X velocity is not 0
-                            int mobX1 = getIntPosFromFloat(currentLevel->mobs[l].position.x - MESH_OFFSET);
-                            int mobX2 = getIntPosFromFloat(currentLevel->mobs[l].position.x + MESH_OFFSET);
-                            int mobZ = getIntPosFromFloat(currentLevel->mobs[l].position.z);
-
-                            if(world[mobX1][mobY][mobZ] != 0 || world[mobX2][mobY][mobZ] != 0) {
-                                currentLevel->mobs[l].velocity.x *= -1.0f;
+                        Mob* mob = &currentLevel->mobs[l];
+                        if (mob->doMovement) {
+                            int mobY = 1;
+                            //X axis movement
+                            if (mob->velocity.x >= 0.0001f || mob->velocity.x <= -0.0001f) {
+                                //If X velocity is not 0
+                                int mobX1 = getIntPosFromFloat(mob->position.x - MESH_OFFSET);
+                                int mobX2 = getIntPosFromFloat(mob->position.x + MESH_OFFSET);
+                                int mobZ = getIntPosFromFloat(mob->position.z);
+                                if (world[mobX1][mobY][mobZ] != 0 || world[mobX2][mobY][mobZ] != 0) {
+                                    mob->velocity.x *= -1.0f;
+                                }
+                                mob->rotation = (mob->velocity.x > 0.0001f ? NORTH : SOUTH);
                             }
 
-                            currentLevel->mobs[l].rotation = (currentLevel->mobs[l].velocity.x > 0.0001f ? NORTH : SOUTH);
-                        }
-
-                        //Z axis movement
-                        if (currentLevel->mobs[l].velocity.z >= 0.0001f || currentLevel->mobs[l].velocity.z <= -0.0001f) { //If Z velocity is not 0
-                            int mobX = getIntPosFromFloat(currentLevel->mobs[l].position.x);
-                            int mobZ1 = getIntPosFromFloat(currentLevel->mobs[l].position.z - MESH_OFFSET);
-                            int mobZ2 = getIntPosFromFloat(currentLevel->mobs[l].position.z + MESH_OFFSET);
-
-                            if(world[mobX][mobY][mobZ1] != 0 || world[mobX][mobY][mobZ2] != 0) {
-                                currentLevel->mobs[l].velocity.z *= -1.0f;
+                            //Z axis movement
+                            if (mob->velocity.z >= 0.0001f || mob->velocity.z <= -0.0001f) { //If Z velocity is not 0
+                                int mobX = getIntPosFromFloat(mob->position.x);
+                                int mobZ1 = getIntPosFromFloat(mob->position.z - MESH_OFFSET);
+                                int mobZ2 = getIntPosFromFloat(mob->position.z + MESH_OFFSET);
+                                if (world[mobX][mobY][mobZ1] != 0 || world[mobX][mobY][mobZ2] != 0) {
+                                    mob->velocity.z *= -1.0f;
+                                }
+                                mob->rotation = (mob->velocity.z > 0.0001f ? EAST : WEST);
                             }
 
-                            currentLevel->mobs[l].rotation = (currentLevel->mobs[l].velocity.z > 0.0001f ? EAST : WEST);
-                        }
+                            if (fabsf(mob->position.x - fabsf(oldView.x)) < 1.00f && fabsf(mob->position.z - fabsf(oldView.z)) < 1.00f) {
+                                mob->doMovement = false;
+                            } else if (!mob->doMovement){
+                                mob->doMovement = true;
+                            }
 
-                        //Do mob movement
-                        currentLevel->mobs[l].position.x += currentLevel->mobs[l].velocity.x;
-                        currentLevel->mobs[l].position.z += currentLevel->mobs[l].velocity.z;
+                            //Do mob movement
+                            mob->position.x += mob->velocity.x;
+                            mob->position.z += mob->velocity.z;
+                        }
                     }
                 }
 
@@ -589,16 +607,16 @@ void mouse(int button, int state, int x, int y) {
         printf("%d %d\n", x, y);
     }
 
-#ifdef DEBUG
     if (button == GLUT_MIDDLE_BUTTON && state == GLUT_UP) {
         float camX = 0, camY = 0, camZ = 0;
         getViewPosition(&camX, &camY, &camZ);
         printf("\nFloat cam: X: %.2f\tY: %.2f\tZ: %.2f\n", NEGATE(camX), NEGATE(camY), NEGATE(camZ));
         ThreeTupleInt camLocation = getIntPosFromFloat3Tuple((ThreeTupleFloat) {.x = camX, .y = camY, .z = camZ});
         printf("Int cam: X: %d\tY: %d\tZ: %d\n", camLocation.x, camLocation.y, camLocation.z);
-        printf("Stairs down at: X: %d\tY: %d\tZ: %d\n\n", ((Level*)(levels->head->data))->stairsDown.x, ((Level*)(levels->head->data))->stairsDown.y, ((Level*)(levels->head->data))->stairsDown.z);
+//        printf("Stairs down at: X: %d\tY: %d\tZ: %d\n\n", ((Level*)(levels->head->data))->stairsDown.x, ((Level*)(levels->head->data))->stairsDown.y, ((Level*)(levels->head->data))->stairsDown.z);
     }
 
+#ifdef DEBUG
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
         moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
     } else if (button == GLUT_RIGHT_BUTTON && state == GLUT_UP) {

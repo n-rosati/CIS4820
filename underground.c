@@ -14,12 +14,12 @@ Level* generateUndergroundLevel() {
     //Build a platform
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {
-#ifdef DEBUG
+#ifndef DEBUG
             level->world[x][0][z] = ((x + z) % 2) ? DARK_BROWN : LIGHT_BROWN; //Checker board for light/dark grey
 #endif
-#ifndef DEBUG
-            level->world[x][0][z] = DIRTY_FLOOR;
-#endif
+//#ifndef DEBUG
+//            level->world[x][0][z] = DIRTY_FLOOR;
+//#endif
         }
     }
 
@@ -67,24 +67,33 @@ void generateMobs(Level* level) {
             level->mobs[i].position.z = ((float)((rand() % (level->rooms[i]->length.z - 4)) + 2 + level->rooms[i]->origin.z) + 0.5f);
         } while (level->world[(int) floorf(level->mobs[i].position.x)][1][(int) floorf(level->mobs[i].position.x)] != 0);
 
+        printf("%.2f %.2f %.2f\n", level->mobs[i].position.x, 1.00f, level->mobs[i].position.z);
+
         switch (rand() % 3) {
             case 0:
                 level->mobs[i].type = FISH;
                 level->mobs[i].scale = 0.5f;
                 level->mobs[i].position.y = 1.50f;
+                level->mobs[i].velocity.x = 0.0f;
+                level->mobs[i].velocity.z = 0.0f;
                 break;
             case 1:
                 level->mobs[i].type = BAT;
                 level->mobs[i].scale = 0.4f;
                 level->mobs[i].position.y = 1.00f;
+                level->mobs[i].velocity.x = 0.02f;
+                level->mobs[i].velocity.z = 0.01f;
                 break;
             case 2:
                 level->mobs[i].type = CACTUS;
                 level->mobs[i].scale = 0.5f;
+                level->mobs[i].velocity.x = 0.0f;
                 level->mobs[i].position.y = 1.00f;
+                level->mobs[i].velocity.z = 0.0f;
         }
 
         level->mobs[i].isVisible = false;
+        level->mobs[i].doMovement = true;
     }
 }
 
