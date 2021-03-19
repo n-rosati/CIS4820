@@ -139,6 +139,7 @@ extern void hideMesh(int);
 /********* end of extern variable declarations **************/
 
 List* levels;
+bool playerTurn = true;
 
 /*** collisionResponse() ***/
 /* -performs collision detection and response */
@@ -227,33 +228,64 @@ void draw2D() {
             if (!currentLevel->isOutside) {
                 //Draw rooms
                 for (int i = 0; i < NUM_ROOMS; ++i) {
-                    if (displayMap == 2 && !currentLevel->rooms[i]->visited) continue;
+                    if (displayMap == 2){
+                        if (displayMap == 2 && !currentLevel->rooms[i]->visited) continue;
 
-                    //Draw the room
-                    Room* currentRoom = currentLevel->rooms[i];
-                    for (int x = currentRoom->origin.x; x < currentRoom->origin.x + currentRoom->length.x; ++x) {
-                        for (int z = currentRoom->origin.z; z < currentRoom->origin.z + currentRoom->length.z; ++z) {
-                            if (world[x][1][z] == EMPTY) continue;
-
-                            TwoTupleInt blockX = get2DScreenPosFromBlock(mapDimension, x);
-                            TwoTupleInt blockY = get2DScreenPosFromBlock(mapDimension, z);
-                            switch(world[x][1][z]) {
-                                case STONE_BRICK:
-                                    set2Dcolour((float[]){0.38f, 0.33f, 0.28f, 1.00f});
-                                    break;
-                                case FLOWER_BOX:
-                                    set2Dcolour((float[]){0.74f, 0.73f, 0.00f, 1.00f});
-                                    break;
-                                case TREE_BOX:
-                                    set2Dcolour((float[]){0.36f, 0.53f, 0.08f, 1.00f});
-                                    break;
-                                case SUN_MOON_BOX:
-                                    set2Dcolour((float[]){0.17f, 0.49f, 0.55f, 1.00f});
-                                    break;
-                                default:
-                                    break;
+                        //Draw the room
+                        Room* currentRoom = currentLevel->rooms[i];
+                        for (int x = currentRoom->origin.x; x < currentRoom->origin.x + currentRoom->length.x; ++x) {
+                            for (int z = currentRoom->origin.z; z < currentRoom->origin.z + currentRoom->length.z; ++z) {
+                                if (world[x][1][z] == EMPTY) continue;
+                                TwoTupleInt blockX = get2DScreenPosFromBlock(mapDimension, x);
+                                TwoTupleInt blockY = get2DScreenPosFromBlock(mapDimension, z);
+                                switch (world[x][1][z]) {
+                                    case STONE_BRICK:
+                                        set2Dcolour((float[]){0.38f, 0.33f, 0.28f, 1.00f});
+                                        break;
+                                    case FLOWER_BOX:
+                                        set2Dcolour((float[]){0.74f, 0.73f, 0.00f, 1.00f});
+                                        break;
+                                    case TREE_BOX:
+                                        set2Dcolour((float[]){0.36f, 0.53f, 0.08f, 1.00f});
+                                        break;
+                                    case SUN_MOON_BOX:
+                                        set2Dcolour((float[]){0.17f, 0.49f, 0.55f, 1.00f});
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
                             }
-                            draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
+                        }
+                    } else {
+                        //Draw dungeons
+                        if (!((Level*)(levels->head->data))->isOutside) {
+                            for (int x = 0; x < WORLDX; ++x) {
+                                for (int z = 0; z < WORLDZ; ++z) {
+                                    TwoTupleInt blockX = get2DScreenPosFromBlock(mapDimension, x);
+                                    TwoTupleInt blockY = get2DScreenPosFromBlock(mapDimension, z);
+                                    switch(world[x][1][z]) {
+                                        case STONE_BRICK:
+                                            set2Dcolour((float[]){0.38f, 0.33f, 0.28f, 1.0f});
+                                            draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
+                                            break;
+                                        case FLOWER_BOX:
+                                            set2Dcolour((float[]){0.74f, 0.73f, 0.0f, 1.0f});
+                                            draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
+                                            break;
+                                        case TREE_BOX:
+                                            set2Dcolour((float[]){0.36f, 0.525f, 0.08f, 1.0f});
+                                            draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
+                                            break;
+                                        case SUN_MOON_BOX:
+                                            set2Dcolour((float[]){0.17f, 0.49f, 0.55f, 1.0f});
+                                            draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -262,16 +294,26 @@ void draw2D() {
                 {
                     float roomDiagonal = sqrtf(powf((float) ROOM_MAX_LENGTH, 2) + powf((float) ROOM_MAX_WIDTH, 2));
                     for (int i = 0; i < 9; ++i) {
+                        switch (currentLevel->mobs[i].type) {
+                            case CACTUS:
+                                set2Dcolour(CACTUS_MAP);
+                                break;
+                            case BAT:
+                                set2Dcolour(BAT_MAP);
+                                break;
+                            case FISH:
+                                set2Dcolour(FISH_MAP);
+                                break;
+                        }
+
                         if (displayMap == 2) {
                             if (sqrtf(powf((currentLevel->viewport.x - currentLevel->mobs[i].position.x), 2) +
                                       powf((currentLevel->viewport.z - currentLevel->mobs[i].position.z), 2)) <= roomDiagonal) {
-                                set2Dcolour((float[]){1.0f, 0.1f, 0.1f, 1.0f});
                                 TwoTupleInt mobX = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->mobs[i].position.x));
                                 TwoTupleInt mobY = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->mobs[i].position.z));
                                 draw2Dbox(mobX.x, mobY.x, mobX.z, mobY.z);
                             }
                         } else {
-                            set2Dcolour((float[]){1.0f, 0.1f, 0.1f, 1.0f});
                             TwoTupleInt mobX = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->mobs[i].position.x));
                             TwoTupleInt mobY = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->mobs[i].position.z));
                             draw2Dbox(mobX.x, mobY.x, mobX.z, mobY.z);
@@ -476,46 +518,47 @@ void update() {
                 }
             } else {
                 //Mob movement
-                {
+                if (!playerTurn) {
                     for (int l = 0; l < 9; ++l) {
                         Mob* mob = &currentLevel->mobs[l];
+                        if (mob->type == CACTUS) continue;
+
+                        //Mob arrived at target. Pick a new one.
+                        if (fabsf(mob->position.x - mob->targetPosition.x) < 0.1f && fabsf(mob->position.z - mob->targetPosition.z) < 0.1f) {
+                            do {
+                                mob->targetPosition.x = (float)(rand() % (currentLevel->rooms[l]->length.x - 4) + 2 + currentLevel->rooms[l]->origin.x) + 0.5f;
+                                mob->targetPosition.z = (float)(rand() % (currentLevel->rooms[l]->length.z - 4) + 2 + currentLevel->rooms[l]->origin.z) + 0.5f;
+                            } while (currentLevel->world[(int) floorf(currentLevel->mobs[l].targetPosition.x)][1][(int) floorf(currentLevel->mobs[l].targetPosition.z)] != 0);
+                        }
+
+                        //Player collision detection; Player and mob within 1 unit
+                        if (fabsf(mob->position.x - fabsf(oldView.x)) < 1.00f && fabsf(mob->position.z - fabsf(oldView.z)) < 1.00f) {
+                            mob->doMovement = false;
+                        } else if (!mob->doMovement){
+                            mob->doMovement = true;
+                        }
+
                         if (mob->doMovement) {
-                            int mobY = 1;
-                            //X axis movement
-                            if (mob->velocity.x >= 0.0001f || mob->velocity.x <= -0.0001f) {
-                                //If X velocity is not 0
-                                int mobX1 = getIntPosFromFloat(mob->position.x - MESH_OFFSET);
-                                int mobX2 = getIntPosFromFloat(mob->position.x + MESH_OFFSET);
-                                int mobZ = getIntPosFromFloat(mob->position.z);
-                                if (world[mobX1][mobY][mobZ] != 0 || world[mobX2][mobY][mobZ] != 0) {
-                                    mob->velocity.x *= -1.0f;
+                            for (int m = 0; m < 100; ++m) {
+                                if (m % 10) {
+                                    if (fabsf(mob->position.x - mob->targetPosition.x) < 0.1f) {
+                                        mob->position.x += mob->position.x < mob->targetPosition.x ? 0.1f : -0.1f;
+                                        mob->rotation = mob->position.x < mob->targetPosition.x ? NORTH : SOUTH;
+                                    } else {
+                                        mob->position.z += mob->position.z < mob->targetPosition.z ? 0.1f : -0.1f;
+                                        mob->rotation = mob->position.z < mob->targetPosition.z ? EAST : WEST;
+                                    }
+
+                                    //Update mob rotations and translations in OpenGL (if underground)
+                                    setTranslateMesh(currentLevel->mobs[l].id, currentLevel->mobs[l].position.x, currentLevel->mobs[l].position.y, currentLevel->mobs[l].position.z);
+                                    setRotateMesh(currentLevel->mobs[l].id, 0, currentLevel->mobs[l].rotation, 0);
                                 }
-                                mob->rotation = (mob->velocity.x > 0.0001f ? NORTH : SOUTH);
                             }
-
-                            //Z axis movement
-                            if (mob->velocity.z >= 0.0001f || mob->velocity.z <= -0.0001f) { //If Z velocity is not 0
-                                int mobX = getIntPosFromFloat(mob->position.x);
-                                int mobZ1 = getIntPosFromFloat(mob->position.z - MESH_OFFSET);
-                                int mobZ2 = getIntPosFromFloat(mob->position.z + MESH_OFFSET);
-                                if (world[mobX][mobY][mobZ1] != 0 || world[mobX][mobY][mobZ2] != 0) {
-                                    mob->velocity.z *= -1.0f;
-                                }
-                                mob->rotation = (mob->velocity.z > 0.0001f ? EAST : WEST);
-                            }
-
-                            if (fabsf(mob->position.x - fabsf(oldView.x)) < 1.00f && fabsf(mob->position.z - fabsf(oldView.z)) < 1.00f) {
-                                mob->doMovement = false;
-                            } else if (!mob->doMovement){
-                                mob->doMovement = true;
-                            }
-
-                            //Do mob movement
-                            mob->position.x += mob->velocity.x;
-                            mob->position.z += mob->velocity.z;
                         }
                     }
+                    playerTurn = true;
                 }
+
 
                 //Mob visibility checking
                 {
@@ -570,15 +613,15 @@ void update() {
                     if (roomNumber != -1) {
                         currentLevel->rooms[roomNumber]->visited = true;
                     }
-                }
-            }
-        }
 
-        //Update mob rotations and translations in OpenGL (if underground)
-        if (!currentLevel->isOutside) {
-            for (int l = 0; l < 9; ++l) {
-                setTranslateMesh(currentLevel->mobs[l].id, currentLevel->mobs[l].position.x, currentLevel->mobs[l].position.y, currentLevel->mobs[l].position.z);
-                setRotateMesh(currentLevel->mobs[l].id, 0, currentLevel->mobs[l].rotation, 0);
+                    ThreeTupleFloat oldPosition;
+                    getOldViewPosition(&oldPosition.x, &oldPosition.y, &oldPosition.z);
+                    ThreeTupleInt oldPositionInt = getIntPosFromFloat3Tuple(oldPosition);
+
+                    if (!(playerPosInt.x == oldPositionInt.x && playerPosInt.y == oldPositionInt.y && playerPosInt.z == oldPositionInt.z)) {
+                        playerTurn = false;
+                    }
+                }
             }
         }
 

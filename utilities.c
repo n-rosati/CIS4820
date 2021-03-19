@@ -22,13 +22,6 @@ void setTexture(int textureID, int colourID) {
     setAssignedTexture(colourID, textureID);
 }
 
-void clearWorld(GLubyte world[100][50][100]) {
-    for (int x = 0; x < WORLDX; ++x)
-        for (int y = 0; y < WORLDY; ++y)
-            for (int z = 0; z < WORLDZ; ++z)
-                world[x][y][z] = EMPTY;
-}
-
 void moveDown(List* levels, GLubyte world[100][50][100], Level* newLevel) {
     if (levels->head->next == NULL) {
         insertBack(levels, newLevel);

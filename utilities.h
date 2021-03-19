@@ -85,6 +85,10 @@ typedef enum {
     GREY = 12
 } Colour;
 
+static float* CACTUS_MAP = (float[]){0.80f, 0.20f, 0.55f, 1.0f};
+static float* BAT_MAP = (float[]){0.54f, 0.25f, 0.55f, 1.0f};
+static float* FISH_MAP = (float[]){0.01f, 0.45f, 0.55f, 1.0f};
+
 //Textures
 typedef enum {
     GRASS = 20,
@@ -151,12 +155,10 @@ typedef struct {
     int id;
     /**Mob type*/
     Mesh type;
-    /**Mob visibility*/
     bool isVisible;
     /**Mob location*/
     ThreeTupleFloat position;
-    /**Mob velocity*/
-    TwoTupleFloat velocity;
+    ThreeTupleFloat targetPosition;
     bool doMovement;
     /**Mob rotation in Y axis*/
     float rotation;
@@ -205,12 +207,6 @@ typedef struct {
 void setUserColourRGBA(int colourNumber, int red, int green, int blue, float alpha);
 
 void setTexture(int textureID, int colourID);
-
-/**
- * Removes all blocks in the world.
- * @param world World to clear.
- */
-void clearWorld(GLubyte world[100][50][100]);
 
 /**
  * Moves the player to the next level (down).
