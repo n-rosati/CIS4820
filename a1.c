@@ -140,6 +140,7 @@ extern void hideMesh(int);
 
 List* levels;
 bool playerTurn = true;
+bool moveTracked = false;
 
 /*** collisionResponse() ***/
 /* -performs collision detection and response */
@@ -557,6 +558,7 @@ void update() {
                         }
                     }
                     playerTurn = true;
+                    printf("Player turn\n");
                 }
 
 
@@ -618,8 +620,14 @@ void update() {
                     getOldViewPosition(&oldPosition.x, &oldPosition.y, &oldPosition.z);
                     ThreeTupleInt oldPositionInt = getIntPosFromFloat3Tuple(oldPosition);
 
-                    if (!(playerPosInt.x == oldPositionInt.x && playerPosInt.y == oldPositionInt.y && playerPosInt.z == oldPositionInt.z)) {
+                    if (playerPosInt.x == oldPositionInt.x && playerPosInt.y == oldPositionInt.y && playerPosInt.z == oldPositionInt.z) {
+                        moveTracked = false;
+                    }
+
+                    if (!(playerPosInt.x == oldPositionInt.x && playerPosInt.y == oldPositionInt.y && playerPosInt.z == oldPositionInt.z) && !moveTracked) {
                         playerTurn = false;
+                        moveTracked = true;
+                        printf("Not player turn\n");
                     }
                 }
             }
