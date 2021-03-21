@@ -156,6 +156,7 @@ typedef struct {
     /**Mob type*/
     Mesh type;
     bool isVisible;
+    bool isDead;
     /**Mob location*/
     ThreeTupleFloat position;
     ThreeTupleFloat targetPosition;

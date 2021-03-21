@@ -183,9 +183,22 @@ void collisionResponse() {
         Mob* mob = &currentLevel->mobs[i];
         ThreeTupleFloat mobPosition = (ThreeTupleFloat) {.x = mob->position.x, .y = mob->position.y, .z = mob->position.z};
 
-        if (fabsf(mobPosition.x - fabsf(newX)) < 1.00f && fabsf(mobPosition.z - fabsf(newZ)) < 1.00f) {
+        if (!mob->isDead && (fabsf(mobPosition.x - fabsf(newX)) < 1.00f && fabsf(mobPosition.z - fabsf(newZ)) < 1.00f)) {
+            //Player colliding with a mob
             setViewPosition(oldX, oldY, oldZ);
             mob->doMovement = false;
+
+            //Random change to hit or miss
+            switch (rand() % 2) {
+                case 0:
+                    printf("Player misses on mob with ID %d!\n", mob->id);
+                    break;
+                case 1:
+                    printf("Player attacked mob with ID %d!\n", mob->id);
+                    mob->isDead = true;
+                    hideMesh(mob->id);
+                    break;
+            }
         } else if (!mob->doMovement){
             mob->doMovement = true;
         }
@@ -558,7 +571,6 @@ void update() {
                         }
                     }
                     playerTurn = true;
-                    printf("Player turn\n");
                 }
 
 
@@ -568,7 +580,7 @@ void update() {
                         Mob* mob = &currentLevel->mobs[l];
                         float distanceMobPlayer = sqrtf(powf(mob->position.x - NEGATE(oldView.x), 2) + powf(mob->position.z - NEGATE(oldView.z), 2)); //Pythagorean theorem
                         if (distanceMobPlayer <= roomDiagonal) {
-                            if (PointInFrustum(mob->position.x, mob->position.y, mob->position.z)) {
+                            if (!mob->isDead && PointInFrustum(mob->position.x, mob->position.y, mob->position.z)) {
                                 if (!mob->isVisible) {
                                     drawMesh(mob->id);
                                     mob->isVisible = true;
@@ -584,21 +596,19 @@ void update() {
                                             break;
                                     }
                                 }
-                            } else {
-                                if (mob->isVisible) {
-                                    hideMesh(mob->id);
-                                    mob->isVisible = false;
-                                    switch (mob->type) {
-                                        case FISH:
-                                            printf("Fish mesh #%d now hidden.\n", mob->id);
-                                            break;
-                                        case BAT:
-                                            printf("Bat mesh #%d now hidden.\n", mob->id);
-                                            break;
-                                        case CACTUS:
-                                            printf("Cactus mesh #%d now hidden.\n", mob->id);
-                                            break;
-                                    }
+                            } else if (mob->isVisible) {
+                                hideMesh(mob->id);
+                                mob->isVisible = false;
+                                switch (mob->type) {
+                                    case FISH:
+                                        printf("Fish mesh #%d now hidden.\n", mob->id);
+                                        break;
+                                    case BAT:
+                                        printf("Bat mesh #%d now hidden.\n", mob->id);
+                                        break;
+                                    case CACTUS:
+                                        printf("Cactus mesh #%d now hidden.\n", mob->id);
+                                        break;
                                 }
                             }
                         }
@@ -627,7 +637,6 @@ void update() {
                     if (!(playerPosInt.x == oldPositionInt.x && playerPosInt.y == oldPositionInt.y && playerPosInt.z == oldPositionInt.z) && !moveTracked) {
                         playerTurn = false;
                         moveTracked = true;
-                        printf("Not player turn\n");
                     }
                 }
             }
