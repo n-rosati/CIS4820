@@ -120,7 +120,7 @@ static const float MESH_OFFSET = 0.15f;
 //Other
 static const float GRAVITY_AMT = 0.1f;
 static const float MAP_SCALE = 1.1f; //Bigger number = smaller map
-static const int HIT_CHANCE = 4; //The chance a player has to hit a mob; 1 in X chance
+static const int HIT_CHANCE = 2; //The chance a player has to hit a mob; 1 in X chance
 
 /**
  * Two tuple of integers x and z

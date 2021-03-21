@@ -305,10 +305,12 @@ void draw2D() {
                     }
                 }
 
-                //Mob movement. Only show movement for close mobs if map type is 2
+                //Mobs. Only show close mobs if map type is 2
                 {
                     float roomDiagonal = sqrtf(powf((float) ROOM_MAX_LENGTH, 2) + powf((float) ROOM_MAX_WIDTH, 2));
                     for (int i = 0; i < 9; ++i) {
+                        if (currentLevel->mobs[i].isDead) continue;
+
                         switch (currentLevel->mobs[i].type) {
                             case CACTUS:
                                 set2Dcolour(CACTUS_MAP);
@@ -322,8 +324,7 @@ void draw2D() {
                         }
 
                         if (displayMap == 2) {
-                            if (sqrtf(powf((currentLevel->viewport.x - currentLevel->mobs[i].position.x), 2) +
-                                      powf((currentLevel->viewport.z - currentLevel->mobs[i].position.z), 2)) <= roomDiagonal) {
+                            if (sqrtf(powf((currentLevel->viewport.x - currentLevel->mobs[i].position.x), 2) + powf((currentLevel->viewport.z - currentLevel->mobs[i].position.z), 2)) <= roomDiagonal) {
                                 TwoTupleInt mobX = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->mobs[i].position.x));
                                 TwoTupleInt mobY = get2DScreenPosFromBlock(mapDimension, (int)floorf(currentLevel->mobs[i].position.z));
                                 draw2Dbox(mobX.x, mobY.x, mobX.z, mobY.z);
