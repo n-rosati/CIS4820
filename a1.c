@@ -189,16 +189,17 @@ void collisionResponse() {
             mob->doMovement = false;
 
             //Random change to hit or miss
-            switch (rand() % 2) {
+            switch (rand() % HIT_CHANCE) {
                 case 0:
-                    printf("Player misses on mob with ID %d!\n", mob->id);
-                    break;
-                case 1:
                     printf("Player attacked mob with ID %d!\n", mob->id);
                     mob->isDead = true;
                     hideMesh(mob->id);
                     break;
+                default:
+                    printf("Player misses on mob with ID %d!\n", mob->id);
+                    break;
             }
+            playerTurn = false;
         } else if (!mob->doMovement){
             mob->doMovement = true;
         }
@@ -486,6 +487,10 @@ void update() {
         getOldViewPosition(&oldView.x, &oldView.y, &oldView.z);
         ThreeTupleInt oldViewInt = getIntPosFromFloat3Tuple(oldView);
 
+        ThreeTupleFloat newView;
+        getOldViewPosition(&newView.x, &newView.y, &newView.z);
+        ThreeTupleInt newViewInt = getIntPosFromFloat3Tuple(newView);
+
 #ifndef DEBUG
         //Check if the current block and block under the view port are air
         //If so, do gravity
@@ -535,10 +540,10 @@ void update() {
                 if (!playerTurn) {
                     for (int l = 0; l < 9; ++l) {
                         Mob* mob = &currentLevel->mobs[l];
-                        if (mob->type == CACTUS) continue;
+                        if (mob->isDead) continue;
 
                         //Mob arrived at target. Pick a new one.
-                        if (fabsf(mob->position.x - mob->targetPosition.x) < 0.1f && fabsf(mob->position.z - mob->targetPosition.z) < 0.1f) {
+                        if (mob->type != CACTUS && (fabsf(mob->position.x - mob->targetPosition.x) < 0.1f && fabsf(mob->position.z - mob->targetPosition.z) < 0.1f)) {
                             do {
                                 mob->targetPosition.x = (float)(rand() % (currentLevel->rooms[l]->length.x - 4) + 2 + currentLevel->rooms[l]->origin.x) + 0.5f;
                                 mob->targetPosition.z = (float)(rand() % (currentLevel->rooms[l]->length.z - 4) + 2 + currentLevel->rooms[l]->origin.z) + 0.5f;
@@ -546,13 +551,15 @@ void update() {
                         }
 
                         //Player collision detection; Player and mob within 1 unit
-                        if (fabsf(mob->position.x - fabsf(oldView.x)) < 1.00f && fabsf(mob->position.z - fabsf(oldView.z)) < 1.00f) {
+                        if (fabsf(mob->position.x - fabsf(newView.x)) < 1.10f && fabsf(mob->position.z - fabsf(newView.z)) < 1.10f) {
+                            //Collision with player
+                            printf("Mob with ID %d hits the player!\n", mob->id);
                             mob->doMovement = false;
                         } else if (!mob->doMovement){
                             mob->doMovement = true;
                         }
 
-                        if (mob->doMovement) {
+                        if (mob->type != CACTUS && mob->doMovement) {
                             for (int m = 0; m < 100; ++m) {
                                 if (m % 10) {
                                     if (fabsf(mob->position.x - mob->targetPosition.x) < 0.1f) {

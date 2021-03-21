@@ -42,7 +42,9 @@ void moveDown(List* levels, GLubyte world[100][50][100], Level* newLevel) {
 
         //Unset current mobs
         for (int i = 0; i < 9; ++i) {
-            unsetMeshID(currentLevel->mobs[i].id);
+            if (!currentLevel->mobs[i].isDead) {
+                unsetMeshID(currentLevel->mobs[i].id);
+            }
         }
     }
 
@@ -63,7 +65,9 @@ void moveUp(List* levels, GLubyte world[100][50][100]) {
 
         //Unset current mobs
         for (int i = 0; i < 9; ++i) {
-            unsetMeshID(currentLevel->mobs[i].id);
+            if (!currentLevel->mobs[i].isDead) {
+                unsetMeshID(currentLevel->mobs[i].id);
+            }
         }
 
         levels->head = levels->head->previous;
@@ -73,7 +77,6 @@ void moveUp(List* levels, GLubyte world[100][50][100]) {
 }
 
 void loadLevel(Level* level, GLubyte world[100][50][100]) {
-//    clearWorld(world);
     srand(level->seed);
     setViewPosition(level->viewport.x, level->viewport.y, level->viewport.z);
     setOldViewPosition(level->viewport.x, level->viewport.y, level->viewport.z);
@@ -90,11 +93,13 @@ void loadLevel(Level* level, GLubyte world[100][50][100]) {
     //Set mobs
     if (!level->isOutside) {
         for (int i = 0; i < 9; ++i) {
-            setMeshID(i, level->mobs[i].type, level->mobs[i].position.x, level->mobs[i].position.y, level->mobs[i].position.z);
-            setTranslateMesh(level->mobs[i].id, level->mobs[i].position.x, level->mobs[i].position.y, level->mobs[i].position.z);
-            setRotateMesh(level->mobs[i].id, 0, level->mobs[i].rotation, 0);
-            setScaleMesh(level->mobs[i].id, level->mobs[i].scale);
+            if (!level->mobs[i].isDead) {
+                setMeshID(i, level->mobs[i].type, level->mobs[i].position.x, level->mobs[i].position.y, level->mobs[i].position.z);
+                setTranslateMesh(level->mobs[i].id, level->mobs[i].position.x, level->mobs[i].position.y, level->mobs[i].position.z);
+                setRotateMesh(level->mobs[i].id, 0, level->mobs[i].rotation, 0);
+                setScaleMesh(level->mobs[i].id, level->mobs[i].scale);
 //            setMobPosition(level->mobs[i].id, level->mobs[i].position.x, level->mobs[i].position.y, level->mobs[i].position.z, level->mobs[i].rotation);
+            }
         }
     }
 }
