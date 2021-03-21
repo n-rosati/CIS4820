@@ -24,6 +24,8 @@ Custom things
     - CACTUS                dark orange
     - BAT                   pink/purple
     - FISH                  aqua
+    - Stairs Up             white
+    - Stairs Down           gray
 
 Features not implemented:
 - The fog of war map is partially implemented. It does not draw hallways.

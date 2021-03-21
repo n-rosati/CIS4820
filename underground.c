@@ -14,12 +14,12 @@ Level* generateUndergroundLevel() {
     //Build a platform
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {
-#ifndef DEBUG
+#ifdef DEBUG
             level->world[x][0][z] = ((x + z) % 2) ? DARK_BROWN : LIGHT_BROWN; //Checker board for light/dark grey
 #endif
-//#ifndef DEBUG
-//            level->world[x][0][z] = DIRTY_FLOOR;
-//#endif
+#ifndef DEBUG
+            level->world[x][0][z] = DIRTY_FLOOR;
+#endif
         }
     }
 

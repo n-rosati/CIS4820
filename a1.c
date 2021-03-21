@@ -243,7 +243,7 @@ void draw2D() {
             if (!currentLevel->isOutside) {
                 //Draw rooms
                 for (int i = 0; i < NUM_ROOMS; ++i) {
-                    if (displayMap == 2){
+                    if (displayMap == 2) {
                         if (displayMap == 2 && !currentLevel->rooms[i]->visited) continue;
 
                         //Draw the room
@@ -271,10 +271,22 @@ void draw2D() {
                                 }
                                 draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
                             }
+
+                            //Draw stairs up
+                            TwoTupleInt stairsUpX = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsUp.x));
+                            TwoTupleInt stairsUpY = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsUp.z));
+                            set2Dcolour((float[]){1.0f, 1.00f, 1.00f, 1.00f});
+                            draw2Dbox(stairsUpX.x, stairsUpY.x, stairsUpX.z, stairsUpY.z);
+
+                            //Draw stairs down
+                            TwoTupleInt stairsDownX = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.x));
+                            TwoTupleInt stairsDownY = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.z));
+                            set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 1.0f});
+                            draw2Dbox(stairsDownX.x, stairsDownY.x, stairsDownX.z, stairsDownY.z);
                         }
                     } else {
                         //Draw dungeons
-                        if (!((Level*)(levels->head->data))->isOutside) {
+                        if (!currentLevel->isOutside) {
                             for (int x = 0; x < WORLDX; ++x) {
                                 for (int z = 0; z < WORLDZ; ++z) {
                                     TwoTupleInt blockX = get2DScreenPosFromBlock(mapDimension, x);
@@ -301,6 +313,18 @@ void draw2D() {
                                     }
                                 }
                             }
+
+                            //Draw stairs up
+                            TwoTupleInt stairsUpX = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsUp.x));
+                            TwoTupleInt stairsUpY = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsUp.z));
+                            set2Dcolour((float[]){1.0f, 1.00f, 1.00f, 1.00f});
+                            draw2Dbox(stairsUpX.x, stairsUpY.x, stairsUpX.z, stairsUpY.z);
+
+                            //Draw stairs down
+                            TwoTupleInt stairsDownX = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.x));
+                            TwoTupleInt stairsDownY = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.z));
+                            set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 1.0f});
+                            draw2Dbox(stairsDownX.x, stairsDownY.x, stairsDownX.z, stairsDownY.z);
                         }
                     }
                 }
@@ -337,18 +361,11 @@ void draw2D() {
                     }
                 }
             } else {
-                //Draw stairs
+                //Draw stairs down
                 TwoTupleInt stairsDownX = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.x));
                 TwoTupleInt stairsDownY = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.z));
                 set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 1.0f});
                 draw2Dbox(stairsDownX.x, stairsDownY.x, stairsDownX.z, stairsDownY.z);
-
-                if (displayMap == 1 && !currentLevel->isOutside) {
-                    TwoTupleInt stairsUpX = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsUp.x));
-                    TwoTupleInt stairsUpY = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsUp.z));
-                    set2Dcolour((float[]){0.8f, 0.8f, 0.8f, 1.0f});
-                    draw2Dbox(stairsUpX.x, stairsUpY.x, stairsUpX.z, stairsUpY.z);
-                }
             }
         }
 

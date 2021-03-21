@@ -37,8 +37,8 @@ void moveDown(List* levels, GLubyte world[100][50][100], Level* newLevel) {
         currentLevel->viewport.y -= 2;
         currentLevel->viewport.z -= 2;
     } else {
-        currentLevel->viewport.x -= (world[currentLevel->stairsDown.x + 1][1][currentLevel->stairsDown.z] == 0) ? 1 : -1;
-        currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][1][currentLevel->stairsDown.z + 1] == 0) ? 1 : -1;
+        currentLevel->viewport.x -= (world[currentLevel->stairsDown.x + 1][2][currentLevel->stairsDown.z] == 0) ? 1.00f : -1.00f;
+        currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][2][currentLevel->stairsDown.z + 1] == 0) ? 1.00f : -1.00f;
 
         //Unset current mobs
         for (int i = 0; i < 9; ++i) {
@@ -49,7 +49,6 @@ void moveDown(List* levels, GLubyte world[100][50][100], Level* newLevel) {
     }
 
     levels->head = levels->head->next;
-
     loadLevel(levels->head->data, world);
 }
 
@@ -60,8 +59,8 @@ void moveUp(List* levels, GLubyte world[100][50][100]) {
         getViewPosition(&currentLevel->viewport.x, &currentLevel->viewport.y, &currentLevel->viewport.z);
 
         //Prevents the user from getting stuck going down->up instantly
-        currentLevel->viewport.x -= (world[currentLevel->stairsDown.x + 1][1][currentLevel->stairsDown.z] == 0) ? 1 : -1;
-        currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][1][currentLevel->stairsDown.z + 1] == 0) ? 1 : -1;
+        currentLevel->viewport.x -= (world[currentLevel->stairsDown.x + 1][2][currentLevel->stairsDown.z] == 0) ? 1.00f : -1.00f;
+        currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][2][currentLevel->stairsDown.z + 1] == 0) ? 1.00f : -1.00f;
 
         //Unset current mobs
         for (int i = 0; i < 9; ++i) {
@@ -71,7 +70,6 @@ void moveUp(List* levels, GLubyte world[100][50][100]) {
         }
 
         levels->head = levels->head->previous;
-
         loadLevel(levels->head->data, world);
     }
 }
@@ -98,7 +96,6 @@ void loadLevel(Level* level, GLubyte world[100][50][100]) {
                 setTranslateMesh(level->mobs[i].id, level->mobs[i].position.x, level->mobs[i].position.y, level->mobs[i].position.z);
                 setRotateMesh(level->mobs[i].id, 0, level->mobs[i].rotation, 0);
                 setScaleMesh(level->mobs[i].id, level->mobs[i].scale);
-//            setMobPosition(level->mobs[i].id, level->mobs[i].position.x, level->mobs[i].position.y, level->mobs[i].position.z, level->mobs[i].rotation);
             }
         }
     }
