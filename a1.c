@@ -150,60 +150,66 @@ bool moveTracked = false;
    will be the negative value of the array indices */
 void collisionResponse() {
 #ifndef DEBUG
-    float oldX = 0, oldY = 0, oldZ = 0;
-    getOldViewPosition(&oldX, &oldY, &oldZ);
+    ThreeTupleFloat oldVP;
+    getOldViewPosition(&oldVP.x, &oldVP.y, &oldVP.z);
+    ThreeTupleInt oldVPInt = getIntPosFromFloat3Tuple(oldVP);
 
-    float newX = 0, newY = 0, newZ = 0;
-    getViewPosition(&newX, &newY, &newZ);
+    ThreeTupleFloat newVP;
+    getViewPosition(&newVP.x, &newVP.y, &newVP.z);
+    ThreeTupleInt newVPInt = getIntPosFromFloat3Tuple(newVP);
 
-    //Handle out of bounds
-    if ((NEGATE(newX) >= WORLDX - 1 || NEGATE(newY) >= WORLDY - 1 || NEGATE(newZ) >= WORLDZ - 1) || ((NEGATE(newX) <= 1) || (NEGATE(newY) <= 1) || (NEGATE(newZ) <= 1))) {
-        newX = NEGATE(clampf(NEGATE(newX), 1, WORLDX - 1));
-        newY = NEGATE(clampf(NEGATE(newY), 1, WORLDY - 1));
-        newZ = NEGATE(clampf(NEGATE(newZ), 1, WORLDZ - 1));
+    TwoTupleFloat move = {.x = newVP.x - oldVP.x, .z = newVP.z - oldVP.z};
+    ThreeTupleFloat constructedVP = {.x = newVP.x, .y = newVP.y, .z = newVP.z};
 
-        setViewPosition(newX, newY, newZ);
-        return;
+    if (newVP.x <= -100.0f || newVP.x >= 0.0f) constructedVP.x -= move.x;
+    if (newVP.z <= -100.0f || newVP.z >= 0.0f) constructedVP.z -= move.z;
+
+    //TODO: Fix clipping
+    if (world[newVPInt.x][newVPInt.y][newVPInt.z] != EMPTY) {
+        //Ability to climb blocks
+        if (world[newVPInt.x][newVPInt.y + 1][newVPInt.z] == EMPTY) {
+            constructedVP.y -= 1.0f;
+            goto end;
+        }
+
+        ThreeTupleInt newPos = getIntPosFromFloat3Tuple((ThreeTupleFloat){.x = oldVP.x + move.x, .y = newVP.y, .z = oldVP.z + move.z});
+        if (world[newPos.x][newPos.y][oldVPInt.z] != EMPTY) constructedVP.x -= move.x;
+        if (world[oldVPInt.x][newPos.y][newPos.z] != EMPTY) constructedVP.z -= move.z;
+        end:;
     }
 
-    //Wall collisions
-    const float LOOK_AHEAD = 0.25f;
-    //Look ahead of where the player is moving and check for a block there. If there is a block at eye level, don't go there
-    //Otherwise, if there is no block at eye level but there is a block at foot level, move up onto it
-    if (world[(int) NEGATE(ceilf(newX + LOOK_AHEAD))][(int) NEGATE(floorf(newY))][(int) NEGATE(ceilf(newZ + LOOK_AHEAD))] != 0 ||
-        world[(int) NEGATE(ceilf(newX - LOOK_AHEAD))][(int) NEGATE(floorf(newY))][(int) NEGATE(ceilf(newZ - LOOK_AHEAD))] != 0) {
-        setViewPosition(oldX, oldY, oldZ);
-    } else if (world[(int) NEGATE(ceilf(newX))][(int) NEGATE(floorf(newY)) - 1][(int) NEGATE(ceilf(newZ))] != 0) {
-        setViewPosition(newX, newY - 1, newZ);
-    }
+    Level* currentLevel = (Level*)(levels->head->data);
+    if (!currentLevel->isOutside) {
+        //Test for mob collisions
+        for (int i = 0; i < 9; ++i) {
+            Mob* mob = &currentLevel->mobs[i];
+            if (mob->isDead) continue;
 
-    //Mob collisions
-    for (int i = 0; i < 9; ++i) {
-        Level* currentLevel = (Level*)(levels->head->data);
-        Mob* mob = &currentLevel->mobs[i];
-        ThreeTupleFloat mobPosition = (ThreeTupleFloat) {.x = mob->position.x, .y = mob->position.y, .z = mob->position.z};
+            ThreeTupleFloat mobPosition = (ThreeTupleFloat){.x = mob->position.x, .y = mob->position.y, .z = mob->position.z};
+            if ((fabsf(mobPosition.x - fabsf(constructedVP.x)) < 1.00f && fabsf(mobPosition.z - fabsf(constructedVP.z)) < 1.00f)) {
+                //Player colliding with a mob
+                constructedVP.x = oldVP.x;
+                constructedVP.y = oldVP.y;
+                constructedVP.z = oldVP.z;
+                mob->doMovement = false;
 
-        if (!mob->isDead && (fabsf(mobPosition.x - fabsf(newX)) < 1.00f && fabsf(mobPosition.z - fabsf(newZ)) < 1.00f)) {
-            //Player colliding with a mob
-            setViewPosition(oldX, oldY, oldZ);
-            mob->doMovement = false;
-
-            //Random change to hit or miss
-            switch (rand() % HIT_CHANCE) {
-                case 0:
-                    printf("Player attacked mob with ID %d!\n", mob->id);
-                    mob->isDead = true;
-                    hideMesh(mob->id);
-                    break;
-                default:
-                    printf("Player misses on mob with ID %d!\n", mob->id);
-                    break;
+                //Random change to hit or miss
+                switch (rand() % HIT_CHANCE) {
+                    case 0:printf("Player attacked mob with ID %d!\n", mob->id);
+                        mob->isDead = true;
+                        hideMesh(mob->id);
+                        break;
+                    default:printf("Player misses on mob with ID %d!\n", mob->id);
+                        break;
+                }
+                playerTurn = false;
+            } else if (!mob->doMovement) {
+                mob->doMovement = true;
             }
-            playerTurn = false;
-        } else if (!mob->doMovement){
-            mob->doMovement = true;
         }
     }
+
+    setViewPosition(constructedVP.x, constructedVP.y, constructedVP.z);
 #endif
 }
 
@@ -695,7 +701,7 @@ void mouse(int button, int state, int x, int y) {
     if (button == GLUT_MIDDLE_BUTTON && state == GLUT_UP) {
         float camX = 0, camY = 0, camZ = 0;
         getViewPosition(&camX, &camY, &camZ);
-        printf("\nFloat cam: X: %.2f\tY: %.2f\tZ: %.2f\n", NEGATE(camX), NEGATE(camY), NEGATE(camZ));
+        printf("\nFloat cam: X: %.2f\tY: %.2f\tZ: %.2f\n", camX, camY, camZ);
         ThreeTupleInt camLocation = getIntPosFromFloat3Tuple((ThreeTupleFloat) {.x = camX, .y = camY, .z = camZ});
         printf("Int cam: X: %d\tY: %d\tZ: %d\n", camLocation.x, camLocation.y, camLocation.z);
 //        printf("Stairs down at: X: %d\tY: %d\tZ: %d\n\n", ((Level*)(levels->head->data))->stairsDown.x, ((Level*)(levels->head->data))->stairsDown.y, ((Level*)(levels->head->data))->stairsDown.z);
