@@ -91,7 +91,7 @@ Level* generateOutsideLevel() {
     level->viewport.x = (float) (level->stairsDown.x + ((rand() % 11) - 5));
     level->viewport.y = 48.0f;
     level->viewport.z = (float) (level->stairsDown.z + ((rand() % 11) - 5));
-    while (level->world[(int) (level->viewport.x)][(int) (level->viewport.y - 3.0f)][(int) (level->viewport.z)] == EMPTY) { //Finds the top layer block
+    while (level->world[(int) (level->viewport.x)][(int) (level->viewport.y - 2.0f)][(int) (level->viewport.z)] == EMPTY) { //Finds the top layer block
         level->viewport.y -= 1.0f;
     }
 

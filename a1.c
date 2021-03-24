@@ -152,30 +152,40 @@ void collisionResponse() {
 #ifndef DEBUG
     ThreeTupleFloat oldVP;
     getOldViewPosition(&oldVP.x, &oldVP.y, &oldVP.z);
-    ThreeTupleInt oldVPInt = getIntPosFromFloat3Tuple(oldVP);
+    oldVP.x = NEGATE(oldVP.x);
+    oldVP.y = NEGATE(oldVP.y);
+    oldVP.z = NEGATE(oldVP.z);
 
     ThreeTupleFloat newVP;
     getViewPosition(&newVP.x, &newVP.y, &newVP.z);
+    newVP.x = NEGATE(newVP.x);
+    newVP.y = NEGATE(newVP.y);
+    newVP.z = NEGATE(newVP.z);
     ThreeTupleInt newVPInt = getIntPosFromFloat3Tuple(newVP);
 
-    TwoTupleFloat move = {.x = newVP.x - oldVP.x, .z = newVP.z - oldVP.z};
-    ThreeTupleFloat constructedVP = {.x = newVP.x, .y = newVP.y, .z = newVP.z};
+    ThreeTupleFloat moveVector = {.x = newVP.x - oldVP.x, .y = newVP.y - oldVP.y, .z = newVP.z - oldVP.z};
 
-    if (newVP.x <= -100.0f || newVP.x >= 0.0f) constructedVP.x -= move.x;
-    if (newVP.z <= -100.0f || newVP.z >= 0.0f) constructedVP.z -= move.z;
+    ThreeTupleFloat constructedVP = {.x = newVP.x + (moveVector.x * 1.5f), .y = newVP.y, .z = newVP.z + (moveVector.z * 1.5f)};
+    ThreeTupleInt constructedVPInt = getIntPosFromFloat3Tuple(constructedVP);
 
-    //TODO: Fix clipping
-    if (world[newVPInt.x][newVPInt.y][newVPInt.z] != EMPTY) {
+    //Out of bounds checks
+    if (constructedVP.x <= 0.0f || constructedVP.x >= 100.0f) newVP.x -= moveVector.x;
+    if (constructedVP.y <= 0.0f || constructedVP.x >= 50.0f) newVP.y -= moveVector.y;
+    if (constructedVP.z <= 0.0f || constructedVP.z >= 100.0f) newVP.z -= moveVector.z;
+
+    if (world[constructedVPInt.x][constructedVPInt.y][constructedVPInt.z] != EMPTY) {
         //Ability to climb blocks
-        if (world[newVPInt.x][newVPInt.y + 1][newVPInt.z] == EMPTY) {
-            constructedVP.y -= 1.0f;
-            goto end;
+        if (world[constructedVPInt.x][constructedVPInt.y + 1][constructedVPInt.z] == EMPTY) {
+            newVP.x += moveVector.x;
+            newVP.y += 1.0f;
+            newVP.z += moveVector.z;
+            goto skipSlide;
         }
 
-        ThreeTupleInt newPos = getIntPosFromFloat3Tuple((ThreeTupleFloat){.x = oldVP.x + move.x, .y = newVP.y, .z = oldVP.z + move.z});
-        if (world[newPos.x][newPos.y][oldVPInt.z] != EMPTY) constructedVP.x -= move.x;
-        if (world[oldVPInt.x][newPos.y][newPos.z] != EMPTY) constructedVP.z -= move.z;
-        end:;
+        //Negate movement in a direction if it hits a block
+        if (world[constructedVPInt.x][constructedVPInt.y][newVPInt.z] != EMPTY) newVP.x -= moveVector.x;
+        if (world[newVPInt.x][constructedVPInt.y][constructedVPInt.z] != EMPTY) newVP.z -= moveVector.z;
+        skipSlide:;
     }
 
     Level* currentLevel = (Level*)(levels->head->data);
@@ -186,20 +196,22 @@ void collisionResponse() {
             if (mob->isDead) continue;
 
             ThreeTupleFloat mobPosition = (ThreeTupleFloat){.x = mob->position.x, .y = mob->position.y, .z = mob->position.z};
-            if ((fabsf(mobPosition.x - fabsf(constructedVP.x)) < 1.00f && fabsf(mobPosition.z - fabsf(constructedVP.z)) < 1.00f)) {
+            if ((fabsf(mobPosition.x - constructedVP.x) < 1.00f && fabsf(mobPosition.z - constructedVP.z) < 1.00f)) {
                 //Player colliding with a mob
-                constructedVP.x = oldVP.x;
-                constructedVP.y = oldVP.y;
-                constructedVP.z = oldVP.z;
+                newVP.x -= moveVector.x;
+                newVP.y -= moveVector.y;
+                newVP.z -= moveVector.z;
                 mob->doMovement = false;
 
                 //Random change to hit or miss
                 switch (rand() % HIT_CHANCE) {
-                    case 0:printf("Player attacked mob with ID %d!\n", mob->id);
+                    case 0:
+                        printf("Player attacked mob with ID %d!\n", mob->id);
                         mob->isDead = true;
                         hideMesh(mob->id);
                         break;
-                    default:printf("Player misses on mob with ID %d!\n", mob->id);
+                    default:
+                        printf("Player misses on mob with ID %d!\n", mob->id);
                         break;
                 }
                 playerTurn = false;
@@ -209,7 +221,7 @@ void collisionResponse() {
         }
     }
 
-    setViewPosition(constructedVP.x, constructedVP.y, constructedVP.z);
+    setViewPosition(NEGATE(newVP.x), NEGATE(newVP.y), NEGATE(newVP.z));
 #endif
 }
 
