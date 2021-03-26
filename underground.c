@@ -5,6 +5,8 @@
 #include <math.h>
 #include "underground.h"
 
+void placeKey(Level* level);
+
 Level* generateUndergroundLevel() {
     Level* level = calloc(1, sizeof(Level));
     level->seed = time(NULL);
@@ -40,6 +42,7 @@ Level* generateUndergroundLevel() {
     }
 
     generateMobs(level);
+    placeKey(level);
 
     //Hallways
     for (int row = 0; row < 3; ++row) {
@@ -57,6 +60,25 @@ Level* generateUndergroundLevel() {
 
     placeStairs(level, roomNumber);
     return level;
+}
+
+void placeKey(Level* level) {
+    int roomNumber = rand() % 9;
+    int lengthOffset;
+    int widthOffset;
+
+    do {
+        lengthOffset = rand() % level->rooms[roomNumber]->length.x;
+        widthOffset = rand() % level->rooms[roomNumber]->length.z;
+    } while (level->world[level->rooms[roomNumber]->origin.x + lengthOffset][1][level->rooms[roomNumber]->origin.z + widthOffset] != EMPTY);
+
+    level->keyLocation.x = (float) (level->rooms[roomNumber]->origin.x + lengthOffset) + 0.5f;
+    level->keyLocation.y = 1.5f;
+    level->keyLocation.z = (float) (level->rooms[roomNumber]->origin.z + widthOffset) + 0.5f;
+
+    printf("Key: %.2f %.2f %.2f\n", level->keyLocation.x, level->keyLocation.y, level->keyLocation.z);
+
+    level->keyFound = false;
 }
 
 void generateMobs(Level* level) {

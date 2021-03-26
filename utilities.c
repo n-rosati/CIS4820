@@ -88,8 +88,9 @@ void loadLevel(Level* level, GLubyte world[100][50][100]) {
         }
     }
 
-    //Set mobs
+    //Set meshes
     if (!level->isOutside) {
+        //Set mob meshes
         for (int i = 0; i < 9; ++i) {
             if (!level->mobs[i].isDead) {
                 setMeshID(i, level->mobs[i].type, level->mobs[i].position.x, level->mobs[i].position.y, level->mobs[i].position.z);
@@ -97,6 +98,13 @@ void loadLevel(Level* level, GLubyte world[100][50][100]) {
                 setRotateMesh(level->mobs[i].id, 0, level->mobs[i].rotation, 0);
                 setScaleMesh(level->mobs[i].id, level->mobs[i].scale);
             }
+        }
+
+        if (!level->keyFound) {
+            setMeshID(10, 8, level->keyLocation.x, level->keyLocation.y, level->keyLocation.z);
+            setRotateMesh(10, 90.0f, 0.0f, 0.0f);
+        } else {
+            unsetMeshID(KEY);
         }
     }
 }

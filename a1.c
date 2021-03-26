@@ -141,6 +141,7 @@ extern void hideMesh(int);
 List* levels;
 bool playerTurn = true;
 bool moveTracked = false;
+Inventory inventory = {.hasKey = false, .hasArmour = false, .hasSword = false, .hasBow = false};
 
 /*** collisionResponse() ***/
 /* -performs collision detection and response */
@@ -249,7 +250,8 @@ void draw2D() {
             draw2Dbox(500, 380, 524, 388);
         }
     } else {
-        int mapDimension = MIN(screenWidth, screenHeight) / MAP_SCALE;
+        int screenMax = MIN(screenWidth, screenHeight);
+        int mapDimension = (int) floorf((float)(screenMax) / MAP_SCALE);
         Level *currentLevel = levels->head->data;
 
         //Get player position
@@ -399,6 +401,16 @@ void draw2D() {
             set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 0.75f});
             draw2Dbox(0, 0, mapDimension, mapDimension);
         }
+
+        //Inventory
+        {
+            //Stairs key
+            if (inventory.hasKey) {
+                set2Dcolour((float[]) {0.80f, 0.75f, 0.12f, 1.00f});
+                int size = (int) floorf(0.125f * (float) (screenMax));
+                draw2Dbox(screenWidth - size, 0 + size, screenWidth, 0); //FIXME: Make this an actual key shape
+            }
+        }
     }
 }
 
@@ -536,8 +548,12 @@ void update() {
 #endif
 
         //Check if the player is on stairs
-        if (oldViewInt.x == currentLevel->stairsDown.x && (oldViewInt.y - 1) == currentLevel->stairsDown.y && oldViewInt.z == currentLevel->stairsDown.z) {
-            moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
+        if ((oldViewInt.x == currentLevel->stairsDown.x && (oldViewInt.y - 1) == currentLevel->stairsDown.y && oldViewInt.z == currentLevel->stairsDown.z)) {
+            if (currentLevel->isOutside) {
+                moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
+            } else if (currentLevel->keyFound == true) {
+                moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
+            }
         } else if (oldViewInt.x == currentLevel->stairsUp.x && (oldViewInt.y - 1) == currentLevel->stairsUp.y && oldViewInt.z == currentLevel->stairsUp.z) {
             moveUp(levels, world);
         }
@@ -680,6 +696,13 @@ void update() {
                     if (!(playerPosInt.x == oldPositionInt.x && playerPosInt.y == oldPositionInt.y && playerPosInt.z == oldPositionInt.z) && !moveTracked) {
                         playerTurn = false;
                         moveTracked = true;
+                    }
+
+                    ThreeTupleInt keyLocation = getIntPosFromFloat3Tuple(currentLevel->keyLocation);
+                    if ((playerPosInt.x == keyLocation.x && playerPosInt.z == keyLocation.z) && !currentLevel->keyFound) {
+                        inventory.hasKey = true;
+                        currentLevel->keyFound = true;
+                        unsetMeshID(10);
                     }
                 }
             }
@@ -906,7 +929,6 @@ int main(int argc, char** argv)
 
     //Free memory
     freeList(levels);
-
     return 0;
 }
 

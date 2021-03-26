@@ -106,7 +106,8 @@ typedef enum {
 typedef enum {
     FISH = 1,
     BAT = 2,
-    CACTUS = 3
+    CACTUS = 3,
+    KEY = 8
 } Mesh;
 
 //Rotations
@@ -195,7 +196,19 @@ typedef struct {
     ThreeTupleInt stairsUp;
     /**Level's mobs*/
     Mob mobs[9];
+    /**Key location*/
+    ThreeTupleFloat keyLocation;
+    /**Key found*/
+    bool keyFound;
 } Level;
+
+/**Player inventory*/
+typedef struct {
+    bool hasKey;
+    bool hasArmour;
+    bool hasSword;
+    bool hasBow;
+} Inventory;
 
 /**
  * Sets x user colour using RGBA instead of x number between 0 and 1.
