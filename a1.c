@@ -365,6 +365,8 @@ void draw2D() {
                             case FISH:
                                 set2Dcolour(FISH_MAP);
                                 break;
+                            default:
+                                break;
                         }
 
                         if (displayMap == 2) {
@@ -653,6 +655,8 @@ void update() {
                                         case CACTUS:
                                             printf("Cactus mesh #%d now visible.\n", mob->id);
                                             break;
+                                        default:
+                                            break;
                                     }
                                 }
                             } else if (mob->isVisible) {
@@ -667,6 +671,8 @@ void update() {
                                         break;
                                     case CACTUS:
                                         printf("Cactus mesh #%d now hidden.\n", mob->id);
+                                        break;
+                                    default:
                                         break;
                                 }
                             }
@@ -704,6 +710,26 @@ void update() {
                         currentLevel->keyFound = true;
                         unsetMeshID(10);
                     }
+
+                    ThreeTupleInt chestLocation = getIntPosFromFloat3Tuple(currentLevel->chestLocation);
+                    if ((playerPosInt.x == chestLocation.x && playerPosInt.z == chestLocation.z) && !currentLevel->chestFound) {
+                        printf("You found treasure!\n");
+                        currentLevel->chestFound = true;
+                        unsetMeshID(11);
+                    }
+
+                    ThreeTupleInt coinLocation = getIntPosFromFloat3Tuple(currentLevel->coin.location);
+                    if ((playerPosInt.x == coinLocation.x && playerPosInt.z == coinLocation.z) && !currentLevel->coinFound) {
+                        printf("You found a coin!\n");
+                        currentLevel->coinFound = true;
+                        unsetMeshID(12);
+                    }
+                }
+
+                //Coin rotation
+                {
+                    currentLevel->coin.rotation.y += 1.0f;
+                    setRotateMesh(12, currentLevel->coin.rotation.x, currentLevel->coin.rotation.y, currentLevel->coin.rotation.z);
                 }
             }
         }

@@ -6,6 +6,8 @@
 #include "underground.h"
 
 void placeKey(Level* level);
+void placeChest(Level* level);
+void placeCoin(Level* level);
 
 Level* generateUndergroundLevel() {
     Level* level = calloc(1, sizeof(Level));
@@ -43,6 +45,8 @@ Level* generateUndergroundLevel() {
 
     generateMobs(level);
     placeKey(level);
+    placeChest(level);
+    placeCoin(level);
 
     //Hallways
     for (int row = 0; row < 3; ++row) {
@@ -62,6 +66,38 @@ Level* generateUndergroundLevel() {
     return level;
 }
 
+void placeCoin(Level* level) {
+    int roomNumber = rand() % 9;
+    int lengthOffset;
+    int widthOffset;
+
+    do {
+        lengthOffset = rand() % level->rooms[roomNumber]->length.x;
+        widthOffset = rand() % level->rooms[roomNumber]->length.z;
+    } while (level->world[level->rooms[roomNumber]->origin.x + lengthOffset][1][level->rooms[roomNumber]->origin.z + widthOffset] != EMPTY);
+
+    level->coin.location.x = (float) (level->rooms[roomNumber]->origin.x + lengthOffset) + 0.5f;
+    level->coin.location.y = 1.5f;
+    level->coin.location.z = (float) (level->rooms[roomNumber]->origin.z + widthOffset) + 0.5f;
+    level->coinFound = false;
+}
+
+void placeChest(Level* level) {
+    int roomNumber = rand() % 9;
+    int lengthOffset;
+    int widthOffset;
+
+    do {
+        lengthOffset = rand() % level->rooms[roomNumber]->length.x;
+        widthOffset = rand() % level->rooms[roomNumber]->length.z;
+    } while (level->world[level->rooms[roomNumber]->origin.x + lengthOffset][1][level->rooms[roomNumber]->origin.z + widthOffset] != EMPTY);
+
+    level->chestLocation.x = (float) (level->rooms[roomNumber]->origin.x + lengthOffset) + 0.5f;
+    level->chestLocation.y = 1.0f;
+    level->chestLocation.z = (float) (level->rooms[roomNumber]->origin.z + widthOffset) + 0.5f;
+    level->chestFound = false;
+}
+
 void placeKey(Level* level) {
     int roomNumber = rand() % 9;
     int lengthOffset;
@@ -75,9 +111,6 @@ void placeKey(Level* level) {
     level->keyLocation.x = (float) (level->rooms[roomNumber]->origin.x + lengthOffset) + 0.5f;
     level->keyLocation.y = 1.5f;
     level->keyLocation.z = (float) (level->rooms[roomNumber]->origin.z + widthOffset) + 0.5f;
-
-    printf("Key: %.2f %.2f %.2f\n", level->keyLocation.x, level->keyLocation.y, level->keyLocation.z);
-
     level->keyFound = false;
 }
 

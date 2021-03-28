@@ -107,7 +107,9 @@ typedef enum {
     FISH = 1,
     BAT = 2,
     CACTUS = 3,
-    KEY = 8
+    OPEN_CHEST = 5,
+    KEY = 8,
+    COIN = 11
 } Mesh;
 
 //Rotations
@@ -169,6 +171,12 @@ typedef struct {
     float scale;
 } Mob;
 
+/**Coin details*/
+typedef struct {
+    ThreeTupleFloat location;
+    ThreeTupleFloat rotation;
+} Coin;
+
 /**Room details.*/
 typedef struct {
     /**Lengths of the room*/
@@ -200,6 +208,12 @@ typedef struct {
     ThreeTupleFloat keyLocation;
     /**Key found*/
     bool keyFound;
+    /**Chest location*/
+    ThreeTupleFloat chestLocation;
+    bool chestFound;
+    /**Coin details*/
+    Coin coin;
+    bool coinFound;
 } Level;
 
 /**Player inventory*/
