@@ -5,10 +5,6 @@
 #include <math.h>
 #include "underground.h"
 
-void placeKey(Level* level);
-void placeChest(Level* level);
-void placeCoin(Level* level);
-
 Level* generateUndergroundLevel() {
     Level* level = calloc(1, sizeof(Level));
     level->seed = time(NULL);
@@ -47,6 +43,8 @@ Level* generateUndergroundLevel() {
     placeKey(level);
     placeChest(level);
     placeCoin(level);
+    placeArmour(level);
+    placeSword(level);
 
     //Hallways
     for (int row = 0; row < 3; ++row) {
@@ -64,6 +62,39 @@ Level* generateUndergroundLevel() {
 
     placeStairs(level, roomNumber);
     return level;
+}
+
+void placeSword(Level* level) {
+    int roomNumber = rand() % 9;
+    int lengthOffset;
+    int widthOffset;
+
+    do {
+        lengthOffset = rand() % level->rooms[roomNumber]->length.x;
+        widthOffset = rand() % level->rooms[roomNumber]->length.z;
+    } while (level->world[level->rooms[roomNumber]->origin.x + lengthOffset][1][level->rooms[roomNumber]->origin.z + widthOffset] != EMPTY);
+
+    level->swordLocation.x = (float) (level->rooms[roomNumber]->origin.x + lengthOffset) + 0.5f;
+    level->swordLocation.y = 1.5f;
+    level->swordLocation.z = (float) (level->rooms[roomNumber]->origin.z + widthOffset) + 0.5f;
+    level->swordFound = false;
+}
+
+void placeArmour(Level* level) {
+    int roomNumber = rand() % 9;
+    int lengthOffset;
+    int widthOffset;
+
+    do {
+        lengthOffset = rand() % level->rooms[roomNumber]->length.x;
+        widthOffset = rand() % level->rooms[roomNumber]->length.z;
+    } while (level->world[level->rooms[roomNumber]->origin.x + lengthOffset][1][level->rooms[roomNumber]->origin.z + widthOffset] != EMPTY);
+
+    level->armourLocation.x = (float) (level->rooms[roomNumber]->origin.x + lengthOffset) + 0.5f;
+    level->armourLocation.y = 1.5f;
+    level->armourLocation.z = (float) (level->rooms[roomNumber]->origin.z + widthOffset) + 0.5f;
+    level->armourFound = false;
+    level->armourFound = false;
 }
 
 void placeCoin(Level* level) {
@@ -213,13 +244,14 @@ void drawRoom(Room* room, GLubyte world[100][50][100]) {
         drawLineX(room->origin.x, room->origin.x + room->length.x - 1, y, room->origin.z + room->length.z - 1, world, STONE_BRICK);
         drawLineZ(room->origin.x, y, room->origin.z, room->origin.z + room->length.z - 1, world, STONE_BRICK);
         drawLineZ(room->origin.x + room->length.x - 1, y, room->origin.z, room->origin.z + room->length.z - 1, world, STONE_BRICK);
-
+#ifndef DEBUG
         //Roof
         if (y == ROOM_HEIGHT) {
             for (int zOffset = 0; zOffset <= room->length.z - 1; ++zOffset) {
                 drawLineX(room->origin.x, room->origin.x + room->length.x - 1, y, room->origin.z + zOffset, world, ASPHALT);
             }
         }
+#endif
     }
 
     populateRoom(room, world);

@@ -101,24 +101,39 @@ void loadLevel(Level* level, GLubyte world[100][50][100]) {
         }
 
         if (!level->keyFound) {
-            setMeshID(10, KEY, level->keyLocation.x, level->keyLocation.y, level->keyLocation.z);
-            setRotateMesh(10, 90.0f, 0.0f, 0.0f);
+            setMeshID(KEY_MESH_ID, KEY, level->keyLocation.x, level->keyLocation.y, level->keyLocation.z);
+            setRotateMesh(KEY_MESH_ID, 90.0f, 0.0f, 0.0f);
         } else {
-            unsetMeshID(KEY);
+            unsetMeshID(KEY_MESH_ID);
         }
 
         if (!level->chestFound) {
-            setMeshID(11, OPEN_CHEST, level->chestLocation.x, level->chestLocation.y, level->chestLocation.z);
-            setRotateMesh(10, 90.0f, 0.0f, 0.0f);
+            setMeshID(CHEST_MESH_ID, OPEN_CHEST, level->chestLocation.x, level->chestLocation.y, level->chestLocation.z);
+            setRotateMesh(CHEST_MESH_ID, 0.0f, 0.0f, 0.0f);
         } else {
-            unsetMeshID(KEY);
+            unsetMeshID(CHEST_MESH_ID);
         }
 
         if (!level->coinFound) {
-            setMeshID(12, COIN, level->coin.location.x, level->coin.location.y, level->coin.location.z);
-            setRotateMesh(10, 90.0f, 0.0f, 0.0f);
+            setMeshID(COIN_MESH_ID, COIN, level->coin.location.x, level->coin.location.y, level->coin.location.z);
+            setRotateMesh(COIN_MESH_ID, 90.0f, 0.0f, 0.0f);
         } else {
-            unsetMeshID(KEY);
+            unsetMeshID(COIN_MESH_ID);
+        }
+
+        if (!level->armourFound) {
+            setMeshID(ARMOUR_MESH_ID, ARMOUR, level->armourLocation.x, level->armourLocation.y, level->armourLocation.z);
+            setRotateMesh(ARMOUR_MESH_ID,0.0f, 0.0f, 0.0f);
+        } else {
+            unsetMeshID(ARMOUR_MESH_ID);
+        }
+
+        if (!level->swordFound) {
+            setMeshID(SWORD_MESH_ID, SWORD, level->swordLocation.x, level->swordLocation.y, level->swordLocation.z);
+            setScaleMesh(SWORD_MESH_ID, 0.5f);
+            setRotateMesh(SWORD_MESH_ID, 0.0f, 0.0f, 0.0f);
+        } else {
+            unsetMeshID(SWORD_MESH_ID);
         }
     }
 }

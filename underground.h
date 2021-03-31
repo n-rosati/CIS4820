@@ -119,4 +119,34 @@ int isInRoom(TwoTupleInt coordinate, Level* level);
  */
 bool isInArea(TwoTupleInt coordinate, TwoTupleInt startCoordinate, TwoTupleInt endCoordinate);
 
+/**
+ * Places a key in the level
+ * @param level Level to place item in
+ */
+void placeKey(Level* level);
+
+/**
+ * Places a chest in the level
+ * @param level Level to place item in
+ */
+void placeChest(Level* level);
+
+/**
+ * Places a coin in the level
+ * @param level Level to place item in
+ */
+void placeCoin(Level* level);
+
+/**
+ * Places armour in the level
+ * @param level Level to place item in
+ */
+void placeArmour(Level* level);
+
+/**
+ * Places a sword in the level
+ * @param level Level to place item in
+ */
+void placeSword(Level* level);
+
 #endif //CIS4820_UNDERGROUND_H

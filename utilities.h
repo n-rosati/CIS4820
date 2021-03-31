@@ -109,8 +109,19 @@ typedef enum {
     CACTUS = 3,
     OPEN_CHEST = 5,
     KEY = 8,
-    COIN = 11
+    COIN = 11,
+    SWORD = 4,
+    ARMOUR = 6
 } Mesh;
+
+//Mesh IDs
+typedef enum {
+    KEY_MESH_ID = 10,
+    ARMOUR_MESH_ID = 13,
+    SWORD_MESH_ID = 14,
+    CHEST_MESH_ID = 11,
+    COIN_MESH_ID = 12
+} StaticMeshID;
 
 //Rotations
 static const float NORTH = 90.0f;
@@ -214,6 +225,12 @@ typedef struct {
     /**Coin details*/
     Coin coin;
     bool coinFound;
+    /**Sword details*/
+    ThreeTupleFloat swordLocation;
+    bool swordFound;
+    /**Armour details*/
+    ThreeTupleFloat armourLocation;
+    bool armourFound;
 } Level;
 
 /**Player inventory*/
