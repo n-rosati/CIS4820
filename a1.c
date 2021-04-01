@@ -441,23 +441,37 @@ void draw2D() {
         {
             //Key
             if (inventory.hasKey) {
-                set2Dcolour((float[]) {0.80f, 0.75f, 0.12f, 1.00f});
                 int size = (int) floorf(0.125f * (float) (screenMax));
-                draw2Dbox(screenWidth - size, 0 + size, screenWidth, 0); //FIXME: Make this an actual key shape
+                set2Dcolour((float[]) {0.40f, 0.40f, 0.40f, 1.00f});
+                draw2Dline(screenWidth - (size / 4), size / 2, screenWidth - (size / 4), size - (size / 3), 5);
+                draw2Dline(screenWidth - (size / 10), size / 2, screenWidth - (size / 10), size - (size / 3), 5);
+                draw2Dline(screenWidth - size + (size / 10), size / 2, screenWidth - (size / 10), size / 2, 5);
+                draw2Dbox(screenWidth - size + (size / 10), size - (size / 3), screenWidth - size + ((size / 10) * 4), size / 3);
             }
 
             //Armour
-            if (inventory.hasKey) {
-                set2Dcolour((float[]) {0.20f, 0.75f, 0.92f, 1.00f});
+            if (inventory.hasArmour) {
                 int size = (int) floorf(0.125f * (float) (screenMax));
-                draw2Dbox(screenWidth - size, 0 + size * 2, screenWidth, size); //FIXME: Make this an actual armour shape
+                TwoTupleInt topLeft = {.x = screenWidth - size, .z = size * 2};
+                TwoTupleInt bottomRight = {.x = screenWidth, .z = size};
+                set2Dcolour((float[]) {0.20f, 0.75f, 0.92f, 1.00f});
+                draw2Dbox(topLeft.x + (size / 6), topLeft.z - (size / 3), bottomRight.x - (size / 2) - (size / 16), bottomRight.z + (size / 2));
+                draw2Dbox(topLeft.x + (size / 16) + (size / 2), topLeft.z - (size / 3), bottomRight.x - (size / 6), bottomRight.z + (size / 2));
+                draw2Dbox(topLeft.x + (size / 3), bottomRight.z + (size / 6), topLeft.x + ((size * 2) / 3), bottomRight.z + (size / 2) + (size / 10));
             }
 
             //Sword
-            if (inventory.hasKey) {
-                set2Dcolour((float[]) {0.53f, 0.53f, 0.53f, 1.00f});
+            if (inventory.hasSword) {
                 int size = (int) floorf(0.125f * (float) (screenMax));
-                draw2Dbox(screenWidth - size, 0 + size * 3, screenWidth, size * 2); //FIXME: Make this an actual sword shape
+                TwoTupleInt topLeft = {.x = screenWidth - size, .z = size * 3};
+                TwoTupleInt bottomRight = {.x = screenWidth, .z = size * 2};
+
+                set2Dcolour((float[]) {0.40f, 0.40f, 0.40f, 1.00f});
+                draw2Dbox(bottomRight.x - (size / 2) - (size / 20), bottomRight.z + (size / 3) - (size / 10), bottomRight.x - (size / 2) + (size / 20), bottomRight.z + (size / 8) - ((size / 16) * 2));
+                draw2Dbox(topLeft.x + (size / 3), bottomRight.z + (size / 3), bottomRight.x - (size / 3), bottomRight.z + (size / 3) - (size / 10));
+                set2Dcolour((float[]) {0.55f, 0.55f, 0.55f, 1.00f});
+                draw2Dbox(topLeft.x + (size / 2) - (size / 8), topLeft.z - (size / 3) + (size / 8), topLeft.x + (size / 2) + (size / 8), bottomRight.z + (size / 3) - (size / 10));
+                draw2Dtriangle(topLeft.x + (size / 2) - (size / 8), topLeft.z - (size / 3) + (size / 8), topLeft.x + (size / 2) + (size / 8), topLeft.z - (size / 3) + (size / 8), topLeft.x + (size / 2), topLeft.z);
             }
         }
     }
@@ -598,10 +612,8 @@ void update() {
 
         //Check if the player is on stairs
         if ((oldViewInt.x == currentLevel->stairsDown.x && (oldViewInt.y - 1) == currentLevel->stairsDown.y && oldViewInt.z == currentLevel->stairsDown.z)) {
-            if (currentLevel->isOutside) {
-                moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
-            } else if (currentLevel->keyFound == true) {
-                moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
+            if (currentLevel->isOutside || (!currentLevel->isOutside && currentLevel->keyFound == true)) {
+                moveDown(levels, world, levels->head->next == NULL ? generateDungeonLevel() : levels->head->next->data);
             }
         } else if (oldViewInt.x == currentLevel->stairsUp.x && (oldViewInt.y - 1) == currentLevel->stairsUp.y && oldViewInt.z == currentLevel->stairsUp.z) {
             moveUp(levels, world);
