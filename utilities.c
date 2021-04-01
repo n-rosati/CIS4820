@@ -124,6 +124,7 @@ void loadLevel(Level* level, GLubyte world[100][50][100]) {
         if (!level->armourFound) {
             setMeshID(ARMOUR_MESH_ID, ARMOUR, level->armourLocation.x, level->armourLocation.y, level->armourLocation.z);
             setRotateMesh(ARMOUR_MESH_ID,0.0f, 0.0f, 0.0f);
+            setScaleMesh(ARMOUR_MESH_ID, 0.80f);
         } else {
             unsetMeshID(ARMOUR_MESH_ID);
         }

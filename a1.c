@@ -292,8 +292,6 @@ void draw2D() {
                                 draw2Dbox(blockX.x, blockY.x, blockX.z, blockY.z);
                             }
 
-                            //TODO: Draw items on map
-
                             //Draw stairs up
                             TwoTupleInt stairsUpX = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsUp.x));
                             TwoTupleInt stairsUpY = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsUp.z));
@@ -347,6 +345,39 @@ void draw2D() {
                             TwoTupleInt stairsDownY = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.z));
                             set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 1.0f});
                             draw2Dbox(stairsDownX.x, stairsDownY.x, stairsDownX.z, stairsDownY.z);
+                        }
+
+                        //Draw items
+                        {
+                            //Coin
+                            TwoTupleInt itemLocationX = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->coin.location.x));
+                            TwoTupleInt itemLocationY = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->coin.location.z));
+                            set2Dcolour((float[]){ 0.50f, 0.45f, 0.00f, 1.00f});
+                            draw2Dbox(itemLocationX.x, itemLocationY.x, itemLocationX.z, itemLocationY.z);
+
+                            //Chest
+                            itemLocationX = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->chestLocation.x));
+                            itemLocationY = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->chestLocation.z));
+                            set2Dcolour((float[]){ 0.49f, 0.45f, 0.00f, 1.00f});
+                            draw2Dbox(itemLocationX.x, itemLocationY.x, itemLocationX.z, itemLocationY.z);
+
+                            //Key
+                            itemLocationX = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->coin.location.x));
+                            itemLocationY = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->coin.location.z));
+                            set2Dcolour((float[]){ 0.09f, 0.68f, 0.51f, 1.00f});
+                            draw2Dbox(itemLocationX.x, itemLocationY.x, itemLocationX.z, itemLocationY.z);
+
+                            //Armour
+                            itemLocationX = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->coin.location.x));
+                            itemLocationY = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->coin.location.z));
+                            set2Dcolour((float[]){ 0.51f, 0.59f, 0.57f, 1.00f});
+                            draw2Dbox(itemLocationX.x, itemLocationY.x, itemLocationX.z, itemLocationY.z);
+
+                            //Sword
+                            itemLocationX = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->coin.location.x));
+                            itemLocationY = get2DScreenPosFromBlock(mapDimension, (int) floorf(currentLevel->coin.location.z));
+                            set2Dcolour((float[]){ 0.99f, 0.45f, 0.73f, 1.00f});
+                            draw2Dbox(itemLocationX.x, itemLocationY.x, itemLocationX.z, itemLocationY.z);
                         }
                     }
                 }
@@ -720,39 +751,38 @@ void update() {
                         moveTracked = true;
                     }
 
-                    ThreeTupleInt keyLocation = getIntPosFromFloat3Tuple(currentLevel->keyLocation);
-                    if ((playerPosInt.x == keyLocation.x && playerPosInt.z == keyLocation.z) && !currentLevel->keyFound) {
-                        inventory.hasKey = true;
-                        currentLevel->keyFound = true;
-                        unsetMeshID(KEY_MESH_ID);
-                    }
-
-                    ThreeTupleInt armourLocation = getIntPosFromFloat3Tuple(currentLevel->armourLocation);
-                    if ((playerPosInt.x == armourLocation.x && playerPosInt.z == armourLocation.z) && !currentLevel->armourFound) {
-                        inventory.hasArmour = true;
-                        currentLevel->armourFound = true;
-                        unsetMeshID(ARMOUR_MESH_ID);
-                    }
-
-                    ThreeTupleInt swordLocation = getIntPosFromFloat3Tuple(currentLevel->swordLocation);
-                    if ((playerPosInt.x == swordLocation.x && playerPosInt.z == swordLocation.z) && !currentLevel->swordFound) {
-                        inventory.hasSword = true;
-                        currentLevel->swordFound = true;
-                        unsetMeshID(SWORD_MESH_ID);
-                    }
-
-                    ThreeTupleInt chestLocation = getIntPosFromFloat3Tuple(currentLevel->chestLocation);
-                    if ((playerPosInt.x == chestLocation.x && playerPosInt.z == chestLocation.z) && !currentLevel->chestFound) {
-                        printf("You found treasure!\n");
-                        currentLevel->chestFound = true;
-                        unsetMeshID(CHEST_MESH_ID);
-                    }
-
-                    ThreeTupleInt coinLocation = getIntPosFromFloat3Tuple(currentLevel->coin.location);
-                    if ((playerPosInt.x == coinLocation.x && playerPosInt.z == coinLocation.z) && !currentLevel->coinFound) {
-                        printf("You found a coin!\n");
-                        currentLevel->coinFound = true;
-                        unsetMeshID(COIN_MESH_ID);
+                    //Found item tracking
+                    {
+                        ThreeTupleInt keyLocation = getIntPosFromFloat3Tuple(currentLevel->keyLocation);
+                        if ((playerPosInt.x == keyLocation.x && playerPosInt.z == keyLocation.z) && !currentLevel->keyFound) {
+                            inventory.hasKey = true;
+                            currentLevel->keyFound = true;
+                            unsetMeshID(KEY_MESH_ID);
+                        }
+                        ThreeTupleInt armourLocation = getIntPosFromFloat3Tuple(currentLevel->armourLocation);
+                        if ((playerPosInt.x == armourLocation.x && playerPosInt.z == armourLocation.z) && !currentLevel->armourFound) {
+                            inventory.hasArmour = true;
+                            currentLevel->armourFound = true;
+                            unsetMeshID(ARMOUR_MESH_ID);
+                        }
+                        ThreeTupleInt swordLocation = getIntPosFromFloat3Tuple(currentLevel->swordLocation);
+                        if ((playerPosInt.x == swordLocation.x && playerPosInt.z == swordLocation.z) && !currentLevel->swordFound) {
+                            inventory.hasSword = true;
+                            currentLevel->swordFound = true;
+                            unsetMeshID(SWORD_MESH_ID);
+                        }
+                        ThreeTupleInt chestLocation = getIntPosFromFloat3Tuple(currentLevel->chestLocation);
+                        if ((playerPosInt.x == chestLocation.x && playerPosInt.z == chestLocation.z) && !currentLevel->chestFound) {
+                            printf("You found treasure!\n");
+                            currentLevel->chestFound = true;
+                            unsetMeshID(CHEST_MESH_ID);
+                        }
+                        ThreeTupleInt coinLocation = getIntPosFromFloat3Tuple(currentLevel->coin.location);
+                        if ((playerPosInt.x == coinLocation.x && playerPosInt.z == coinLocation.z) && !currentLevel->coinFound) {
+                            printf("You found a coin!\n");
+                            currentLevel->coinFound = true;
+                            unsetMeshID(COIN_MESH_ID);
+                        }
                     }
                 }
 
