@@ -15,7 +15,8 @@
 
 #include "utilities.h"
 #include "outside.h"
-#include "underground.h"
+#include "dungeon.h"
+#include "cave.h"
 #include "graphics.h"
 #include "LinkedListAPI.h"
 
@@ -190,7 +191,7 @@ void collisionResponse() {
     }
 
     Level* currentLevel = (Level*)(levels->head->data);
-    if (!currentLevel->isOutside) {
+    if (currentLevel->levelType == MAZE) {
         //Test for mob collisions
         for (int i = 0; i < 9; ++i) {
             Mob* mob = &currentLevel->mobs[i];
@@ -260,7 +261,7 @@ void draw2D() {
         ThreeTupleInt playerInt = getIntPosFromFloat3Tuple(player);
 
         if (displayMap == 1 || displayMap == 2) {
-            if (!currentLevel->isOutside) {
+            if (currentLevel->levelType == MAZE) {
                 //Draw rooms
                 for (int i = 0; i < NUM_ROOMS; ++i) {
                     if (displayMap == 2) {
@@ -306,7 +307,7 @@ void draw2D() {
                         }
                     } else {
                         //Draw dungeons
-                        if (!currentLevel->isOutside) {
+                        if (currentLevel->levelType == MAZE) {
                             for (int x = 0; x < WORLDX; ++x) {
                                 for (int z = 0; z < WORLDZ; ++z) {
                                     TwoTupleInt blockX = get2DScreenPosFromBlock(mapDimension, x);
@@ -415,6 +416,18 @@ void draw2D() {
                         }
                     }
                 }
+            } else if (currentLevel->levelType == CAVE){
+                //Draw stairs up
+                TwoTupleInt stairsUpX = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsUp.x));
+                TwoTupleInt stairsUpY = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsUp.z));
+                set2Dcolour((float[]){1.0f, 1.00f, 1.00f, 1.00f});
+                draw2Dbox(stairsUpX.x, stairsUpY.x, stairsUpX.z, stairsUpY.z);
+
+                //Draw stairs down
+                TwoTupleInt stairsDownX = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.x));
+                TwoTupleInt stairsDownY = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.z));
+                set2Dcolour((float[]){0.1f, 0.1f, 0.1f, 1.0f});
+                draw2Dbox(stairsDownX.x, stairsDownY.x, stairsDownX.z, stairsDownY.z);
             } else {
                 //Draw stairs down
                 TwoTupleInt stairsDownX = get2DScreenPosFromBlock(mapDimension, (currentLevel->stairsDown.x));
@@ -612,10 +625,15 @@ void update() {
 
         //Check if the player is on stairs
         if ((oldViewInt.x == currentLevel->stairsDown.x && (oldViewInt.y - 1) == currentLevel->stairsDown.y && oldViewInt.z == currentLevel->stairsDown.z)) {
-            if (currentLevel->isOutside || (!currentLevel->isOutside && currentLevel->keyFound == true)) {
-                moveDown(levels, world, levels->head->next == NULL ? generateDungeonLevel() : levels->head->next->data);
+            if (currentLevel->levelType == OUTSIDE) {
+                moveDown(levels, world, generateMazeLevel());
+            } else if (currentLevel->levelType == MAZE && currentLevel->keyFound == true) {
+                inventory.hasKey = false;
+                moveDown(levels, world, levels->head->next == NULL ? generateCaveLevel() : levels->head->next->data);
+            } else if (currentLevel->levelType == CAVE) {
+                moveDown(levels, world, levels->head->next == NULL ? generateMazeLevel() : levels->head->next->data);
             }
-        } else if (oldViewInt.x == currentLevel->stairsUp.x && (oldViewInt.y - 1) == currentLevel->stairsUp.y && oldViewInt.z == currentLevel->stairsUp.z) {
+        } else if ((currentLevel->levelType != OUTSIDE) && (oldViewInt.x == currentLevel->stairsUp.x && (oldViewInt.y - 1) == currentLevel->stairsUp.y && oldViewInt.z == currentLevel->stairsUp.z)) {
             moveUp(levels, world);
         }
 
@@ -633,7 +651,7 @@ void update() {
         while (deltaT >= minUpdateTime) { //Do the timing loop
             deltaT -= minUpdateTime;
 
-            if (currentLevel->isOutside) {
+            if (currentLevel->levelType == OUTSIDE) {
                 //Clouds
                 {
                     static int cloudTick = 0;
@@ -650,7 +668,7 @@ void update() {
                 }
             } else {
                 //Mob movement
-                if (!playerTurn) {
+                if (!playerTurn && currentLevel->levelType == MAZE) {
                     for (int l = 0; l < 9; ++l) {
                         Mob* mob = &currentLevel->mobs[l];
                         if (mob->isDead) continue;
@@ -745,9 +763,11 @@ void update() {
                     getViewPosition(&playerPos.x, &playerPos.y, &playerPos.z);
                     ThreeTupleInt playerPosInt = getIntPosFromFloat3Tuple(playerPos);
 
-                    int roomNumber = isInRoom((TwoTupleInt){.x = playerPosInt.x, .z = playerPosInt.z}, currentLevel);
-                    if (roomNumber != -1) {
-                        currentLevel->rooms[roomNumber]->visited = true;
+                    if (currentLevel->levelType == MAZE){
+                        int roomNumber = isInRoom((TwoTupleInt){.x = playerPosInt.x, .z = playerPosInt.z}, currentLevel);
+                        if (roomNumber != -1) {
+                            currentLevel->rooms[roomNumber]->visited = true;
+                        }
                     }
 
                     ThreeTupleFloat oldPosition;
@@ -842,7 +862,8 @@ void mouse(int button, int state, int x, int y) {
 
 #ifdef DEBUG
     if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
-        moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
+//        moveDown(levels, world, levels->head->next == NULL ? generateUndergroundLevel() : levels->head->next->data);
+        moveDown(levels, world, levels->head->next == NULL ? generateCaveLevel() : levels->head->next->data);
     } else if (button == GLUT_RIGHT_BUTTON && state == GLUT_UP) {
         moveUp(levels, world);
     }
@@ -1011,6 +1032,7 @@ int main(int argc, char** argv)
         setTexture(25, FLOWER_BOX);
         setTexture(50, TREE_BOX);
         setTexture(54, SNOW);
+        setTexture(55, CAVE_STONE);
 
         //Prep the levels list
         levels = initializeList(printLevel, deleteLevel, compareLevels);
@@ -1019,7 +1041,6 @@ int main(int argc, char** argv)
         insertFront(levels, generateOutsideLevel());
         loadLevel((Level*)(levels->head->data), world);
     }
-
 
     /* starts the graphics processing loop */
     /* code after this will not run until the program exits */

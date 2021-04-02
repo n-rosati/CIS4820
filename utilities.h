@@ -99,7 +99,8 @@ typedef enum {
     SUN_MOON_BOX = 26,
     FLOWER_BOX = 27,
     TREE_BOX = 28,
-    SNOW = 29
+    SNOW = 29,
+    CAVE_STONE = 55
 } Texture;
 
 //Meshes
@@ -198,9 +199,16 @@ typedef struct {
     bool visited;
 } Room;
 
+/**Level types*/
+typedef enum {
+    OUTSIDE = 0,
+    CAVE = 1,
+    MAZE = 2
+} LevelType;
+
 /**Level details.*/
 typedef struct {
-    bool isOutside;
+    LevelType levelType;
     /**World associated with level*/
     GLubyte world[100][50][100];
     /**Rooms in level. NULL if outdoor level.*/

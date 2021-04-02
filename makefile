@@ -54,8 +54,8 @@ LIBS = -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/De
 
 .PHONY: clean
 
-MY_FILES = LinkedListAPI.c outside.c underground.c utilities.c
-MY_HEADERS = LinkedListAPI.h outside.h underground.h utilities.h
+MY_FILES = LinkedListAPI.c outside.c dungeon.c utilities.c cave.c
+MY_HEADERS = LinkedListAPI.h outside.h dungeon.h utilities.h cave.h
 SUPPLIED_FILES = a1.c graphics.c visible.c mesh.c
 SUPPLIED_HEADERS = graphics.h mesh.h fast_obj.h
 

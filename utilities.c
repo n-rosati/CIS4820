@@ -31,12 +31,12 @@ void moveDown(List* levels, GLubyte world[100][50][100], Level* newLevel) {
     getViewPosition(&currentLevel->viewport.x, &currentLevel->viewport.y, &currentLevel->viewport.z);
 
     //This prevents the user from getting stuck in an up <-> down loop when going up stairs
-    if (currentLevel->isOutside) {
+    if (currentLevel->levelType == OUTSIDE) {
         //Outdoor level
         currentLevel->viewport.x -= 3;
         currentLevel->viewport.y -= 2;
         currentLevel->viewport.z -= 2;
-    } else {
+    } else if (currentLevel->levelType == MAZE){
         currentLevel->viewport.x -= (world[currentLevel->stairsDown.x + 1][2][currentLevel->stairsDown.z] == 0) ? 1.00f : -1.00f;
         currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][2][currentLevel->stairsDown.z + 1] == 0) ? 1.00f : -1.00f;
 
@@ -46,6 +46,15 @@ void moveDown(List* levels, GLubyte world[100][50][100], Level* newLevel) {
                 unsetMeshID(currentLevel->mobs[i].id);
             }
         }
+
+        unsetMeshID(COIN_MESH_ID);
+        unsetMeshID(KEY_MESH_ID);
+        unsetMeshID(ARMOUR_MESH_ID);
+        unsetMeshID(SWORD_MESH_ID);
+        unsetMeshID(CHEST_MESH_ID);
+    } else {
+        currentLevel->viewport.x -= (world[currentLevel->stairsDown.x + 1][2][currentLevel->stairsDown.z] == 0) ? 1.00f : -1.00f;
+        currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][2][currentLevel->stairsDown.z + 1] == 0) ? 1.00f : -1.00f;
     }
 
     levels->head = levels->head->next;
@@ -53,7 +62,7 @@ void moveDown(List* levels, GLubyte world[100][50][100], Level* newLevel) {
 }
 
 void moveUp(List* levels, GLubyte world[100][50][100]) {
-    if (!((Level *)(levels->head->data))->isOutside) {
+    if (((Level *)(levels->head->data))->levelType != OUTSIDE) {
         //Save viewport position
         Level* currentLevel = levels->head->data;
         getViewPosition(&currentLevel->viewport.x, &currentLevel->viewport.y, &currentLevel->viewport.z);
@@ -62,10 +71,11 @@ void moveUp(List* levels, GLubyte world[100][50][100]) {
         currentLevel->viewport.x -= (world[currentLevel->stairsDown.x + 1][2][currentLevel->stairsDown.z] == 0) ? 1.00f : -1.00f;
         currentLevel->viewport.z -= (world[currentLevel->stairsDown.x][2][currentLevel->stairsDown.z + 1] == 0) ? 1.00f : -1.00f;
 
-        //Unset current mobs
-        for (int i = 0; i < 9; ++i) {
-            if (!currentLevel->mobs[i].isDead) {
-                unsetMeshID(currentLevel->mobs[i].id);
+        if (((Level *)(levels->head->data))->levelType == MAZE){        //Unset current mobs
+            for (int i = 0; i < 9; ++i) {
+                if (!currentLevel->mobs[i].isDead) {
+                    unsetMeshID(currentLevel->mobs[i].id);
+                }
             }
         }
 
@@ -89,7 +99,7 @@ void loadLevel(Level* level, GLubyte world[100][50][100]) {
     }
 
     //Set meshes
-    if (!level->isOutside) {
+    if (level->levelType == MAZE) {
         //Set mob meshes
         for (int i = 0; i < 9; ++i) {
             if (!level->mobs[i].isDead) {

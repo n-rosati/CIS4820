@@ -3,14 +3,15 @@
 //
 
 #include <math.h>
-#include "underground.h"
+#include "dungeon.h"
 
-Level* generateUndergroundLevel() {
+Level* generateMazeLevel() {
     Level* level = calloc(1, sizeof(Level));
     level->seed = time(NULL);
     srand(level->seed);
 
-    level->isOutside = false;
+    level->levelType = MAZE;
+
     //Build a platform
     for (int x = 0; x < WORLDX; x++) {
         for (int z = 0; z < WORLDZ; z++) {

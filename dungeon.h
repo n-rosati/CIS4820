@@ -2,8 +2,8 @@
 // Created by Nicholas Rosati on 2021-02-17.
 //
 
-#ifndef CIS4820_UNDERGROUND_H
-#define CIS4820_UNDERGROUND_H
+#ifndef CIS4820_DUNGEON_H
+#define CIS4820_DUNGEON_H
 
 #include "utilities.h"
 
@@ -26,7 +26,7 @@ static const int HALL_HEIGHT = 4;
  *
  *         The `world` array in the Level that is returned is unmodified. It is intended to be written to upon saving the level.
  */
-Level* generateUndergroundLevel();
+Level* generateMazeLevel();
 
 /**
  * Generates the mobs in a level
@@ -149,4 +149,4 @@ void placeArmour(Level* level);
  */
 void placeSword(Level* level);
 
-#endif //CIS4820_UNDERGROUND_H
+#endif //CIS4820_DUNGEON_H
