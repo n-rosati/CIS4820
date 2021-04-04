@@ -55,18 +55,12 @@ Level* generateOutsideLevel() {
             int height = perlinNoise((TwoTupleInt){.x = x, .z = z}, 0.05f, 1, (int)maxHeight) + 5;
 
             for (int i = height; i > height - 3; --i) {
-                switch (i) {
-                    case 0 ... (int)(maxHeight * (0.2f)) + 5:
-                        level->world[x][i][z] = DIRT;
-                        break;
-                    case (int)(maxHeight * (0.2f)) + 6 ... (int)(maxHeight * (0.8f)) + 5:
-                        level->world[x][i][z] = GRASS;
-                        break;
-                    case (int)(maxHeight * (0.8f)) + 6 ... (int)maxHeight + 5:
-                        level->world[x][i][z] = SNOW;
-                        break;
-                    default:
-                        printf("Height: %d\n", i);
+                if (i >= 0 && i <= (int) floorf(maxHeight * 0.2f) + 5) {
+                    level->world[x][i][z] = DIRT;
+                } else if (i >= (int) floorf(maxHeight * 0.2f) + 6 && i <= (int) floorf(maxHeight * 0.8f) + 5) {
+                    level->world[x][i][z] = GRASS;
+                } else if (i >= (int) floorf(maxHeight * 0.8f) + 6 && i <= (int)maxHeight + 5) {
+                    level->world[x][i][z] = SNOW;
                 }
             }
         }
